@@ -15,14 +15,12 @@ namespace Ferienpass\AdminBundle\Components;
 
 use Doctrine\ORM\QueryBuilder;
 use Ferienpass\CoreBundle\Pagination\Paginator;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[AsLiveComponent(template: '@FerienpassAdmin/components/SearchableQueryableList.html.twig')]
-class SearchableQueryableList extends AbstractController
+class SearchableQueryableList
 {
     use DefaultActionTrait;
 
@@ -30,15 +28,39 @@ class SearchableQueryableList extends AbstractController
     public array $config;
 
     #[LiveProp]
-    public QueryBuilder $qb;
+    public array $searchable;
 
     #[LiveProp(writable: true)]
     public string $query = '';
 
-    public function getPagination(Request $request): Paginator
-    {
-        $qb = $this->qb->andWhere('i.lastname LIKE :query')->setParameter('query', '%'.$this->query.'%');
+    #[LiveProp]
+    public QueryBuilder $qb;
 
-        return (new Paginator($qb, 100))->paginate($request->query->getInt('page', 1));
+    #[LiveProp]
+    public ?string $originalRoute = null;
+    #[LiveProp]
+    public ?array $originalQuery = null;
+
+    public function getPagination(): Paginator
+    {
+        $this->addQueryBuilderSearch();
+
+        if ('' !== $this->query) {
+            unset($this->originalQuery['page']);
+        }
+
+        return (new Paginator($this->qb, 50))->paginate((int) $this->originalQuery['page'] ?? 1);
+    }
+
+    private function addQueryBuilderSearch(): void
+    {
+        $where = $this->qb->expr()->orX();
+
+        foreach ($this->searchable as $i => $field) {
+            $where->add("i.$field LIKE :query_$i");
+            $this->qb->setParameter("query_$i", "%{$this->query}%");
+        }
+
+        $this->qb->andWhere($where);
     }
 }

@@ -21,6 +21,7 @@ use Ferienpass\AdminBundle\Form\MultiSelectType;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Ferienpass\CoreBundle\Entity\PaymentItem;
 use Ferienpass\CoreBundle\Export\Payments\ReceiptExportInterface;
+use Ferienpass\CoreBundle\Message\PaymentReceiptCreated;
 use Ferienpass\CoreBundle\Payments\ReceiptNumberGenerator;
 use Ferienpass\CoreBundle\Repository\PaymentRepository;
 use Ferienpass\CoreBundle\Session\Flash;
@@ -30,6 +31,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -110,7 +112,7 @@ final class PaymentsController extends AbstractController
         $items = $items->filter(fn (PaymentItem $pi) => $pi->getAttendance()->isPaid());
 
         if ($items->isEmpty()) {
-            $flash->addError('Es wurde nichts storniert. Entweder wurde keine Auswahl getroffen, oder die Buchungen waren schon storniert.');
+            $flash->addError(text: 'Es wurde nichts storniert. Entweder wurde keine Auswahl getroffen, oder die Buchungen waren schon storniert.');
 
             return $this->redirectToRoute('admin_payments_receipt', ['id' => $payment->getId()]);
         }
@@ -127,7 +129,7 @@ final class PaymentsController extends AbstractController
         $em->persist($reversalPayment);
         $em->flush();
 
-        $flash->addConfirmation('Der Stornobeleg wurde erstellt.');
+        $flash->addConfirmation(text: 'Der Stornobeleg wurde erstellt.');
 
         return $this->redirectToRoute('admin_payments_receipt', ['id' => $reversalPayment->getId()]);
     }

@@ -51,24 +51,21 @@ class MenuBuilder
         }
 
         if ($this->isGranted('ROLE_ADMIN')) {
-            $menu->addChild('hosts.title', [
-                'route' => 'admin_hosts_index',
-            ]);
             $menu->addChild('participants.title', [
                 'route' => 'admin_participants_index',
             ]);
-            //        $menu->addChild('Accounts', [
-            //            'route' => 'admin_payments_index',
-            //        ]);
+            $menu->addChild('hosts.title', [
+                'route' => 'admin_hosts_index',
+            ]);
             $menu->addChild('payments.title', [
                 'route' => 'admin_payments_index',
             ]);
-            //        $menu->addChild('Einstellungen', [
-            //            'route' => 'admin_payments_index',
-            //        ]);
-            //        $menu->addChild('Inhalte', [
-            //            'route' => 'admin_payments_index',
-            //        ]);
+            $menu->addChild('Accounts', [
+                'route' => 'admin_accounts_index',
+            ]);
+            $menu->addChild('Werkzeuge & Einstellungen', [
+                'route' => 'admin_tools',
+            ]);
         }
 
         return $menu;
@@ -191,6 +188,13 @@ class MenuBuilder
                 'label' => 'offers.action.participantList',
                 'route' => 'admin_offer_applications',
                 'routeParameters' => ['id' => $offer->getId(), 'edition' => $offer->getEdition()->getAlias()],
+                'display' => $this->isGranted('participants.view', $offer),
+                'extras' => ['icon' => 'user-group-solid'],
+            ]);
+            $menu->addChild('participantList.pdf', [
+                'label' => 'offers.action.participantListPdf',
+                'route' => 'admin_offer_attendances',
+                'routeParameters' => ['id' => $offer->getId(), '_suffix' => '.pdf'],
                 'display' => $this->isGranted('participants.view', $offer),
                 'extras' => ['icon' => 'user-group-solid'],
             ]);

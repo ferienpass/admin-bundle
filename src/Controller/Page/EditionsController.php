@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[Route('/saisons')]
-final class EditionController extends AbstractController
+final class EditionsController extends AbstractController
 {
     private array $stats;
 
@@ -40,8 +40,6 @@ final class EditionController extends AbstractController
     #[Route('', name: 'admin_editions_index')]
     public function index(Request $request, Breadcrumb $breadcrumb): Response
     {
-        return $this->render('@FerienpassAdmin/page/tools/noop.html.twig');
-
         $items = $this->editionRepository->findAll();
 
         return $this->render('@FerienpassAdmin/page/edition/index.html.twig', [
@@ -79,11 +77,12 @@ final class EditionController extends AbstractController
     }
 
     #[Route('/{alias}/statistik', name: 'admin_editions_stats')]
-    public function stats(Edition $edition, Request $request): Response
+    public function stats(Edition $edition, Breadcrumb $breadcrumb): Response
     {
         return $this->render('@FerienpassAdmin/page/edition/stats.html.twig', [
             'edition' => $edition,
             'widgets' => array_map(fn (object $controller) => $controller::class, $this->stats),
+            'breadcrumb' => $breadcrumb->generate(['Werkzeuge & Einstellungen', ['route' => 'admin_tools']], ['editions.title', ['route' => 'admin_editions_index']], [$edition->getName(), ['route' => 'admin_editions_edit', 'routeParameters' => ['alias' => $edition->getAlias()]]], 'editions.stats'),
         ]);
     }
 }

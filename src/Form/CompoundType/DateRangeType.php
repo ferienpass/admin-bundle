@@ -13,19 +13,16 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Form\CompoundType;
 
-use Contao\Config;
-use Ferienpass\CoreBundle\Entity\OfferDate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateType extends AbstractType
+class DateRangeType extends AbstractType
 {
     public function getBlockPrefix(): string
     {
-        return 'offer_date';
+        return 'date_range';
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -36,16 +33,16 @@ class DateType extends AbstractType
                 'html5' => false,
                 'date_widget' => 'single_text',
                 'date_format' => 'dd.MM.yyyy',
-                'input_format' => Config::get('datimFormat'),
                 'minutes' => [0, 15, 30, 45],
+                'property_path' => $options['field_begin'],
             ])
             ->add('end', DateTimeType::class, [
                 'label' => false,
                 'html5' => false,
                 'date_format' => 'dd.MM.yyyy',
                 'date_widget' => 'single_text',
-                'input_format' => Config::get('datimFormat'),
                 'minutes' => [0, 15, 30, 45],
+                'property_path' => $options['field_end'],
             ])
         ;
     }
@@ -53,10 +50,9 @@ class DateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => OfferDate::class,
-            // We rely on the fact that the parent form is a DatesType
-            // and its parent form is a OfferType that is linked to an Offer entity.
-            'empty_data' => fn (FormInterface $form) => new OfferDate($form->getParent()->getParent()->getData()->offerEntity()),
+            'inherit_data' => true,
         ]);
+        $resolver->setDefault('field_begin', '[begin]');
+        $resolver->setDefault('field_end', '[end]');
     }
 }

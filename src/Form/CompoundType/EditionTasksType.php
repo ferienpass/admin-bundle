@@ -13,32 +13,22 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Form\CompoundType;
 
-use Ferienpass\CoreBundle\Entity\OfferDate;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\UX\LiveComponent\Form\Type\LiveCollectionType;
 
-class DatesType extends AbstractType
+class EditionTasksType extends AbstractType
 {
-    public function getBlockPrefix(): string
-    {
-        return 'offer_dates';
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'entry_type' => DateType::class,
+            'entry_type' => EditionTaskType::class,
             'entry_options' => ['label' => false],
-            'allow_add' => 'true',
-            'allow_delete' => 'true',
-            'delete_empty' => fn (OfferDate $date = null) => null === $date || (null === $date->getBegin() && null === $date->getEnd()),
-            'by_reference' => false,
         ]);
     }
 
     public function getParent(): string
     {
-        return CollectionType::class;
+        return LiveCollectionType::class;
     }
 }

@@ -22,7 +22,6 @@ use Ferienpass\CoreBundle\Repository\EditionRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,19 +42,19 @@ final class EditionsController extends AbstractController
     #[Route('', name: 'admin_editions_index')]
     public function index(Request $request, Breadcrumb $breadcrumb): Response
     {
-        $items = $this->editionRepository->findAll();
+        $items = $this->editionRepository->findBy([], ['archived' => 'ASC', 'name' => 'ASC']);
 
         return $this->render('@FerienpassAdmin/page/edition/index.html.twig', [
             'items' => $items,
-            'breadcrumb' => $breadcrumb->generate(['Werkzeuge & Einstellungen', ['route' => 'admin_tools']], 'Saisons'),
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'editions.title'),
         ]);
     }
 
     #[Route('/neu', name: 'admin_editions_create')]
     #[Route('/{alias}', name: 'admin_editions_edit')]
-    public function edit(?Edition $edition, Request $request, FormFactoryInterface $formFactory, EntityManagerInterface $em, Breadcrumb $breadcrumb, Flash $flash): Response
+    public function edit(?Edition $edition, Request $request, EntityManagerInterface $em, Breadcrumb $breadcrumb, Flash $flash): Response
     {
-        $form = $formFactory->create(EditEditionType::class, $edition ?? new Host());
+        $form = $this->createForm(EditEditionType::class, $edition ?? new Host());
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -74,8 +73,8 @@ final class EditionsController extends AbstractController
 
         return $this->render('@FerienpassAdmin/page/edition/edit.html.twig', [
             'item' => $edition,
-            'form' => $form,
-            'breadcrumb' => $breadcrumb->generate(['Werkzeuge & Einstellungen', ['route' => 'admin_tools']], ['editions.title', ['route' => 'admin_editions_index']], $breadcrumbTitle),
+            'form' => $form->createView(),
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], ['editions.title', ['route' => 'admin_editions_index']], $breadcrumbTitle),
         ]);
     }
 
@@ -85,7 +84,7 @@ final class EditionsController extends AbstractController
         return $this->render('@FerienpassAdmin/page/edition/stats.html.twig', [
             'edition' => $edition,
             'widgets' => array_map(fn (object $controller) => $controller::class, $this->stats),
-            'breadcrumb' => $breadcrumb->generate(['Werkzeuge & Einstellungen', ['route' => 'admin_tools']], ['editions.title', ['route' => 'admin_editions_index']], [$edition->getName(), ['route' => 'admin_editions_edit', 'routeParameters' => ['alias' => $edition->getAlias()]]], 'editions.stats'),
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], ['editions.title', ['route' => 'admin_editions_index']], [$edition->getName(), ['route' => 'admin_editions_edit', 'routeParameters' => ['alias' => $edition->getAlias()]]], 'editions.stats'),
         ]);
     }
 }

@@ -45,8 +45,8 @@ class PaymentsFilter extends AbstractFilter
     protected static function getSorting(): array
     {
         return [
-            'createdAt' => ['createdAt', 'DESC'],
-            'amount' => ['totalAmount', 'DESC'],
+            'createdAt' => ['i.createdAt', 'DESC'],
+            'amount' => ['i.totalAmount', 'DESC'],
         ];
     }
 }

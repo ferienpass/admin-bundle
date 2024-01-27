@@ -29,7 +29,6 @@ use Ferienpass\CoreBundle\Repository\PaymentRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,13 +44,13 @@ final class PaymentsController extends AbstractController
     {
     }
 
-    #[Route('{_suffix}', name: 'admin_payments_index', defaults: ['_suffix' => ''])]
-    public function index(PaymentRepository $repository, Breadcrumb $breadcrumb, string $_suffix, XlsxExport $xlsxExport): Response
+    #[Route('{_suffix?}', name: 'admin_payments_index')]
+    public function index(PaymentRepository $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExport $xlsxExport): Response
     {
         $qb = $repository->createQueryBuilder('i');
         $qb->orderBy('i.createdAt', 'DESC');
 
-        $_suffix = ltrim($_suffix, '.');
+        $_suffix = ltrim((string) $_suffix, '.');
         if ('' !== $_suffix) {
             // TODO service-tagged exporter
             if ('xlsx' === $_suffix) {
@@ -77,12 +76,12 @@ final class PaymentsController extends AbstractController
     }
 
     #[Route('/{id}/storno', name: 'admin_payments_reverse')]
-    public function reverse(Payment $payment, Request $request, FormFactoryInterface $formFactory, EntityManagerInterface $em, Breadcrumb $breadcrumb, Flash $flash, ReceiptNumberGenerator $numberGenerator, MessageBusInterface $messageBus): Response
+    public function reverse(Payment $payment, Request $request, EntityManagerInterface $em, Breadcrumb $breadcrumb, Flash $flash, ReceiptNumberGenerator $numberGenerator, MessageBusInterface $messageBus): Response
     {
         $items = $payment->getItems();
 
         /** @var Form $ms */
-        $ms = $formFactory->create(MultiSelectType::class, options: [
+        $ms = $this->createForm(MultiSelectType::class, options: [
             'buttons' => ['reverse', 'reverse_and_withdraw'],
             'items' => $items->toArray(),
         ]);

@@ -1,0 +1,15 @@
+{% extends "@FerienpassAdmin/layout/login.html.twig" %}
+
+{% block content %}
+
+    <p class="mt-2 text-gray-500">
+        Wenn es ein Benutzerkonto gibt, das mit Ihrer E-Mail-Adresse übereinstimmt, wurde Ihnen soeben eine E-Mail mit einem Link geschickt, mit dem Sie Ihr Passwort zurücksetzen können.
+        Dieser Link läuft ab in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+    </p>
+    <p class="text-gray-500 text-sm">Wenn Sie keine E-Mail erhalten, überprüfen Sie bitte Ihren Spam-Ordner oder <a class="underline hover:no-underline" href="{{ path('admin_lost_password') }}">versuchen Sie es erneut</a>.</p>
+
+    <div class="mt-6">
+        {% include '@FerienpassAdmin/components/back-link.html.twig' with {uri: path('admin_index')} %}
+    </div>
+
+{% endblock %}

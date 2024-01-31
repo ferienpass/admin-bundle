@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Form\Filter;
 
-use Ferienpass\AdminBundle\Form\Filter\Offer\HostsFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\OnlineApplicationFilter;
+use Doctrine\ORM\QueryBuilder;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -34,19 +33,11 @@ class PaymentsFilter extends AbstractFilter
         ]);
     }
 
-    protected static function getFilters(): array
-    {
-        return [
-            'status' => OnlineApplicationFilter::class,
-            'user' => HostsFilter::class,
-        ];
-    }
-
     protected static function getSorting(): array
     {
         return [
-            'createdAt' => ['i.createdAt', 'DESC'],
-            'amount' => ['i.totalAmount', 'DESC'],
+            'createdAt' => fn (QueryBuilder $qb) => $qb->addOrderBy('i.createdAt', 'DESC'),
+            'amount' => fn (QueryBuilder $qb) => $qb->addOrderBy('i.totalAmount', 'DESC'),
         ];
     }
 }

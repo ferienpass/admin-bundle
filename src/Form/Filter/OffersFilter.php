@@ -13,17 +13,18 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Form\Filter;
 
-use Ferienpass\AdminBundle\Form\Filter\Offer\CancelledFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\EditionFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\HostsFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\OnlineApplicationFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\PublishedFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresApplicationFilter;
+use Doctrine\ORM\QueryBuilder;
 use Ferienpass\CoreBundle\Entity\Offer;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OffersFilter extends AbstractFilter
 {
+    public function __construct(#[TaggedIterator('ferienpass_admin.filter.offer', indexAttribute: 'key')] iterable $filterTypes)
+    {
+        $this->filterTypes = $filterTypes instanceof \Traversable ? iterator_to_array($filterTypes) : $filterTypes;
+    }
+
     public static function getEntity(): string
     {
         return Offer::class;
@@ -38,24 +39,13 @@ class OffersFilter extends AbstractFilter
         ]);
     }
 
-    protected static function getFilters(): array
-    {
-        return [
-            'editions' => EditionFilter::class,
-            'hosts' => HostsFilter::class,
-            'requires_application' => RequiresApplicationFilter::class,
-            'online_application' => OnlineApplicationFilter::class,
-            'cancelled' => CancelledFilter::class,
-            'published' => PublishedFilter::class,
-        ];
-    }
-
     protected static function getSorting(): array
     {
         return [
-            'date' => 'd.begin',
-            'name' => 'i.name',
-            'host' => 'h.name',
+            'date' => fn (QueryBuilder $qb) => $qb->leftJoin('i.dates', 'd')->addOrderBy('d.begin', 'ASC'),
+            'name' => fn (QueryBuilder $qb) => $qb->addOrderBy('i.name', 'ASC'),
+            'host' => fn (QueryBuilder $qb) => $qb->leftJoin('i.hosts', 'h')->addOrderBy('h.name', 'ASC'),
+            'status' => fn (QueryBuilder $qb) => $qb->addOrderBy('i.state', 'ASC')->addOrderBy('i.name', 'ASC'),
         ];
     }
 }

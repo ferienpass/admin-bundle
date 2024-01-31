@@ -25,10 +25,19 @@ use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Workflow\WorkflowInterface;
+use Symfony\UX\Dropzone\Form\DropzoneType;
 
 class EditOfferType extends AbstractType
 {
+    public function __construct(private readonly WorkflowInterface $offerStateMachine)
+    {
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -62,11 +71,38 @@ class EditOfferType extends AbstractType
             ->add('maxParticipants', IntegerType::class, ['attr' => ['placeholder' => 'ohne Begrenzung'], 'fieldset_group' => 'applications', 'width' => '1/3'])
             ->add('applyText', null, ['help' => 'offers.help.applyText', 'fieldset_group' => 'applications', 'width' => '1/2'])
             ->add('contact', null, ['help' => 'offers.help.contact', 'fieldset_group' => 'applications', 'width' => '1/2'])
-            ->add('image', null, ['fieldset_group' => 'media'])
+            ->add('image', DropzoneType::class, [
+                'fieldset_group' => 'media',
+                'attr' => ['placeholder' => 'offers.dropzonePlaceholder'],
+                'mapped' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'application/pdf',
+                            'application/x-pdf',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid PDF document',
+                    ]),
+                ],
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Daten speichern',
             ])
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            $form = $event->getForm();
+            if (!($offer = $event->getData()) instanceof Offer) {
+                return;
+            }
+
+            foreach ($this->offerStateMachine->getEnabledTransitions($offer) as $enabledTransition) {
+                $form->add($label = 'submitAnd'.ucfirst($enabledTransition->getName()), SubmitType::class, [
+                    'label' => $label,
+                ]);
+            }
+        });
 
         $properties = (new \ReflectionClass($options['data_class']))->getProperties(\ReflectionProperty::IS_PUBLIC);
 

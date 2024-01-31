@@ -13,43 +13,31 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Form\Filter\Offer;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Ferienpass\AdminBundle\Form\Filter\AbstractFilterType;
-use Ferienpass\CoreBundle\Entity\Edition;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bundle\SecurityBundle\Security;
+use Ferienpass\CoreBundle\Entity\Offer;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-class EditionFilter extends AbstractFilterType
+class StatusFilter extends AbstractFilterType
 {
-    public function __construct(private readonly Security $security)
-    {
-    }
-
     public function getParent(): string
     {
-        return EntityType::class;
+        return ChoiceType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'class' => Edition::class,
-            'query_builder' => function (EntityRepository $er): QueryBuilder {
-                $qb = $er->createQueryBuilder('e');
-
-                if (!$this->security->isGranted('ROLE_ADMIN')) {
-                }
-                $qb->where('e.archived <> 1');
-
-                return $qb->orderBy('e.name');
+            'choices' => [Offer::STATE_DRAFT, Offer::STATE_COMPLETED, Offer::STATE_REVIEWED, Offer::STATE_PUBLISHED],
+            'choice_label' => function (string $choice): TranslatableMessage {
+                return new TranslatableMessage('offers.status.'.$choice, [], 'admin');
             },
-            'choice_value' => fn (?Edition $entity) => $entity?->getAlias(),
-            'choice_label' => 'name',
             'placeholder' => '-',
+            'expanded' => false,
             'multiple' => false,
         ]);
     }
@@ -63,11 +51,14 @@ class EditionFilter extends AbstractFilterType
         $k = $form->getName();
         $v = $form->getData();
 
-        $qb->andWhere('i.edition = :q_'.$k)->setParameter('q_'.$k, $v);
+        $qb
+            ->andWhere('i.state = :q_'.$k)
+            ->setParameter('q_'.$k, $v)
+        ;
     }
 
     protected function getHumanReadableValue(FormInterface $form): null|string|TranslatableInterface
     {
-        return $form->getData()?->getName();
+        return $form->getData();
     }
 }

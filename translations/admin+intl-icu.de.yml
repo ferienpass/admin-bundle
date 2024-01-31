@@ -54,13 +54,20 @@ offers:
   title: Angebote
   editions: Saisons
   index.empty: Es sind hier noch keine Angebote erstellt worden.
+  th.status: ''
   th.name: Titel
   th.hosts: Veranstalter
   th.date: Datum
   th.attendances: Anmeldungen
+  status.draft: Entwurf
+  status.completed: Vom Veranstalter freigegeben
+  status.reviewed: Vom Admin freigegeben
+  status.published: Auf Webseite veröffentlicht
+  status.cancelled: Angebot abgesagt
   sorting.name: Sortieren nach Titel
   sorting.date: Sortieren nach Datum
   sorting.host: Sortieren nach Veranstalter
+  sorting.status: Sortieren nach Status
   action:
     edit: Angebot bearbeiten
     proof: Korrekturabzug
@@ -111,8 +118,12 @@ offers:
     requiresApplication: Eine vorherige Anmeldung ist erforderlich, um am Angebot teilnehmen zu können.
     onlineApplication: Die Anmeldungen über das Online-System laufen lassen.
     applicationDeadline: Ab folgendem Tag sind Anmeldungen zum Angebot nicht mehr möglich.
+  filter.editions: Saisons
+  filter.hosts: Veranstaltende
   edit_offer_dates_add: Zusätzliche Zeit zu diesem Termin
   edit_offer_dates_entry_delete: Zeitraum löschen
+  dropzonePlaceholder: Wählen Sie ein Bild aus oder platzieren Sie es hier mittels Drag'n'Drop
+  uncompletedOffers: Sie haben Angebote im Entwurfsmodus. Bitte markieren Sie alle Angebote als vollständig, damit sie im Ferienpass berücksichtigt werden können.
 
 hosts:
   title: Veranstaltende
@@ -120,16 +131,10 @@ hosts:
   action:
     show: Anzeigen
     edit: Bearbeiten
-  legend:
-    base:
-      - 'Basisdaten'
-      - 'test'
-    contact:
-      - 'Kontaktdaten'
-      - 'test'
-    address:
-      - 'Postanschrift'
-      - 'test'
+  legend.base.0: Basisdaten
+  legend.contact.0: Kontaktdaten
+  legend.address.0: Postanschrift
+  legend.media.0: Logo
   label:
     name: Name
     alias: Alias
@@ -142,14 +147,17 @@ hosts:
     street: Straße
     postal: PLZ
     city: Ort
+    logo: Logo
   th:
     name: Name
     email: E-Mail-Adresse
     phone: Telefon
     website: Webseite
     accounts: Accounts mit Zugriff
+    numberOffers: Angebote
   sorting.createdAt: Sortieren nach Datum
   sorting.name: Sortieren nach Name
+  sorting.numberOffers: Sortieren nach Anzahl Angeboten
   help:
     alias: Der Alias wird automatisch generiert.
 

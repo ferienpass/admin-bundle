@@ -2,14 +2,15 @@
 
 
 {% block list %}
-    {{ component('SearchableQueryableList', { qb: qb, originalRoute: app.request.get('_route'), originalQuery: app.request.query.all,
+    {{ component('SearchableQueryableList', { qb: qb, routeName: app.request.get('_route'), routeParameters: app.request.query.all,
         searchable: searchable,
         config: {
             columns: {
                 name: '{{ item.name }}',
                 email: '{{ item.email }}',
                 phone: '{{ item.phone }}',
-                accounts: '{{ item.users|map(u => "#{u.firstname} #{u.lastname}")|join(", ") }}'
+                accounts: '{{ item.users|map(u => "#{u.firstname} #{u.lastname}")|join(", ") }}',
+                numberOffers: '{{ item.offers|length }}',
             }
         }}) }}
 {% endblock %}

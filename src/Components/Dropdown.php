@@ -13,9 +13,20 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Components;
 
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent]
-class SlideOver
+class Dropdown
 {
+    #[LiveProp]
+    public ?string $toggleLabel = null;
+    #[LiveProp]
+    public ?string $toggleSize = null;
+
+    #[LiveProp]
+    public ?string $dropdownClass = null;
+
+    #[LiveProp]
+    public string $position = 'right';
 }

@@ -1,6 +1,6 @@
 {% trans_default_domain 'admin' %}
 
-<div {{ attributes }} data-poll class="rounded border border-gray-200 overflow-hidden lg:flex">
+<div {{ attributes }} class="rounded border border-gray-200 overflow-hidden lg:flex">
 
     <section aria-labelledby="message-heading"
              class="flex h-full min-w-0 flex-1 flex-col overflow-hidden lg:order-last">
@@ -137,14 +137,29 @@
                         <p class="text-sm font-medium text-gray-500">{{ pagination.numResults }} Nachrichten</p>
                     </div>
                 </div>
-                <div class="border-b border-t border-gray-200 bg-gray-50 px-6 py-2 text-sm font-medium text-gray-500">
-                    Nach Datum sortiert
+                <div class="border-b border-t border-gray-200 bg-gray-50 px-5 py-2">
+                    <div>
+                        <label for="search" class="sr-only">Nachrichten durchsuchen</label>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="h-5 w-5 text-gray-400">
+                                    {{ source('@FerienpassAdmin/icons/MagnifyingGlass.solid.svg') }}
+                                </span>
+                            </div>
+                            <input type="search"
+                                   data-model="query"
+                                   name="search"
+                                   id="search"
+                                   class="block w-full py-1 pl-10 sm:text-sm sm:leading-6"
+                                   placeholder="Suchen…">
+                        </div>
+                    </div>
                 </div>
             </div>
             <nav aria-label="Message list" class="min-h-0 flex-1 overflow-y-auto">
                 <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">
                     {% for item in pagination.results %}
-                        <li class="relative px-6 py-5 {{ item.id == message.id|default ? 'bg-gray-50' : 'bg-white' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-600 hover:bg-gray-50">
+                        <li id="{{ "msg_#{item.id}" }}" class="relative px-6 py-5 {{ item.id == message.id|default ? 'bg-gray-50' : 'bg-white' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-600 hover:bg-gray-50">
                             <div class="flex justify-between space-x-3">
                                 <div class="min-w-0 flex-1">
                                     <a class="block focus:outline-none"

@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Dto\AddAttendanceDto;
 use Ferienpass\AdminBundle\Form\AddAttendanceType;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
-use Ferienpass\CoreBundle\Entity\Participant;
+use Ferienpass\CoreBundle\Entity\Participant\ParticipantInterface;
 use Ferienpass\CoreBundle\Facade\AttendanceFacade;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -38,7 +38,7 @@ class AddAttendance extends AbstractController
     public OfferInterface|null $offer = null;
 
     #[LiveProp]
-    public Participant|null $participant = null;
+    public ParticipantInterface|null $participant = null;
 
     #[LiveProp]
     public bool $isNewParticipant = false;

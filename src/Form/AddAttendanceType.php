@@ -16,7 +16,6 @@ namespace Ferienpass\AdminBundle\Form;
 use Doctrine\ORM\EntityRepository;
 use Ferienpass\AdminBundle\Dto\AddAttendanceDto;
 use Ferienpass\CoreBundle\Entity\Attendance;
-use Ferienpass\CoreBundle\Entity\Participant;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\AbstractType;
@@ -29,7 +28,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class AddAttendanceType extends AbstractType
 {
-    public function __construct(#[Autowire(param: 'ferienpass.model.offer.class')] private readonly string $offerEntityClass)
+    public function __construct(#[Autowire(param: 'ferienpass.model.offer.class')] private readonly string $offerEntityClass, #[Autowire(param: 'ferienpass.model.participant.class')] private readonly string $participantEntityClass)
     {
     }
 
@@ -67,7 +66,7 @@ class AddAttendanceType extends AbstractType
 
         if ($options['add_participant'] && !$options['new_participant']) {
             $builder->add('participant', EntityType::class, [
-                'class' => Participant::class,
+                'class' => $this->participantEntityClass,
                 'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('p')
                     ->orderBy('p.lastname'),
                 'choice_label' => 'name',

@@ -19,7 +19,7 @@ use Ferienpass\CoreBundle\Entity\Attendance;
 use Ferienpass\CoreBundle\Entity\Edition;
 use Ferienpass\CoreBundle\Entity\Host;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
-use Ferienpass\CoreBundle\Entity\Participant;
+use Ferienpass\CoreBundle\Entity\Participant\ParticipantInterface;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Ferienpass\CoreBundle\Entity\User;
 use Ferienpass\CoreBundle\Repository\EditionRepository;
@@ -50,7 +50,7 @@ class ActionsBuilder
             return $menu;
         }
 
-        if ($item instanceof Participant) {
+        if ($item instanceof ParticipantInterface) {
             $this->participants($menu, $item);
 
             return $menu;
@@ -173,7 +173,7 @@ class ActionsBuilder
         ]);
     }
 
-    private function participants(ItemInterface $root, Participant $item)
+    private function participants(ItemInterface $root, ParticipantInterface $item)
     {
         $root->addChild('attendances', [
             'label' => 'participants.action.attendances',

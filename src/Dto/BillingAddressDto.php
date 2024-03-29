@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Dto;
 
-use Contao\MemberModel;
 use Doctrine\Common\Collections\Collection;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Ferienpass\CoreBundle\Entity\PaymentItem;
+use Ferienpass\CoreBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class BillingAddressDto
@@ -30,24 +30,23 @@ class BillingAddressDto
     /** @var Collection<PaymentItem> */
     public Collection $items;
 
-    public static function fromMemberModel(MemberModel $memberModel)
+    public static function fromUser(User $user): self
     {
         $self = new self();
 
         $self->address = <<<EOF
-$memberModel->firstname $memberModel->lastname
-$memberModel->street
-$memberModel->postal $memberModel->city
+$user->getFirstname() $user->getLastname()
+$user->getStreet()
+$user->getPostal() $user->getCity()
 EOF;
 
-        $self->email = $memberModel->email;
-
+        $self->email = $user->getEmail();
         $self->address = trim($self->address);
 
         return $self;
     }
 
-    public static function fromPayment(Payment $payment)
+    public static function fromPayment(Payment $payment): self
     {
         $participant = null;
 
@@ -59,18 +58,10 @@ EOF;
         if (null === $participant?->getUser()) {
             $self = new self();
         } else {
-            $self = self::fromMemberModel($participant->getUser());
+            $self = self::fromUser($participant->getUser());
         }
 
         $self->items = $payment->getItems();
-
-        if ($participant?->isDiscounted()) {
-            foreach ($self->items as $item) {
-                $item->setAmount($item->getAmount() >= 200 ? $item->getAmount() / 2 : $item->getAmount());
-            }
-
-            $payment->calculateTotalAmount();
-        }
 
         if ($participant?->getEmail()) {
             $self->email = $participant->getEmail();

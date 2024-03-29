@@ -15,25 +15,30 @@ namespace Ferienpass\AdminBundle\Form;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use Ferienpass\CoreBundle\Entity\Participant;
 use Ferienpass\CoreBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EditParticipantType extends AbstractType
+class EditParticipantType extends AbstractType implements FormSubscriberAwareInterface
 {
+    use FormSubscriberTrait;
+
+    public function __construct(#[Autowire(param: 'ferienpass.model.participant.class')] private readonly string $participantEntityClass)
+    {
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined('show_submit');
 
         $resolver->setDefaults([
-            'data_class' => Participant::class,
+            'data_class' => $this->participantEntityClass,
             'label_format' => 'participants.label.%name%',
             'translation_domain' => 'admin',
             'required' => false,
@@ -62,13 +67,16 @@ class EditParticipantType extends AbstractType
             ->add('ownEmail', EmailType::class, ['fieldset_group' => 'contact', 'width' => '1/2', 'help' => 'participants.help.email'])
             ->add('ownMobile', null, ['fieldset_group' => 'contact', 'width' => '1/2', 'help' => 'participants.help.mobile'])
             ->add('ownPhone', null, ['fieldset_group' => 'contact', 'width' => '1/2'])
-            ->add('discounted', CheckboxType::class, ['fieldset_group' => 'allowance', 'help' => 'participants.help.discounted'])
         ;
 
         if ($options['show_submit']) {
             $builder->add('submit', SubmitType::class, [
                 'label' => 'Daten speichern',
             ]);
+        }
+
+        foreach ($this->getEventSubscribers() as $subscriber) {
+            $builder->addEventSubscriber($subscriber);
         }
     }
 }

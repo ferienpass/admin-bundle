@@ -22,7 +22,7 @@ use Ferienpass\CoreBundle\Notifier\Notifier;
 use Ferienpass\CoreBundle\Repository\EditionRepository;
 use Ferienpass\CoreBundle\Repository\HostRepository;
 use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
-use Ferienpass\CoreBundle\Repository\ParticipantRepository;
+use Ferienpass\CoreBundle\Repository\ParticipantRepositoryInterface;
 use Ferienpass\CoreBundle\Repository\UserRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,7 +48,7 @@ class SendDecisions extends AbstractController
     #[LiveProp(writable: true, url: true)]
     public ?Edition $edition = null;
 
-    public function __construct(private readonly EditionRepository $editionRepository, private readonly ParticipantRepository $participantRepository, private readonly UserRepository $userRepository, private readonly HostRepository $hostRepository, private readonly OfferRepositoryInterface $offerRepository, private readonly Environment $twig, private readonly RequestStack $requestStack, private readonly NormalizerInterface $normalizer, private readonly Notifier $notifier, private readonly MailingNotification $mailingNotification, private readonly DecisionsFacade $unconfirmedApplications)
+    public function __construct(private readonly EditionRepository $editionRepository, private readonly ParticipantRepositoryInterface $participantRepository, private readonly UserRepository $userRepository, private readonly HostRepository $hostRepository, private readonly OfferRepositoryInterface $offerRepository, private readonly Environment $twig, private readonly RequestStack $requestStack, private readonly NormalizerInterface $normalizer, private readonly Notifier $notifier, private readonly MailingNotification $mailingNotification, private readonly DecisionsFacade $unconfirmedApplications)
     {
     }
 

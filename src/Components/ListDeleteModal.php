@@ -15,7 +15,7 @@ namespace Ferienpass\AdminBundle\Components;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
-use Ferienpass\CoreBundle\Entity\Participant;
+use Ferienpass\CoreBundle\Entity\Participant\ParticipantInterface;
 use Ferienpass\CoreBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -55,7 +55,7 @@ class ListDeleteModal extends AbstractController
         $this->denyAccessUnlessGranted('delete', $this->item);
 
         // TODO Refactor using a Facade
-        if ($this->item instanceof Participant) {
+        if ($this->item instanceof ParticipantInterface) {
             /** @var $attendance */
             foreach ($this->item->getAttendances() as $attendance) {
                 foreach ($attendance->getPaymentItems() as $paymentItem) {

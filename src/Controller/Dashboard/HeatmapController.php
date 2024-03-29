@@ -25,6 +25,8 @@ class HeatmapController extends AbstractController
 
     public function __invoke(): Response
     {
+        return new Response();
+
         if (!$this->isGranted('ROLE_ADMIN')) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }

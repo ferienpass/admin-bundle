@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Components;
 
+use Contao\StringUtil;
 use Doctrine\ORM\QueryBuilder;
 use Ferienpass\CoreBundle\Entity\SentMessage;
 use Ferienpass\CoreBundle\Pagination\Paginator;
-use Ferienpass\CoreBundle\Repository\SentMessageRepository;
+use Ferienpass\CoreBundle\Repository\SentEmailRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -44,15 +45,16 @@ class Outbox extends AbstractController
 
     private int $page = 1;
 
-    public function __construct(private readonly SentMessageRepository $repository)
+    public function __construct(private readonly SentEmailRepository $repository)
     {
-        $this->qb = $this->repository->createQueryBuilder('message');
+        // TODO full outer join SentSms (ALT: tabs in the interface)
+        $this->qb = $this->repository->createQueryBuilder('email');
     }
 
     #[ExposeInTemplate]
     public function getPagination(): Paginator
     {
-        $this->qb->orderBy('message.createdAt', 'DESC');
+        $this->qb->orderBy('email.createdAt', 'DESC');
 
         $this->addQueryBuilderSearch();
 
@@ -60,13 +62,13 @@ class Outbox extends AbstractController
     }
 
     #[LiveListener('open')]
-    public function openMessage(#[LiveArg] SentMessage $message)
+    public function openMessage(#[LiveArg] SentMessage $message): void
     {
         $this->message = $message;
     }
 
     #[LiveListener('loadMore')]
-    public function loadMore()
+    public function loadMore(): void
     {
         ++$this->page;
     }
@@ -74,16 +76,10 @@ class Outbox extends AbstractController
     private function addQueryBuilderSearch(): void
     {
         $where = $this->qb->expr()->andX();
-        //        foreach (array_filter(StringUtil::trimsplit(' ', $this->query)) as $j => $token) {
-        //            $or = $this->qb->expr()->orX();
-        //
-        //            foreach ($this->searchable as $i => $field) {
-        //                $or->add("i.$field LIKE :query_$i$j");
-        //                $this->qb->setParameter("query_$i$j", "%{$token}%");
-        //            }
-        //
-        //            $where->add($or);
-        //        }
+        foreach (array_filter(StringUtil::trimsplit(' ', $this->query)) as $j => $token) {
+            $where->add("email.emailData LIKE :query_$j");
+            $this->qb->setParameter("query_$j", "%{$token}%");
+        }
 
         if ($where->count()) {
             $this->qb->andWhere($where);

@@ -13,34 +13,17 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\ApplicationSystem;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
-use Ferienpass\CoreBundle\ApplicationSystem\ApplicationSystems;
 use Ferienpass\CoreBundle\Entity\Attendance;
-use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
-use Ferienpass\CoreBundle\Entity\Participant;
-use Ferienpass\CoreBundle\Facade\AttendanceFacade;
 use Ferienpass\CoreBundle\Message\AttendanceStatusChanged;
 use Ferienpass\CoreBundle\Message\ParticipantListChanged;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ParticipantList
 {
-    public function __construct(private readonly MessageBusInterface $messageBus, private readonly Connection $connection, private readonly ApplicationSystems $applicationSystems, private readonly AttendanceFacade $attendanceFacade, private readonly ManagerRegistry $doctrine, private readonly Security $security)
+    public function __construct(private readonly MessageBusInterface $messageBus, private readonly ManagerRegistry $doctrine, private readonly Security $security)
     {
-    }
-
-    public function add(OfferInterface $offer, array $data): void
-    {
-        if (!$data['firstname'] && !$data['lastname']) {
-            throw new \InvalidArgumentException('Missing name');
-        }
-
-        $this->addParticipant($data, $offer);
-
-        $this->dispatchMessage(new ParticipantListChanged($offer->getId()));
     }
 
     /**
@@ -106,75 +89,8 @@ class ParticipantList
         }
     }
 
-    private function addParticipant(array $data, OfferInterface $offer): void
+    private function dispatchMessage($message, array $stamps = []): void
     {
-        $applicationSystem = $this->applicationSystems->findApplicationSystem($offer);
-
-        $expr = $this->connection->createExpressionBuilder();
-
-        // Try to find an existing participant
-        $statement = $this->connection->createQueryBuilder()
-            ->select('p.id')
-            ->from('Participant', 'p')
-            ->leftJoin('p', 'tl_member', 'm', 'p.member=m.id')
-            ->where(
-                $expr->or(
-                    $expr->and('p.phone<>\'\'', 'p.phone=:phone'),
-                    $expr->and('m.phone<>\'\'', 'm.phone=:phone'),
-                    $expr->and('p.email<>\'\'', 'p.email=:email'),
-                    $expr->and('m.email<>\'\'', 'm.email=:email')
-                )
-            )
-            ->andWhere($expr->and('p.firstname=:firstname', 'p.lastname=:lastname'))
-            ->setParameter('phone', $data['phone'])
-            ->setParameter('email', $data['email'])
-            ->setParameter('firstname', $data['firstname'])
-            ->setParameter('lastname', $data['lastname'])
-            ->executeQuery()
-        ;
-
-        if (false !== $participantId = $statement->fetchOne()) {
-            $participant = $this->doctrine->getRepository(Participant::class)->find($participantId);
-            $this->attendanceFacade->create($offer, $participant);
-
-            return;
-        }
-
-        // Try to find an existing member for this participant
-        $statement = $this->connection->createQueryBuilder()
-            ->select('m.id')
-            ->from('tl_member', 'm')
-            ->where(
-                $expr->or(
-                    $expr->and('m.phone<>\'\'', 'm.phone=:phone'),
-                    $expr->and('m.email<>\'\'', 'm.email=:email')
-                )
-            )
-            ->setParameter('phone', $data['phone'])
-            ->setParameter('email', $data['email'])
-            ->executeQuery()
-        ;
-
-        if (false !== $memberId = $statement->fetchOne()) {
-            $participant = new Participant($memberId);
-        } else {
-            $participant = new Participant();
-        }
-
-        $participant->setEmail($data['email'] ?? null);
-        $participant->setPhone($data['phone'] ?? null);
-        $participant->setFirstname($data['firstname'] ?? null);
-        $participant->setLastname($data['lastname'] ?? null);
-        $participant->setMobile($data['mobile'] ?? null);
-
-        $this->doctrine->getManager()->persist($participant);
-        $this->doctrine->getManager()->flush();
-
-        $this->attendanceFacade->create($offer, $participant);
-    }
-
-    private function dispatchMessage($message, array $stamps = []): Envelope
-    {
-        return $this->messageBus->dispatch($message, $stamps);
+        $this->messageBus->dispatch($message, $stamps);
     }
 }

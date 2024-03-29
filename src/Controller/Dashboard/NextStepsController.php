@@ -28,6 +28,8 @@ class NextStepsController extends AbstractController
 
     public function __invoke(): Response
     {
+        return new Response();
+
         foreach ($this->editionRepository->findCurrent() as $edition) {
             $editions[] = [
                 'edition' => $edition,

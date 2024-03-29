@@ -21,13 +21,12 @@ use Ferienpass\AdminBundle\Form\EditParticipantType;
 use Ferienpass\AdminBundle\Form\MultiSelectType;
 use Ferienpass\AdminBundle\Form\SettleAttendancesType;
 use Ferienpass\CoreBundle\Entity\Attendance;
-use Ferienpass\CoreBundle\Entity\Participant;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Ferienpass\CoreBundle\Entity\PaymentItem;
 use Ferienpass\CoreBundle\Message\PaymentReceiptCreated;
 use Ferienpass\CoreBundle\Payments\ReceiptNumberGenerator;
 use Ferienpass\CoreBundle\Repository\AttendanceRepository;
-use Ferienpass\CoreBundle\Repository\ParticipantRepository;
+use Ferienpass\CoreBundle\Repository\ParticipantRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[IsGranted('ROLE_PARTICIPANTS_ADMIN')]
 #[Route('/teilnehmende')]
@@ -45,7 +45,7 @@ final class ParticipantsController extends AbstractController
     }
 
     #[Route('{_suffix?}', name: 'admin_participants_index', requirements: ['_suffix' => '\.\w+'])]
-    public function index(ParticipantRepository $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExport $xlsxExport): Response
+    public function index(ParticipantRepositoryInterface $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExport $xlsxExport): Response
     {
         $qb = $repository->createQueryBuilder('i');
         $qb->orderBy('i.lastname');
@@ -71,10 +71,16 @@ final class ParticipantsController extends AbstractController
 
     #[Route('/neu', name: 'admin_participants_create')]
     #[Route('/{id}/bearbeiten', name: 'admin_participants_edit', requirements: ['id' => '\d+'])]
-    public function edit(?Participant $participant, Request $request, Breadcrumb $breadcrumb): Response
+    public function edit(?int $id, Request $request, Breadcrumb $breadcrumb, ParticipantRepositoryInterface $participantRepository): Response
     {
+        if (null !== $id && null === ($participant = $participantRepository->find($id))) {
+            throw $this->createNotFoundException();
+        }
+
+        $participant ??= $participantRepository->createNew();
+
         $em = $this->doctrine->getManager();
-        $form = $this->createForm(EditParticipantType::class, $participant ?? new Participant());
+        $form = $this->createForm(EditParticipantType::class, $participant);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -98,8 +104,13 @@ final class ParticipantsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'admin_participants_attendances', requirements: ['id' => '\d+'])]
-    public function attendances(Participant $participant, Request $request, Breadcrumb $breadcrumb): Response
+    public function attendances(int $id, ParticipantRepositoryInterface $participantRepository, Request $request, Breadcrumb $breadcrumb, EventDispatcherInterface $dispatcher): Response
     {
+        $participant = $participantRepository->find($id);
+        if (null === $participant) {
+            throw $this->createNotFoundException();
+        }
+
         $items = $participant->getAttendances();
 
         /** @var Form $ms */
@@ -120,18 +131,19 @@ final class ParticipantsController extends AbstractController
             'msPreferred' => $items->filter(fn (Attendance $a) => $a->isConfirmed() && !$a->isPaid())->toArray(),
             'items' => $items,
             'participant' => $participant,
+            'dispatcher' => $dispatcher,
             'breadcrumb' => $breadcrumb->generate(['participants.title', ['route' => 'admin_participants_index']], $participant->getName().' (Anmeldungen)'),
         ]);
     }
 
     #[Route('/abrechnen', name: 'admin_attendances_settle', methods: ['POST'])]
-    public function settle(Request $request, Breadcrumb $breadcrumb, AttendanceRepository $attendanceRepository, MessageBusInterface $messageBus): Response
+    public function settle(Request $request, Breadcrumb $breadcrumb, AttendanceRepository $attendanceRepository, MessageBusInterface $messageBus, EventDispatcherInterface $dispatcher): Response
     {
         $user = $this->getUser();
         $attendances = $this->getAttendancesFromRequest($attendanceRepository, $request);
         $attendances = array_filter($attendances, fn (Attendance $a) => !$a->isPaid());
 
-        $draftPayment = Payment::fromAttendances($attendances);
+        $draftPayment = Payment::fromAttendances($attendances, $dispatcher);
 
         $form = $this->createForm(SettleAttendancesType::class, $dto = BillingAddressDto::fromPayment($draftPayment), ['attendances' => $attendances]);
 

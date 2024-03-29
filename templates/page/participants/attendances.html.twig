@@ -12,11 +12,12 @@
 {% endif %}
 ',
         fee: '
-{% if not item.participant.discounted %}
-        {{ (item.offer.fee/100)|format_currency("EUR", locale="de") }}
+{% set fee = item.offer.getFeePayable(item.participant, dispatcher) %}
+{% if fee == item.offer.fee %}
+        {{ (fee/100)|format_currency("EUR", locale="de") }}
 {% else %}
         <del class="inline line-through">{{ (item.offer.fee/100)|format_currency("EUR", locale="de") }}</del>
-        <span>{{ ((item.offer.fee >= 200 ? (item.offer.fee/2) : item.offer.fee)/100)|format_currency("EUR", locale="de") }}</span>
+        <span>{{ (fee/100)|format_currency("EUR", locale="de") }}</span>
 {% endif %}
 ',
         status: '

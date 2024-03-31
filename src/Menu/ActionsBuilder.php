@@ -319,14 +319,25 @@ class ActionsBuilder
             'extras' => ['icon' => 'pencil-solid'],
         ]);
 
-        $root->addChild('impersonate', [
-            'label' => 'accounts.action.impersonate',
-            'route' => false ? 'user_account' : 'admin_index',
-            'routeParameters' => ['_switch_user' => $item->getUserIdentifier()],
-            'display' => $this->isGranted('ROLE_ALLOWED_TO_SWITCH'),
-            'linkAttributes' => ['data-turbo' => 'false'],
-            'extras' => ['icon' => 'logout-filled', 'translation_params' => ['user' => $item->getUserIdentifier()]],
-        ]);
+        if (\in_array('ROLE_MEMBER', $item->getRoles(), true)) {
+            $root->addChild('impersonate', [
+                'label' => 'accounts.action.impersonate',
+                'route' => 'admin_frontend_preview',
+                'routeParameters' => ['username' => $item->getUserIdentifier()],
+                'display' => $this->isGranted('ROLE_ALLOWED_TO_SWITCH'),
+                'linkAttributes' => ['data-turbo' => 'false'],
+                'extras' => ['icon' => 'logout-filled', 'translation_params' => ['user' => $item->getUserIdentifier()]],
+            ]);
+        } else {
+            $root->addChild('impersonate', [
+                'label' => 'accounts.action.impersonate',
+                'route' => 'admin_index',
+                'routeParameters' => ['_switch_user' => $item->getUserIdentifier()],
+                'display' => $this->isGranted('ROLE_ALLOWED_TO_SWITCH'),
+                'linkAttributes' => ['data-turbo' => 'false'],
+                'extras' => ['icon' => 'logout-filled', 'translation_params' => ['user' => $item->getUserIdentifier()]],
+            ]);
+        }
 
         $class = $item::class;
         $root->addChild('delete', [

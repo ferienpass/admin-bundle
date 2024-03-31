@@ -9,6 +9,11 @@
             prefix="/admin"
     />
 
+    <import resource="../src/Controller/FrontendPreviewController.php"
+            type="annotation"
+            prefix="/admin"
+    />
+
     <route id="admin_logout"
            path="/admin/logout"
            methods="GET"

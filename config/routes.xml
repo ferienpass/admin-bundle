@@ -13,6 +13,10 @@
             type="annotation"
             prefix="/admin"
     />
+    <import resource="../src/Controller/CmsLoginController.php"
+            type="annotation"
+            prefix="/admin"
+    />
 
     <route id="admin_logout"
            path="/admin/logout"

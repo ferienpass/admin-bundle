@@ -27,7 +27,7 @@
                     <twig:Admin:Dropdown toggleLabel="Exportieren…" toggleSize="lg">
                         <twig:block name="dropdown">
                             {% for format in exports %}
-                                {% embed '@FerienpassAdmin/components/dropdown-a.html.twig' with {'uri': path(app.request.attributes.get('_route'), app.request.query.all|merge(app.request.get('_route_params'))|merge({ '_suffix': ".#{format}" }))} %}
+                                {% embed '@FerienpassAdmin/components/dropdown-a.html.twig' with {'uri': path(app.current_route, app.request.query.all|merge(app.request.get('_route_params'))|merge({ '_suffix': ".#{format}" }))} %}
                                     {% block link %}
                                         <span class="mr-1.5 h-5 w-5 text-gray-400 flex-shrink-0">{{ source('@FerienpassAdmin/icons/filetype/'~format~'.svg', ignore_missing = true) }}</span>
                                         <span class="text-left leading-tight">{{ format|upper }}</span>

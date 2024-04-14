@@ -86,7 +86,7 @@
                     {{ form_rest(form.participant) }}
                 </div>
             {% else %}
-                {{ form_row(form.participant) }}
+                {{ form_row(form.participant, { attr: { 'data-action': 'change->live#action', 'data-live-action-param': 'preview'} }) }}
             {% endif %}
         {% endif %}
 

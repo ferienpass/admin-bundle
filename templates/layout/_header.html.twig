@@ -38,6 +38,38 @@
 
                 <div class="flex items-center">
                     {% if is_granted('ROLE_ADMIN') %}
+                        {#
+                        <a href="#"
+                           title="Warnungen anzeigen"
+                           class="group py-2 px-2 inline-flex items-center">
+
+                            {% if systemStatus.hasWarnings %}
+                                <span class="sr-only">Warnungen anzeigen</span>
+                                <span aria-hidden="true"
+                                      class="h-6 w-6 text-orange-600 group-hover:text-orange-700">{{ source('@FerienpassAdmin/icons/exclamation-triangle.solid.svg') }}</span>
+                            {% else %}
+                                <span class="sr-only">Keine Warnungen</span>
+                                <span aria-hidden="true"
+                                      class="h-6 w-6 text-green-600 group-hover:text-green-700">{{ source('@FerienpassAdmin/icons/check-circle.outline.svg') }}</span>
+                            {% endif %}
+
+                        </a>
+                        <a href="#"
+                           title="Problem melden"
+                           class="py-2 px-2 inline-flex items-center text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-50">
+                            <span class="sr-only">Ticket erstellen</span>
+                            <span aria-hidden="true"
+                                  class="h-6 w-6">{{ source('@FerienpassAdmin/icons/hand-thumb-down.outline.svg') }}</span>
+                        </a>
+                        <a href="#"
+                           title="Schnell-Erfassung"
+                           class="py-2 px-2 inline-flex items-center text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-50">
+                            <span class="sr-only">Schnell-Erfassung</span>
+                            <span aria-hidden="true"
+                                  class="h-6 w-6">{{ source('@FerienpassAdmin/icons/user-plus.outline.svg') }}</span>
+                        </a>
+                        #}
+
                         <a href="{{ path('admin_frontend_preview') }}"
                            target="_blank"
                            class="rounded-md py-2 px-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-900/80 hover:text-gray-900 dark:hover:text-gray-50">

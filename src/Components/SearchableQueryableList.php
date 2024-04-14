@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -99,9 +100,9 @@ class SearchableQueryableList extends AbstractController
     }
 
     #[LiveAction]
-    public function filter()
+    public function filter(): RedirectResponse
     {
-        if (null === $filter = $this->getFilter()) {
+        if (null === $this->getFilter()) {
             return $this->redirectToRoute($this->routeName, $this->routeParameters);
         }
 
@@ -124,6 +125,7 @@ class SearchableQueryableList extends AbstractController
         }
 
         $this->routeParameters = array_merge($this->routeParameters, $filterData);
+        unset($this->routeParameters['page']);
 
         return $this->redirectToRoute($this->routeName, array_filter($this->routeParameters));
     }

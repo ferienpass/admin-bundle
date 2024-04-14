@@ -16,6 +16,7 @@ namespace Ferienpass\AdminBundle\DependencyInjection;
 use DoctrineExtensions\Query\Mysql\DateFormat;
 use DoctrineExtensions\Query\Mysql\TimestampDiff;
 use Ferienpass\AdminBundle\State\PrivacyConsent;
+use Ferienpass\AdminBundle\State\SystemStatus;
 use Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonSearch;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\FileLocator;
@@ -65,12 +66,15 @@ final class FerienpassAdminExtension extends Extension implements PrependExtensi
 
     private function prependTwigBundle(ContainerBuilder $container): void
     {
-        $config = ['form_themes' => [
-            '@FerienpassAdmin/form/custom_types.html.twig',
-            '@FerienpassAdmin/form/form_types.html.twig',
-        ]];
-
-        $container->prependExtensionConfig('twig', $config);
+        $container->prependExtensionConfig('twig', [
+            'form_themes' => [
+                '@FerienpassAdmin/form/custom_types.html.twig',
+                '@FerienpassAdmin/form/form_types.html.twig',
+            ],
+            'globals' => [
+                'systemStatus' => '@'.SystemStatus::class,
+            ],
+        ]);
     }
 
     private function prependDoctrineBundle(ContainerBuilder $container): void

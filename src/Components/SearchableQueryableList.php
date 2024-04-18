@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -63,7 +64,7 @@ class SearchableQueryableList extends AbstractController
     #[LiveProp]
     public ?string $filterType = null;
 
-    public function __construct(private readonly FormFactoryInterface $formFactory, #[TaggedLocator('ferienpass_admin.filter')] private readonly ServiceLocator $filters)
+    public function __construct(private readonly FormFactoryInterface $formFactory, #[TaggedLocator('ferienpass_admin.filter')] private readonly ServiceLocator $filters, private readonly RequestStack $requestStack)
     {
     }
 
@@ -157,6 +158,9 @@ class SearchableQueryableList extends AbstractController
         }
 
         $filterDataFromUrl = array_filter($this->routeParameters, fn (string $key) => \in_array($key, $this->getFilters(), true), \ARRAY_FILTER_USE_KEY);
+
+        //        $session = $this->requestStack->getSession();
+        //        $filterDataFromSession = $session->get('ferienpass_admin.filter.' . $filter::class, []);
 
         $filterForm = $this->formFactory->create($filter::class);
         $filterForm->submit($filterDataFromUrl);

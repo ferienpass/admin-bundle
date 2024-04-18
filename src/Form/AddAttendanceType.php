@@ -16,6 +16,7 @@ namespace Ferienpass\AdminBundle\Form;
 use Doctrine\ORM\EntityRepository;
 use Ferienpass\AdminBundle\Dto\AddAttendanceDto;
 use Ferienpass\CoreBundle\Entity\Attendance;
+use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\AbstractType;
@@ -58,7 +59,9 @@ class AddAttendanceType extends AbstractType
                     ->where('dates.begin >= CURRENT_TIMESTAMP()')
                     ->andWhere('o.onlineApplication = 1')
                     ->orderBy('o.name'),
-                'choice_label' => 'name',
+                'choice_label' => function (OfferInterface $choice, string $key, mixed $value): TranslatableMessage|string {
+                    return sprintf('%s (%s)', $choice->getName(), $choice->getEdition()?->getName());
+                },
                 'autocomplete' => true,
                 'placeholder' => '-',
             ]);

@@ -15,7 +15,6 @@ export default class extends Controller {
     }
 
     clickOutside(event: Event) {
-        event.preventDefault()
         this.close()
     }
 

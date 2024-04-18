@@ -8,7 +8,6 @@ export default class default_1 extends Controller {
         useClickOutside(this);
     }
     clickOutside(event) {
-        event.preventDefault();
         this.close();
     }
     open() {

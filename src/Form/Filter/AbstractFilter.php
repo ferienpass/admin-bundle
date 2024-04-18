@@ -15,9 +15,12 @@ namespace Ferienpass\AdminBundle\Form\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractFilter extends AbstractType
@@ -72,6 +75,12 @@ abstract class AbstractFilter extends AbstractType
                 'label' => 'Filtern',
             ])
         ;
+
+        //        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (PreSubmitEvent $event): void {
+        //            $session = $this->requestStack->getSession();
+        //
+        //            $session->get('ferienpass_admin.filter.' . self::class, $event->getData());
+        //        });
     }
 
     public function apply(QueryBuilder $qb, FormInterface $form): void

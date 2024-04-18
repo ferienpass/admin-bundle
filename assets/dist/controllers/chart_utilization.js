@@ -1,8 +1,7 @@
 'use strict';
-import {Controller} from '@hotwired/stimulus';
+import { Controller } from '@hotwired/stimulus';
 // @ts-ignore
-import {Chart} from 'frappe-charts';
-
+import { Chart } from 'frappe-charts';
 export default class default_1 extends Controller {
     connect() {
         new Chart(this.element, {

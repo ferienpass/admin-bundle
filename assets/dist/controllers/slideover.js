@@ -1,7 +1,7 @@
 'use strict';
-import {Controller} from '@hotwired/stimulus';
+import { Controller } from '@hotwired/stimulus';
 // @ts-ignore
-import {enter, leave} from "el-transition";
+import { enter, leave } from "el-transition";
 //import {Component, getComponent} from '@symfony/ux-live-component';
 export default class default_1 extends Controller {
     show() {

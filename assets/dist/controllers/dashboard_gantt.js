@@ -1,5 +1,5 @@
 'use strict';
-import {Controller} from '@hotwired/stimulus';
+import { Controller } from '@hotwired/stimulus';
 // import * as Gantt from 'frappe-gantt';
 // interface CustomTask extends Gantt.Task {
 //     description: string;

@@ -1,7 +1,6 @@
 'use strict';
-import {Controller} from '@hotwired/stimulus';
-import {easepick, RangePlugin} from '@easepick/bundle';
-
+import { Controller } from '@hotwired/stimulus';
+import { easepick, RangePlugin } from '@easepick/bundle';
 export default class default_1 extends Controller {
     connect() {
         const begin = this.beginTarget;

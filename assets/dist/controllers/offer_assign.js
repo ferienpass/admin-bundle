@@ -8,10 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import {Controller} from '@hotwired/stimulus';
+import { Controller } from '@hotwired/stimulus';
 import Sortable from "sortablejs";
 // @ts-ignore
-import {getComponent} from '@symfony/ux-live-component';
+import { getComponent } from '@symfony/ux-live-component';
 // Multi-drag currently disabled because it complicates handling one or many entities in the event listener
 // Sortable.mount(new MultiDrag());
 export default class default_1 extends Controller {

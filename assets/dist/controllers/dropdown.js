@@ -1,9 +1,16 @@
 'use strict';
-import {Controller} from '@hotwired/stimulus';
+import { Controller } from '@hotwired/stimulus';
+import { useClickOutside } from 'stimulus-use';
 // @ts-ignore
-import {enter, leave} from "el-transition";
-
+import { enter, leave } from "el-transition";
 export default class default_1 extends Controller {
+    connect() {
+        useClickOutside(this);
+    }
+    clickOutside(event) {
+        event.preventDefault();
+        this.close();
+    }
     open() {
         this.dropdownTarget.classList.remove("hidden");
         enter(this.dropdownTarget);

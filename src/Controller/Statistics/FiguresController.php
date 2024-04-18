@@ -29,19 +29,12 @@ class FiguresController extends AbstractController
 
     public function __invoke(Edition $edition): Response
     {
-        $preceding = $this->editionRepository->findPreceding($edition);
-
         return $this->render('@FerienpassAdmin/fragment/statistics/figures.html.twig', [
             'count_participants' => $this->countParticipants($edition),
-            'count_participants_preceding' => $this->countParticipants($preceding),
             'count_offers' => $this->countOffers($edition),
-            'count_offers_preceding' => $this->countOffers($preceding),
             'count_offers_no_variants' => $this->countOffersWithoutVariants($edition),
-            'count_offers_no_variants_preceding' => $this->countOffersWithoutVariants($preceding),
             'count_hosts' => $this->countHostsWithOffer($edition),
-            'count_hosts_preceding' => $this->countHostsWithOffer($preceding),
             'count_attendances' => $this->countAttendancesWithoutWithdrawn($edition),
-            'count_attendances_preceding' => $this->countAttendancesWithoutWithdrawn($preceding),
         ]);
     }
 

@@ -6,9 +6,16 @@
         <div>
             {% block head_before %}{% endblock %}
         </div>
-        {% if filter is defined %}
-            {% include '@FerienpassAdmin/components/_list_filter.html.twig' with filter %}
-        {% endif %}
+        <div class="flex items-center space-x-2">
+            {% if pagination is defined %}
+                <p class="text-xs text-gray-500">
+                    <span class="font-medium">{{ pagination.numResults }}</span> Elemente
+                </p>
+            {% endif %}
+            {% if filter is defined %}
+                {% include '@FerienpassAdmin/components/_list_filter.html.twig' with filter %}
+            {% endif %}
+        </div>
     </div>
 
     {% if config.layout|default('table') == 'table' and config.columns is defined %}

@@ -1,0 +1,12 @@
+{% extends "@FerienpassAdmin/layout/modalBase.html.twig" %}
+
+{% block main %}
+
+    {% include '@FerienpassAdmin/fragment/deleteModal.html.twig' with {
+        metadata: {
+            name: '{{ item.name }}',
+            codes: '{{ item.codes|length }} Codes',
+        }
+    } %}
+
+{% endblock %}

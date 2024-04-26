@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Controller\Page;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Dto\BillingAddressDto;
@@ -28,6 +29,7 @@ use Ferienpass\CoreBundle\Payments\ReceiptNumberGenerator;
 use Ferienpass\CoreBundle\Repository\AttendanceRepository;
 use Ferienpass\CoreBundle\Repository\ParticipantRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -133,6 +135,39 @@ final class ParticipantsController extends AbstractController
             'participant' => $participant,
             'dispatcher' => $dispatcher,
             'breadcrumb' => $breadcrumb->generate(['participants.title', ['route' => 'admin_participants_index']], $participant->getName().' (Anmeldungen)'),
+        ]);
+    }
+
+    #[Route('/{id}/löschen', name: 'admin_participants_delete', requirements: ['id' => '\d+'])]
+    public function delete(int $id, ParticipantRepositoryInterface $repository, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if (null === $item = $repository->find($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted('delete', $item);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_participants_delete', ['id' => $id]),
+        ]);
+        $form->handleRequest($request);
+
+        // TODO Can use a facade
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var $attendance */
+            foreach ($item->getAttendances() as $attendance) {
+                foreach ($attendance->getPaymentItems() as $paymentItem) {
+                    $paymentItem->removeAttendanceAssociation();
+                }
+            }
+
+            $entityManager->remove($item);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/participants/delete.html.twig', [
+            'item' => $item,
+            'form' => $form,
         ]);
     }
 

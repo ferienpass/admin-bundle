@@ -21,6 +21,7 @@ use Ferienpass\CoreBundle\Facade\EraseDataFacade;
 use Ferienpass\CoreBundle\Repository\AccessCodeStrategyRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -162,6 +163,27 @@ final class ToolsController extends AbstractController
             'item' => $accessCodeStrategy,
             'form' => $form,
             'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'settings.title', 'accessCodes.title', $breadcrumbTitle),
+        ]);
+    }
+
+    #[Route('/einstellungen/zugangscodes/{id}/löschen', name: 'admin_accessCodes_delete', requirements: ['id' => '\d+'])]
+    public function delete(AccessCodeStrategy $item, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('delete', $item);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_participants_delete', ['id' => $item->getId()]),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->remove($item);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/tools/access_codes_delete.html.twig', [
+            'item' => $item,
+            'form' => $form,
         ]);
     }
 

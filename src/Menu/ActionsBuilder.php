@@ -165,11 +165,12 @@ class ActionsBuilder
             'extras' => ['icon' => 'mail'],
         ]);
 
-        $class = $item::class;
         $root->addChild('delete', [
             'label' => 'accounts.action.delete',
+            'route' => 'admin_offers_delete',
+            'routeParameters' => array_filter(['id' => $item->getId(), 'edition' => $item->getEdition()?->getAlias()]),
             'display' => $this->isGranted('delete', $item),
-            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-action' => 'live#emit', 'data-live-event-param' => 'delete', 'data-live-id-param' => $item->getId(), 'data-live-class-param' => $class]],
+            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-turbo-frame' => 'modal']],
         ]);
     }
 
@@ -201,13 +202,6 @@ class ActionsBuilder
             ->getResult()
         ;
 
-        $class = $item::class;
-        $root->addChild('delete', [
-            'label' => 'participants.action.delete',
-            'display' => $this->isGranted('delete', $item),
-            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-action' => 'live#emit', 'data-live-event-param' => 'delete', 'data-live-id-param' => $item->getId(), 'data-live-class-param' => $class]],
-        ]);
-
         /** @var Payment $payment */
         foreach ($payments as $payment) {
             $root->addChild('show_payment.'.$payment->getId(), [
@@ -218,6 +212,14 @@ class ActionsBuilder
                 'extras' => ['icon' => 'pencil-solid', 'translation_params' => ['%number%' => $payment->getReceiptNumber()]],
             ]);
         }
+
+        $root->addChild('delete', [
+            'label' => 'participants.action.delete',
+            'route' => 'admin_participants_delete',
+            'routeParameters' => array_filter(['id' => $item->getId()]),
+            'display' => $this->isGranted('delete', $item),
+            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-turbo-frame' => 'modal']],
+        ]);
     }
 
     private function hosts(ItemInterface $root, Host $item)
@@ -237,11 +239,12 @@ class ActionsBuilder
             'extras' => ['icon' => 'mail'],
         ]);
 
-        $class = $item::class;
         $root->addChild('delete', [
             'label' => 'hosts.action.delete',
+            'route' => 'admin_hosts_delete',
+            'routeParameters' => array_filter(['alias' => $item->getAlias()]),
             'display' => $this->isGranted('delete', $item),
-            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-action' => 'live#emit', 'data-live-event-param' => 'delete', 'data-live-id-param' => $item->getId(), 'data-live-class-param' => $class]],
+            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-turbo-frame' => 'modal']],
         ]);
     }
 
@@ -263,11 +266,12 @@ class ActionsBuilder
             'extras' => ['icon' => 'chart-pie.mini'],
         ]);
 
-        $class = $item::class;
         $root->addChild('delete', [
             'label' => 'editions.action.delete',
+            'route' => 'admin_editions_delete',
+            'routeParameters' => array_filter(['alias' => $item->getAlias()]),
             'display' => $this->isGranted('delete', $item),
-            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-action' => 'live#emit', 'data-live-event-param' => 'delete', 'data-live-id-param' => $item->getId(), 'data-live-class-param' => $class]],
+            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-turbo-frame' => 'modal']],
         ]);
     }
 
@@ -281,11 +285,12 @@ class ActionsBuilder
             'extras' => ['icon' => 'pencil-solid'],
         ]);
 
-        $class = $item::class;
         $root->addChild('delete', [
             'label' => 'accessCodes.action.delete',
-            // 'display' => $this->isGranted('delete', $item),
-            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-action' => 'live#emit', 'data-live-event-param' => 'delete', 'data-live-id-param' => $item->getId(), 'data-live-class-param' => $class]],
+            'route' => 'admin_accessCodes_delete',
+            'routeParameters' => array_filter(['id' => $item->getId()]),
+            'display' => $this->isGranted('delete', $item),
+            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-turbo-frame' => 'modal']],
         ]);
     }
 
@@ -339,11 +344,12 @@ class ActionsBuilder
             ]);
         }
 
-        $class = $item::class;
         $root->addChild('delete', [
             'label' => 'accounts.action.delete',
+            'route' => 'admin_accounts_delete',
+            'routeParameters' => array_filter(['id' => $item->getId()]),
             'display' => $this->isGranted('delete', $item),
-            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-action' => 'live#emit', 'data-live-event-param' => 'delete', 'data-live-id-param' => $item->getId(), 'data-live-class-param' => $class]],
+            'extras' => ['icon' => 'trash-solid', 'attr' => ['data-turbo-frame' => 'modal']],
         ]);
     }
 

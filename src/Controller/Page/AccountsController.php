@@ -23,6 +23,7 @@ use Ferienpass\CoreBundle\Repository\UserRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Knp\Menu\FactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -137,6 +138,36 @@ final class AccountsController extends AbstractController
             'headline' => $user->getId() ? $user->getName() : 'accounts.new',
             'form' => $form,
             'breadcrumb' => $breadcrumb->generate(['accounts.title', ['route' => 'admin_accounts_index', 'routeParameters' => ['role' => $role]]], ['accounts.'.self::ROLES[$role], ['route' => 'admin_accounts_index', 'routeParameters' => ['role' => $role]]], $breadcrumbTitle),
+        ]);
+    }
+
+    #[Route('/{id}/löschen', name: 'admin_accounts_delete', requirements: ['id' => '\d+'])]
+    public function delete(User $item, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('delete', $item);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_accounts_delete', ['id' => $item->getId()]),
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            foreach ($item->getParticipants() as $participant) {
+                /** @var $attendance */
+                foreach ($participant->getAttendances() as $attendance) {
+                    foreach ($attendance->getPaymentItems() as $paymentItem) {
+                        $paymentItem->removeAttendanceAssociation();
+                    }
+                }
+            }
+
+            $entityManager->remove($item);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/accounts/delete.html.twig', [
+            'item' => $item,
+            'form' => $form,
         ]);
     }
 }

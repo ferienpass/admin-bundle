@@ -1,0 +1,107 @@
+{% extends "@FerienpassAdmin/layout/modalBase.html.twig" %}
+{% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
+
+{% trans_default_domain 'admin' %}
+{% set translationPrefix = app.request.get('_route')|split('_')[1] %}
+
+{% block main %}
+
+
+
+    {% embed '@FerienpassAdmin/fragment/deleteModal.html.twig' with {
+        metadata: {
+            name: '{{ item.name }}',
+            hosts: '{{ item.hosts|map(h => h.name)|join(", ") }}',
+            date: '
+{% if item.dates is not empty %}
+    {% set startDate = item.dates|first.begin %}
+    <time datetime="{{ startDate|date(\'c\') }}">{{ startDate|format_datetime(pattern="E, dd.MM.yyyy HH:mm") }}</time>
+{% else %}
+    <span>Dauerangebot</span>
+{% endif %}
+',
+            attendances: '
+                <p class="flex items-center space-x-1" title="aktuelle Anmeldungen">
+                    <span class="{{ (item.maxParticipants and item.attendancesConfirmed|length >= item.maxParticipants) ? \'text-red-700\' : \'text-green-700\' }}">
+                        <svg viewBox="0 0 2 2" class="h-2 w-2 fill-current">
+                            <circle cx="1" cy="1" r="1"/>
+                        </svg>
+                    </span>
+
+                    <span>
+                        {{ item.attendancesNotWithdrawn|length ~ \' / \' ~ (item.maxParticipants ?: \'∞\') ~ \'\' }}
+                    </span>
+                </p>
+',
+        }
+    } %}
+
+        {% block content %}
+            {% if item.attendances|length %}
+                <div class="mt-2 flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-700 dark:text-yellow-500" viewBox="0 0 20 20"
+                             fill="currentColor"
+                             aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                  d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-2">
+                        <p class="text-sm text-yellow-700 dark:text-yellow-500">
+                            <span class="font-semibold">Anmeldungen werden mitgelöscht!</span>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        {% endblock %}
+
+{% endembed %}
+
+
+{% endblock %}
+
+{#   {% if not offer.isVariantBase %}
+        <div class="mb-12">
+            {% embed '@FerienpassAdmin/components/alert/info.html.twig' %}
+                {% block message %}
+                    <span>
+                        Sie bearbeiten eine Variante von <a class="underline hover:no-underline"
+                                                            href="{{ path(app.request.get('_route'), {'id':offer.variantBase.id, edition: offer.variantBase.edition.alias}) }}">
+                            Angebot ID {{ offer.variantBase.id }}</a> und können deswegen nicht alle Felder
+                        bearbeiten.
+                    </span>
+                {% endblock %}
+            {% endembed %}
+        </div>
+    {% endif %}
+#}
+{#
+
+    {% for error in form.errors(true)|default %}
+        <div class="space-y-4">
+            {% include '@FerienpassAdmin/components/alert/error.html.twig' with {'message': error.message} %}
+        </div>
+    {% endfor %}
+
+#}
+
+           {# {% if offer.image is not empty %}
+                <div class="col-span-6">
+                    <h4 class="text-gray-500 uppercase tracking-wide text-sm">Aktuelles Bild</h4>
+                    <div class="mt-1 mb-4 bg-gray-100 border-2 border-dashed px-6 py-4">
+                        {{ contao_figure(offer.image, '_host_details_logo') }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="col-span-3">
+                {{ form_widget(form.image) }}
+            </div>
+            <div class="col-span-4">
+                {{ form_row(form.imgCopyright) }}
+            </div>
+            </div>
+#}
+

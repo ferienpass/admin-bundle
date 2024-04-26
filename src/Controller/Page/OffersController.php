@@ -26,6 +26,8 @@ use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
 use Knp\Menu\FactoryInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -91,6 +93,50 @@ final class OffersController extends AbstractController
             'offer' => $offer,
             'hasPdf' => $pdfExports->has(),
             'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName()),
+        ]);
+    }
+
+    #[Route('/{id}/löschen', name: 'admin_offers_delete', requirements: ['id' => '\d+'])]
+    public function delete(int $id, OfferRepositoryInterface $repository, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if (null === $item = $repository->find($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted('delete', $item);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_offers_delete', ['id' => $id]),
+        ]);
+        $form->handleRequest($request);
+
+        // TODO Can use a facade
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var $attendance */
+            foreach ($item->getAttendances() as $attendance) {
+                foreach ($attendance->getPaymentItems() as $paymentItem) {
+                    $paymentItem->removeAttendanceAssociation();
+                }
+            }
+
+            if ($item->hasVariants()) {
+                $variants = $item->getVariants()->toArray();
+                $variants[0]->setVariantBase(null);
+
+                for ($i = 1; $i < \count($variants); ++$i) {
+                    $variants[$i]->setVariantBase($variants[0]);
+                }
+            } elseif (!$item->isVariantBase()) {
+                $item->setVariantBase(null);
+            }
+
+            $entityManager->remove($item);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/offers/delete.html.twig', [
+            'item' => $item,
+            'form' => $form,
         ]);
     }
 }

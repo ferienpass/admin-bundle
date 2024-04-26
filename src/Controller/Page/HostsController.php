@@ -24,6 +24,7 @@ use Ferienpass\CoreBundle\Pagination\Paginator;
 use Ferienpass\CoreBundle\Repository\HostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -96,6 +97,27 @@ final class HostsController extends AbstractController
             'item' => $host,
             'form' => $form,
             'breadcrumb' => $breadcrumb->generate(['hosts.title', ['route' => 'admin_hosts_index']], $breadcrumbTitle),
+        ]);
+    }
+
+    #[Route('/{alias}/löschen', name: 'admin_hosts_delete', requirements: ['id' => '\d+'])]
+    public function delete(Host $item, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('delete', $item);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_hosts_delete', ['alias' => $item->getAlias()]),
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->remove($item);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/hosts/delete.html.twig', [
+            'item' => $item,
+            'form' => $form,
         ]);
     }
 }

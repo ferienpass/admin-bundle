@@ -37,9 +37,10 @@
             <div class="hidden lg:relative lg:z-10 lg:ml-4 lg:flex lg:items-center lg:space-x-4">
 
                 <div class="flex items-center">
-                    {% if is_granted('ROLE_ADMIN') %}
                         {#
-                        <a href="#"
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_tools_warnings') }}"
+                           data-turbo-frame="modal"
                            title="Warnungen anzeigen"
                            class="group py-2 px-2 inline-flex items-center">
 
@@ -54,21 +55,23 @@
                             {% endif %}
 
                         </a>
-                        <a href="#"
+                        <a href="{{ path('admin_tools_issue') }}"
+                           data-turbo-frame="modal"
                            title="Problem melden"
                            class="py-2 px-2 inline-flex items-center text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-50">
                             <span class="sr-only">Ticket erstellen</span>
                             <span aria-hidden="true"
                                   class="h-6 w-6">{{ source('@FerienpassAdmin/icons/hand-thumb-down.outline.svg') }}</span>
                         </a>
-                        <a href="#"
+                        #}
+                        <a href="{{ path('admin_tools_registration') }}"
+                           data-turbo-frame="modal"
                            title="Schnell-Erfassung"
                            class="py-2 px-2 inline-flex items-center text-gray-500 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-50">
                             <span class="sr-only">Schnell-Erfassung</span>
                             <span aria-hidden="true"
                                   class="h-6 w-6">{{ source('@FerienpassAdmin/icons/user-plus.outline.svg') }}</span>
                         </a>
-                        #}
 
                         <a href="{{ path('admin_frontend_preview') }}"
                            target="_blank"

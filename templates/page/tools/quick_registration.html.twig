@@ -1,0 +1,15 @@
+{% extends "@FerienpassAdmin/layout/modalBase.html.twig" %}
+
+{% block main %}
+
+    <h3 class="text-lg leading-6 font-medium text-gray-900">Schnell-Erfassung Anmeldung</h3>
+    <div class="mt-2 max-w-xl text-sm leading-5 text-gray-500">
+        <p>Veranstaltung auswählen. Anmeldung erfassen.</p>
+    </div>
+    <div class="mt-5">
+
+        <twig:Admin:AddAttendance/>
+
+    </div>
+
+{% endblock %}

@@ -187,6 +187,24 @@ final class ToolsController extends AbstractController
         ]);
     }
 
+    #[Route('/tools/schnellerfassung', name: 'admin_tools_registration')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function quickRegistration(Breadcrumb $breadcrumb): Response
+    {
+        return $this->render('@FerienpassAdmin/page/tools/quick_registration.html.twig', [
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'Schnell-Erfassung'),
+        ]);
+    }
+
+    #[Route('/tools/problem-melden', name: 'admin_tools_issue')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function createIssue(Breadcrumb $breadcrumb): Response
+    {
+        return $this->render('@FerienpassAdmin/page/tools/create_issue.html.twig', [
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'Ticket erstellen'),
+        ]);
+    }
+
     #[Route('/download/{file}', name: 'admin_download')]
     public function download(string $file, UriSigner $uriSigner, Request $request): BinaryFileResponse
     {

@@ -16,20 +16,20 @@
 
                 {% if is_granted('ROLE_ADMIN') %}
                     <fieldset>
-                        <legend class="text-base font-semibold leading-6 text-gray-900">{{ 'mailing.selectGroup'|trans }}</legend>
+                        <legend class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100">{{ 'mailing.selectGroup'|trans }}</legend>
 
                         <div class="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
                             <button
                                     data-action="live#emit"
                                     data-live-event-param="group"
                                     data-live-group-param="hosts"
-                                    class="{{ group == 'hosts' ? 'border-indigo-600 ring-2 ring-indigo-600' : 'border-gray-300' }} text-left relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none">
+                                    class="{{ group == 'hosts' ? 'border-indigo-600 dark:border-indigo-400/50 ring-2 ring-indigo-600 dark:border-indigo-400/50' : 'border-gray-300 dark:border-gray-800' }} text-left relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm focus:outline-none">
                                 <span class="flex flex-1">
                                     <span class="flex flex-col">
                                         <span id="group-0-label"
-                                              class="block text-sm font-medium text-gray-900">Veranstaltende</span>
+                                              class="block text-sm font-medium text-gray-900 dark:text-gray-100">Veranstaltende</span>
                                         <span id="group-0-description-0"
-                                              class="mt-1 flex items-center text-sm text-gray-500">{{ countAllHosts }}
+                                              class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">{{ countAllHosts }}
                                             E-Mails</span>
                                     </span>
                                 </span>
@@ -47,13 +47,13 @@
                             <button data-action="live#emit"
                                     data-live-event-param="group"
                                     data-live-group-param="participants"
-                                    class="{{ group == 'participants' ? 'border-indigo-600 ring-2 ring-indigo-600' : 'border-gray-300' }} text-left relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none">
+                                    class="{{ group == 'participants' ? 'border-indigo-600 dark:border-indigo-400/50 ring-2 ring-indigo-600 dark:ring-indigo-400/50' : 'border-gray-300 dark:border-gray-800' }} text-left relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm focus:outline-none">
                                 <span class="flex flex-1">
                                     <span class="flex flex-col">
                                         <span id="group-1-label"
-                                              class="block text-sm font-medium text-gray-900">Teilnehmende</span>
+                                              class="block text-sm font-medium text-gray-900 dark:text-gray-100">Teilnehmende</span>
                                         <span id="group-1-description-0"
-                                              class="mt-1 flex items-center text-sm text-gray-500">{{ countAllParticipants }}
+                                              class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">{{ countAllParticipants }}
                                             E-Mails</span>
                                     </span>
                                 </span>
@@ -85,9 +85,9 @@
                                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                                 </div>
                                 <div class="ml-3 text-sm leading-6">
-                                    <label for="comments" class="font-medium text-gray-900">Nicht-deaktivierte
+                                    <label for="comments" class="font-medium text-gray-900 dark:text-gray-100">Nicht-deaktivierte
                                         Accounts:</label>
-                                    <span id="comments-description" class="text-gray-500">Nur Accounts, die einen
+                                    <span id="comments-description" class="text-gray-500 dark:text-gray-400">Nur Accounts, die einen
                                         aktiven
                                         Account haben.</span>
                                 </div>
@@ -103,8 +103,8 @@
                                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                                 </div>
                                 <div class="ml-3 text-sm leading-6">
-                                    <label for="candidates" class="font-medium text-gray-900">Mit Angebot:</label>
-                                    <span id="candidates-description" class="text-gray-500">Veranstalter bietet oder hat
+                                    <label for="candidates" class="font-medium text-gray-900 dark:text-gray-100">Mit Angebot:</label>
+                                    <span id="candidates-description" class="text-gray-500 dark:text-gray-400">Veranstalter bietet oder hat
                                         in
                                         Vergangenheit ein Angebot angeboten.</span>
                                 </div>
@@ -117,8 +117,8 @@
                 {% if ('participants' == group and not offers) or hostsWithOffer %}
 
                     <fieldset>
-                        <legend class="text-sm font-semibold leading-6 text-gray-900">Saisons</legend>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">Nur an Veranstalter mit Angebot in einer dieser
+                        <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Saisons</legend>
+                        <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-400">Nur an Veranstalter mit Angebot in einer dieser
                             Saisons.</p>
                         <div class="mt-4 space-y-2">
                             {% for edition in editionOptions %}
@@ -132,7 +132,7 @@
                                     </div>
                                     <div class="text-sm leading-6">
                                         <label for="editions{{ loop.index }}"
-                                               class="font-medium text-gray-900">{{ edition.name }}</label>
+                                               class="font-medium text-gray-900 dark:text-gray-100">{{ edition.name }}</label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -144,8 +144,8 @@
                 {% if 'participants' == group and offers is not empty %}
 
                     <fieldset>
-                        <legend class="text-sm font-semibold leading-6 text-gray-900">Angebote</legend>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">Nur an Teilnehmende aus folgenden Angeboten.</p>
+                        <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Angebote</legend>
+                        <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-400">Nur an Teilnehmende aus folgenden Angeboten.</p>
                         <div class="mt-4 space-y-2">
                             {% for offer in offerOptions %}
                                 <div class="relative flex gap-x-3">
@@ -158,7 +158,7 @@
                                     </div>
                                     <div class="text-sm leading-6">
                                         <label for="editions{{ loop.index }}"
-                                               class="font-medium text-gray-900">{{ offer.name }}</label>
+                                               class="font-medium text-gray-900 dark:text-gray-100">{{ offer.name }}</label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -166,8 +166,8 @@
                     </fieldset>
 
                     <fieldset>
-                        <legend class="text-sm font-semibold leading-6 text-gray-900">Anmeldestatus</legend>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">Nur an Teilnehmende, die zu dem/den Angeboten
+                        <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Anmeldestatus</legend>
+                        <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-400">Nur an Teilnehmende, die zu dem/den Angeboten
                             ...
                             sind.</p>
                         <div class="mt-4 space-y-2">
@@ -182,7 +182,7 @@
                                     </div>
                                     <div class="text-sm leading-6">
                                         <label for="status{{ loop.index }}"
-                                               class="font-medium text-gray-900">{{ "mailing.attendanceStatus.#{status}"|trans }}</label>
+                                               class="font-medium text-gray-900 dark:text-gray-100">{{ "mailing.attendanceStatus.#{status}"|trans }}</label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -194,8 +194,8 @@
                 {% if hosts is not empty %}
 
                     <fieldset>
-                        <legend class="text-sm font-semibold leading-6 text-gray-900">Veranstalter-Profile</legend>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">Nur an Ansprechpartner von folgenden
+                        <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Veranstalter-Profile</legend>
+                        <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-400">Nur an Ansprechpartner von folgenden
                             Veranstaltern
                             versenden.</p>
                         <div class="mt-4 space-y-2">
@@ -210,7 +210,7 @@
                                     </div>
                                     <div class="text-sm leading-6">
                                         <label for="hosts{{ loop.index }}"
-                                               class="font-medium text-gray-900">{{ host.name }}</label>
+                                               class="font-medium text-gray-900 dark:text-gray-100">{{ host.name }}</label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -223,27 +223,27 @@
 
             <div class="pt-6">
 
-                <h3>{{ 'mailing.recipients.0'|trans }}</h3>
+                <h3 class="text-gray-900 dark:text-gray-100">{{ 'mailing.recipients.0'|trans }}</h3>
 
-                <p class="text-sm leading-5 text-gray-500 dark:text-gray-300">{{ 'mailing.recipients.1'|trans }}</p>
+                <p class="text-sm leading-5 text-gray-500 dark:text-gray-400 dark:text-gray-300">{{ 'mailing.recipients.1'|trans }}</p>
 
                 <div class="mt-6">
 
                     {% for email, users in recipients %}
 
-                        <span class="inline-flex items-center space-x-2 rounded-full bg-white border border-gray-200 p-1 pr-2 mb-1">
+                        <span class="inline-flex items-center space-x-2 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 pr-2 mb-1">
 
                             <span class="isolate inline-flex -space-x-1 overflow-hidden">
                                 {% for user in users %}
 
-                                    <span class="relative z-30 ring-2 ring-white flex-none inline-flex items-center justify-center h-6 w-6 rounded-full bg-gray-400">
+                                    <span class="relative z-30 ring-2 ring-white dark:ring-gray-900 flex-none inline-flex items-center justify-center h-6 w-6 rounded-full bg-gray-400">
                                         <span class="text-xs font-medium leading-none text-white"
                                               title="{{ user.name }}">{{ user.firstname|first|upper ~ user.lastname|first|upper }}</span>
                                     </span>
                                 {% endfor %}
                             </span>
 
-                            <span class="text-sm text-gray-700">{{ email }}</span>
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ email }}</span>
 
                         </span>
 
@@ -251,21 +251,21 @@
 
                 </div>
 
-                <p class="mt-4 font-medium text-sm text-gray-900">{{ recipients|length }} E-Mails</p>
+                <p class="mt-4 font-medium text-sm text-gray-900 dark:text-gray-100">{{ recipients|length }} E-Mails</p>
 
             </div>
 
             <div class="pt-6">
 
-                <h3>{{ 'mailing.write.0'|trans }}</h3>
+                <h3 class="text-gray-900 dark:text-gray-100">{{ 'mailing.write.0'|trans }}</h3>
 
-                <p class="text-sm leading-5 text-gray-500 dark:text-gray-300">{{ 'mailing.write.1'|trans }}</p>
+                <p class="text-sm leading-5 text-gray-500 dark:text-gray-400 dark:text-gray-300">{{ 'mailing.write.1'|trans }}</p>
 
                 {% if recipients|length %}
                     <form class="mt-6 grid gap-6">
 
                         <div class="col-span-2">
-                            <label for="emailSubject" class="block text-sm font-medium leading-6 text-gray-900">E-Mail-Betreff</label>
+                            <label for="emailSubject" class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">E-Mail-Betreff</label>
                             <div class="mt-2">
                                 <input type="text" data-model="emailSubject" id="emailSubject" class="">
                             </div>
@@ -274,19 +274,19 @@
 
                         <div class="col-span-3" x-data="{ preview: false }">
                             <label for="emailText"
-                                   class="block text-sm font-medium leading-6 text-gray-900">E-Mail-Text</label>
+                                   class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">E-Mail-Text</label>
                             <div class="mt-2 flex items-center" aria-orientation="horizontal" role="tablist">
                                 <button @click="preview = false"
                                         id="tabs-1-tab-1"
-                                        :class="{ 'bg-gray-100 text-gray-900 hover:bg-gray-200': !preview, 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900': preview}"
-                                        class="bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded-md border border-transparent px-3 py-1.5 text-sm font-medium"
+                                        :class="{ 'bg-gray-100 text-gray-900 dark:text-gray-100 hover:bg-gray-200': !preview, 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100': preview}"
+                                        class="bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 rounded-md border border-transparent px-3 py-1.5 text-sm font-medium"
                                         aria-controls="tabs-1-panel-1"
                                         role="tab" type="button">Verfassen
                                 </button>
                                 <button @click="preview = true"
                                         id="tabs-1-tab-2"
-                                        :class="{ 'bg-gray-100 text-gray-900 hover:bg-gray-200': preview, 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900': !preview}"
-                                        class="bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 ml-2 rounded-md border border-transparent px-3 py-1.5 text-sm font-medium"
+                                        :class="{ 'bg-gray-100 text-gray-900 dark:text-gray-100 hover:bg-gray-200': preview, 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100': !preview}"
+                                        class="bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 ml-2 rounded-md border border-transparent px-3 py-1.5 text-sm font-medium"
                                         aria-controls="tabs-1-panel-2"
                                         role="tab" type="button">Vorschau
                                 </button>
@@ -303,10 +303,10 @@
                                 <textarea rows="5"
                                           id="emailText"
                                           data-model="emailText"
-                                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                          class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                           placeholder="E-Mail verfassen..."></textarea>
                                     </div>
-                                    <p class="mt-1 text-gray-500 text-sm">Markdown wird unterstützt.</p>
+                                    <p class="mt-1 text-gray-500 dark:text-gray-400 text-sm">Markdown wird unterstützt.</p>
                                 </div>
                                 <div x-show="preview"
                                      id="tabs-1-panel-2"
@@ -352,9 +352,9 @@
             </div>
 
             <div class="pt-6">
-                <h3>Benachrichtigungs-Tokens</h3>
+                <h3 class="text-gray-900 dark:text-gray-100">Benachrichtigungs-Tokens</h3>
 
-                <p class="text-sm leading-5 text-gray-500 dark:text-gray-300">
+                <p class="text-sm leading-5 text-gray-500 dark:text-gray-400 dark:text-gray-300">
                     Sie können folgende Tokens verwenden, die vor dem Versenden mit dem richtigen Inhalt
                     ersetzt werden.
                 </p>
@@ -362,7 +362,7 @@
                 <div class="mt-6 border-t border-gray-100 dark:border-gray-700">
                     <dl class="divide-y divide-gray-100 dark:divide-gray-800">
                         <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                            <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">
+                            <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100 dark:text-gray-100">
                                 Token
                             </dt>
                             <dd class="mt-1 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-200 sm:col-span-2 sm:mt-0">
@@ -371,7 +371,7 @@
                         </div>
                         {% for name, value in availableTokens %}
                             <div class="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">{{ "{{ #{name} }}" }}</dt>
+                                <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ "{{ #{name} }}" }}</dt>
                                 <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-200 sm:col-span-2 sm:mt-0">{{ value }}</dd>
                             </div>
                         {% endfor %}
@@ -387,11 +387,11 @@
         {% block content %}
 
             <div class="overflow-hidden">
-                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">
+                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100" id="modal-title">
                     E-Mail-Versand starten
                 </h3>
                 <div class="mt-2scroll">
-                    <p class="text-sm text-gray-500">Sind Sie sicher, dass Sie folgende E-Mail an
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Sind Sie sicher, dass Sie folgende E-Mail an
                         die {{ recipients|length }} Empfänger:innen versenden wollen?</p>
                 </div>
 
@@ -411,7 +411,7 @@
                 <button type="button"
                         data-action="live#action:prevent"
                         data-live-action-param="cancel"
-                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
                     Abbrechen
                 </button>
             </div>

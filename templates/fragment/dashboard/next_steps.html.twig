@@ -4,9 +4,9 @@
 <div class="grid">
 
     <div>
-        <h2 class="text-base font-semibold leading-6 text-gray-900">Was gibt es heute zu erledigen?</h2>
-        <p class="mt-1 text-sm text-gray-500">Vielleicht helfen Ihnen diese Links für den Einstieg.</p>
-        <ul role="list" class="mt-6 divide-y divide-gray-200 border-b border-t border-gray-200">
+        <h2 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-50">Was gibt es heute zu erledigen?</h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300 dark:text-gray-300">Vielleicht helfen Ihnen diese Links für den Einstieg.</p>
+        <ul role="list" class="mt-6 divide-y divide-gray-200 dark:divide-gray-800 border-b border-t border-gray-200 dark:border-gray-800">
 
             {% if not is_granted('ROLE_ADMIN') %}
                 {% for offer in offerRepository.findUpcoming|filter((offer) => offer.state == 'draft' and is_granted('view', offer)) %}
@@ -22,7 +22,7 @@
                                 </span>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
                                     <a href="{{ path('admin_offers_edit', { id: offer.id, edition: offer.edition.alias } ) }}">
                                         <span class="absolute inset-0" aria-hidden="true"></span>
                                         „{{ offer.name }}“ jetzt abschließen!</span>
@@ -68,7 +68,7 @@
                                 </span>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
                                     <a href="{{ path('admin_offer_participants', { id: offer.id, edition: offer.edition.alias } ) }}">
                                         <span class="absolute inset-0" aria-hidden="true"></span>
                                         Teilnahmeliste von „{{ offer.name }}“</span>
@@ -129,13 +129,13 @@
                             </span>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
                                 <a href="{{ path('admin_offers_new', { edition: edition.alias }) }}">
                                     <span class="absolute inset-0" aria-hidden="true"></span>
                                     Neue Veranstaltung in <span class="italic">{{ edition.name }}</span>
                                 </a>
                             </div>
-                            <p class="text-sm text-gray-500">Erstellen Sie jetzt eine neue Veranstaltung für <span
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Erstellen Sie jetzt eine neue Veranstaltung für <span
                                         class="italic">{{ edition.name }}</span>!</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
@@ -163,13 +163,13 @@
                             </span>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
                                 <a href="{{ path('admin_editions_create') }}">
                                     <span class="absolute inset-0" aria-hidden="true"></span>
                                     Neue Ferienpass-Saison erstellen
                                 </a>
                             </div>
-                            <p class="text-sm text-gray-500">Es schaut so aus, als wäre es Zeit für einen neuen
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Es schaut so aus, als wäre es Zeit für einen neuen
                                 Ferienpass.</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
@@ -195,13 +195,13 @@
                             </span>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
                                 <a href="{{ path('admin_tools_registration') }}" data-turbo-frame="modal">
                                     <span class="absolute inset-0" aria-hidden="true"></span>
                                     Neue Anmeldung
                                 </a>
                             </div>
-                            <p class="text-sm text-gray-500">Ergänzen Sie hier neue Teilnehmende.</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Ergänzen Sie hier neue Teilnehmende.</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
                             <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
@@ -220,7 +220,7 @@
 {#
     <div>
         <h2 class="text-base font-semibold leading-6 text-gray-900">Sind Sie auf Kurs?</h2>
-        <p class="mt-1 text-sm text-gray-500">Hier können Sie sehen, was zuletzt alles passiert ist.</p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Hier können Sie sehen, was zuletzt alles passiert ist.</p>
         <ul role="list" class="mt-6 divide-y divide-gray-200 border-b border-t border-gray-200">
             <li class="py-4">
                 <div class="flex items-center gap-x-3">
@@ -229,7 +229,7 @@
                     <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Michael Foster</h3>
                     <time datetime="2023-01-23T11:00" class="flex-none text-xs text-gray-500">1h</time>
                 </div>
-                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span class="text-gray-700">ios-app</span>
+                <p class="mt-3 truncate text-sm text-gray-500 dark:text-gray-300">Pushed to <span class="text-gray-700">ios-app</span>
                     (<span class="font-mono text-gray-700">2d89f0c8</span> on <span class="text-gray-700">main</span>)
                 </p>
             </li>
@@ -240,7 +240,7 @@
                     <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Lindsay Walton</h3>
                     <time datetime="2023-01-23T09:00" class="flex-none text-xs text-gray-500">3h</time>
                 </div>
-                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span class="text-gray-700">mobile-api</span> (<span
+                <p class="mt-3 truncate text-sm text-gray-500 dark:text-gray-300">Pushed to <span class="text-gray-700">mobile-api</span> (<span
                             class="font-mono text-gray-700">249df660</span> on <span class="text-gray-700">main</span>)
                 </p>
             </li>
@@ -251,7 +251,7 @@
                     <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Courtney Henry</h3>
                     <time datetime="2023-01-23T00:00" class="flex-none text-xs text-gray-500">12h</time>
                 </div>
-                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span class="text-gray-700">ios-app</span>
+                <p class="mt-3 truncate text-sm text-gray-500 dark:text-gray-300">Pushed to <span class="text-gray-700">ios-app</span>
                     (<span class="font-mono text-gray-700">11464223</span> on <span class="text-gray-700">main</span>)
                 </p>
             </li>
@@ -262,7 +262,7 @@
                     <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Courtney Henry</h3>
                     <time datetime="2023-01-21T13:00" class="flex-none text-xs text-gray-500">2d</time>
                 </div>
-                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span
+                <p class="mt-3 truncate text-sm text-gray-500 dark:text-gray-300">Pushed to <span
                             class="text-gray-700">tailwindui.com</span> (<span
                             class="font-mono text-gray-700">dad28e95</span> on <span class="text-gray-700">main</span>)
                 </p>
@@ -274,7 +274,7 @@
                     <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Michael Foster</h3>
                     <time datetime="2023-01-18T12:34" class="flex-none text-xs text-gray-500">5d</time>
                 </div>
-                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span
+                <p class="mt-3 truncate text-sm text-gray-500 dark:text-gray-300">Pushed to <span
                             class="text-gray-700">relay-service</span> (<span
                             class="font-mono text-gray-700">624bc94c</span> on <span class="text-gray-700">main</span>)
                 </p>

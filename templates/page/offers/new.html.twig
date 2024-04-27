@@ -8,11 +8,10 @@
     <div class="mx-auto max-w-3xl">
         {{ partials.h1("offers.new"|trans) }}
 
-        <p class="mt-1 text-sm text-gray-500">Wählen Sie aus, ob Sie mit einer Vorlage starten wollen.</p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Wählen Sie aus, ob Sie mit einer Vorlage starten wollen.</p>
 
         <twig:Admin:OfferNewWizard class="mt-6" edition="{{ edition }}" />
 
     </div>
-
 
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends "@FerienpassAdmin/layout/base.html.twig" %}
+{% trans_default_domain 'admin' %}
+{% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
+
+
+{% block main %}
+
+    <div class="mx-auto max-w-3xl">
+        {{ partials.h1("offers.new"|trans) }}
+
+        <p class="mt-1 text-sm text-gray-500">Wählen Sie aus, ob Sie mit einer Vorlage starten wollen.</p>
+
+        <twig:Admin:OfferNewWizard class="mt-6" edition="{{ edition }}" />
+
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,180 @@
+{% trans_default_domain 'admin' %}
+{% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
+
+{% macro offers(offers, edition, action) %}
+    <ul class="divide-y divide-gray-200 border-b border-gray-200">
+
+        {% for offer in offers %}
+
+            <li class="py-2 font-medium text-gray-900">
+                <div class="group relative flex items-start space-x-4 py-2">
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-medium text-gray-900">
+                            <a href="{{ path(action, { edition: edition.alias, id: offer.id }) }}"
+                               class="flex items-center space-x-1.5 whitespace-nowrap">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+
+                                <span class="truncate">
+                                    {{ offer.name }}
+                                </span>
+
+                                <svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
+                                    <circle cx="1" cy="1" r="1"/>
+                                </svg>
+
+                                <span class="font-normal text-gray-500">
+                                    {% if offer.dates is not empty %}
+                                        {% set startDate = offer.dates|first.begin %}
+                                        <time datetime="{{ startDate|date('c') }}">{{ startDate|format_datetime(pattern="E, dd.MM.yyyy HH:mm") }}</time>
+                                    {% else %}
+                                        <span>Dauerangebot</span>
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 self-center">
+                        <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                             fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </li>
+
+        {% endfor %}
+
+    </ul>
+
+    <p class="pl-2 pt-2 text-xs text-gray-500">Wenn Ihr Angebot hier nicht angezeigt wird, wechseln Sie zur
+        Angebotsübersicht und rufen die Aktion über die drei Punkte auf.</p>
+
+{% endmacro %}
+
+
+<div {{ attributes }}>
+
+    <ul role="list" class="divide-y divide-gray-200 border-b border-t border-gray-200">
+        {% if canCopy %}
+            <li>
+                <div class="group relative flex items-start space-x-3 py-4">
+                    <div class="flex-shrink-0">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-pink-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-medium text-gray-900">
+                            <a href="#"
+                               data-action="live#emit:prevent"
+                               data-live-event-param="action"
+                               data-live-action-param="copy"
+                            >
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                Aus dem Vorjahr übernehmen
+                            </a>
+                        </div>
+                        <p class="text-sm text-gray-500">Wenn Sie die gleiche Veranstaltung schon einmal angeboten
+                            haben, nutzen Sie sie doch gerne als Vorlage!</p>
+                    </div>
+                    <div class="flex-shrink-0 self-center">
+                        <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                             fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+
+                {% if action == 'copy' %}
+                    <div class="ml-12 pb-4 border-t border-gray-200">
+                        {{ _self.offers(offers, edition, 'admin_offers_copy') }}
+                    </div>
+                {% endif %}
+
+            </li>
+        {% endif %}
+        {% if canCreateVariant %}
+            <li>
+                <div class="group relative flex items-start space-x-3 py-4">
+                    <div class="flex-shrink-0">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-medium text-gray-900">
+                            <a href="#"
+                               data-action="live#emit:prevent"
+                               data-live-event-param="action"
+                               data-live-action-param="createVariant">
+                                <span class="absolute inset-0" aria-hidden="true"></span>
+                                Neue Termingruppe zu gleicher Veranstaltung erstellen
+                            </a>
+                        </div>
+                        <p class="text-sm text-gray-500"> Wenn Sie eine Veranstaltung mehrmals anbieten, dann erstellen
+                            Sie hier gerne eine neue Termingruppe! Nur Datum und Zielgruppe darf abweichen.</p>
+                    </div>
+                    <div class="flex-shrink-0 self-center">
+                        <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                             fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+                {% if action == 'createVariant' %}
+                    <div class="ml-12 py-4 border-t border-gray-200">
+                        {{ _self.offers(offers, edition, 'admin_offers_new_variant') }}
+                    </div>
+                {% endif %}
+
+            </li>
+        {% endif %}
+        <li>
+            <div class="group relative flex items-start space-x-3 py-4">
+                <div class="flex-shrink-0">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="w-6 h-6 text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                        </svg>
+                    </span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="text-sm font-medium text-gray-900">
+                        <a href="{{ path('admin_offers_create', { edition: edition.alias }) }}">
+                            <span class="absolute inset-0" aria-hidden="true"></span>
+                            Ohne Vorlage beginnen (Standard)
+                        </a>
+                    </div>
+                    <p class="text-sm text-gray-500">Sie können ohne Weiteres ein neues Angebot erstellen.</p>
+                </div>
+                <div class="flex-shrink-0 self-center">
+                    <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                         fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                              clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+</div>

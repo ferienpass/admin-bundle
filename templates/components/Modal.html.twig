@@ -1,27 +1,27 @@
 <div {{ attributes.defaults(stimulus_controller('ferienpass/admin-modal')) }}>
-        <dialog {{ stimulus_target('ferienpass/admin-modal', 'dialog') }}
-                {{ stimulus_action('ferienpass/admin-modal', 'hide', 'close') }}
-                data-transition-enter="ease-out duration-300"
-                data-transition-enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                data-transition-enter-end="opacity-100 translate-y-0 sm:scale-100"
-                data-transition-leave="ease-in duration-200"
-                data-transition-leave-start="opacity-100 translate-y-0 sm:scale-100"
-                data-transition-leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="relative bg-white dark:bg-gray-900 rounded-lg px-4 pt-5 pb-4 overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full sm:p-6"
-                aria-labelledby="modal-headline">
-            <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
-                <button {{ stimulus_action('ferienpass/admin-modal', 'hide') }}
-                        type="button"
-                        class="text-gray-400 dark:text-gray-700 hover:text-gray-500 dark:hover:text-gray-600 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150"
-                        aria-label="Schließen">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
+    <dialog data-ferienpass--admin-modal-target="dialog"
+            data-action="close->ferienpass--admin-modal#hide turbo:before-cache@window->ferienpass--admin-modal#hide"
+            data-transition-enter="ease-out duration-300"
+            data-transition-enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            data-transition-enter-end="opacity-100 translate-y-0 sm:scale-100"
+            data-transition-leave="ease-in duration-200"
+            data-transition-leave-start="opacity-100 translate-y-0 sm:scale-100"
+            data-transition-leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            class="relative bg-white dark:bg-gray-900 rounded-lg px-4 pt-5 pb-4 overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full sm:p-6"
+            aria-labelledby="modal-headline">
+        <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+            <button {{ stimulus_action('ferienpass/admin-modal', 'hide') }}
+                    type="button"
+                    class="text-gray-400 dark:text-gray-700 hover:text-gray-500 dark:hover:text-gray-600 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150"
+                    aria-label="Schließen">
+                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
 
-            <turbo-frame id="modal" {{ stimulus_target('ferienpass/admin-modal', 'dynamicContent') }}></turbo-frame>
+        <turbo-frame id="modal" {{ stimulus_target('ferienpass/admin-modal', 'dynamicContent') }}></turbo-frame>
 
-        </dialog>
+    </dialog>
 </div>

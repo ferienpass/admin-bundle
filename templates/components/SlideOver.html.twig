@@ -1,8 +1,7 @@
 <div {{ attributes.defaults(stimulus_controller('ferienpass/admin-slideover')) }}>
 
-    <dialog
-            {{ stimulus_target('ferienpass/admin-slideover', 'dialog') }}
-            {{ stimulus_action('ferienpass/admin-slideover', 'hide', 'close') }}
+    <dialog data-ferienpass--admin-slideover-target="dialog"
+            data-action="close->ferienpass--admin-slideover#hide turbo:before-cache@window->ferienpass--admin-slideover#hide"
             class="relative z-10"
          aria-labelledby="slide-over-title">
         <div class="fixed inset-0"></div>

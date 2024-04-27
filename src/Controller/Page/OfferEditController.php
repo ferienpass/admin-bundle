@@ -43,7 +43,7 @@ final class OfferEditController extends AbstractController
     }
 
     #[Route('/{id}/bearbeiten', name: 'admin_offers_edit', requirements: ['id' => '\d+'])]
-    #[Route('/neu', name: 'admin_offers_new')]
+    #[Route('/neu/leer', name: 'admin_offers_create')]
     #[Route('/kopieren/{id}', name: 'admin_offers_copy')]
     #[Route('/variante/{id}', name: 'admin_offers_new_variant')]
     public function __invoke(?int $id, #[MapEntity(mapping: ['edition' => 'alias'])] ?Edition $edition, EntityManagerInterface $em, Request $request, Breadcrumb $breadcrumb): Response

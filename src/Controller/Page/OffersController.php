@@ -96,6 +96,17 @@ final class OffersController extends AbstractController
         ]);
     }
 
+    #[Route('/neu', name: 'admin_offers_new')]
+    public function newWizard(#[MapEntity(mapping: ['edition' => 'alias'])] ?Edition $edition, Breadcrumb $breadcrumb): Response
+    {
+        $this->denyAccessUnlessGranted('offer.create', $edition);
+
+        return $this->render('@FerienpassAdmin/page/offers/new.html.twig', [
+            'edition' => $edition,
+            'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $edition->getAlias()]]], [$edition->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $edition->getAlias()]]], 'Neue Veranstaltung'),
+        ]);
+    }
+
     #[Route('/{id}/korrekturabzug', name: 'admin_offers_proof', requirements: ['id' => '\d+'])]
     public function proof(int $id, OfferRepositoryInterface $repository, PdfExports $pdfExports, Breadcrumb $breadcrumb): Response
     {
@@ -155,6 +166,7 @@ final class OffersController extends AbstractController
             'form' => $form,
         ]);
     }
+
     #[Route('/{id}/absagen', name: 'admin_offers_cancel', requirements: ['id' => '\d+'])]
     public function cancel(int $id, OfferRepositoryInterface $repository, Request $request, EntityManagerInterface $entityManager, WorkflowInterface $offerStateMachine, Breadcrumb $breadcrumb): Response
     {
@@ -180,6 +192,7 @@ final class OffersController extends AbstractController
             'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName()),
         ]);
     }
+
     #[Route('/{id}/wiederherstellen', name: 'admin_offers_relaunch', requirements: ['id' => '\d+'])]
     public function relaunch(int $id, OfferRepositoryInterface $repository, Request $request, EntityManagerInterface $entityManager, WorkflowInterface $offerStateMachine, Breadcrumb $breadcrumb): Response
     {

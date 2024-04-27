@@ -1,47 +1,285 @@
-<div class="space-y-6">
+{% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
+{% trans_default_domain "admin" %}
 
-    {% for edition in editions %}
-        {% embed '@FerienpassAdmin/fragment/_box_33_66.html.twig' with {
-            'headline': edition.edition.name,
-        } %}
+<div class="grid">
 
-            {% block box %}
+    <div>
+        <h2 class="text-base font-semibold leading-6 text-gray-900">Was gibt es heute zu erledigen?</h2>
+        <p class="mt-1 text-sm text-gray-500">Vielleicht helfen Ihnen diese Links für den Einstieg.</p>
+        <ul role="list" class="mt-6 divide-y divide-gray-200 border-b border-t border-gray-200">
 
-                <ol role="list" class="space-y-6">
+            {% if not is_granted('ROLE_ADMIN') %}
+                {% for offer in offerRepository.findUpcoming|filter((offer) => offer.state == 'draft' and is_granted('view', offer)) %}
+                    <li>
+                        <div class="group relative flex items-start space-x-3 py-4">
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-500">
+                                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                         stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-sm font-medium text-gray-900">
+                                    <a href="{{ path('admin_offers_edit', { id: offer.id, edition: offer.edition.alias } ) }}">
+                                        <span class="absolute inset-0" aria-hidden="true"></span>
+                                        „{{ offer.name }}“ jetzt abschließen!</span>
+                                    </a>
+                                </div>
+                                <div class="mt-1 flex items-center gap-x-2 text-sm leading-5 text-gray-500 dark:text-gray-100/40">
 
-                    {% for step in edition.steps %}
-                        <li>
-                            <div class="flex items-start">
+                                    {% if offer.dates is not empty %}
+                                        {% set startDate = offer.dates|first.begin %}
+                                        <time datetime="{{ startDate|date('c') }}">{{ startDate|format_datetime(pattern="E, dd.MM.yyyy HH:mm") }}</time>
+                                    {% else %}
+                                        <span>Dauerangebot</span>
+                                    {% endif %}
 
-                                {% if step.completed|default %}
-                                    <div class="flex-shrink-0 relative h-5 w-5 flex items-center justify-center">
-                                        <span class="h-full w-full text-primary-600">{{ source('@FerienpassAdmin/icons/check-circle.solid.svg') }}</span>
-                                    </div>
-                                {% elseif step.current|default %}
-                                    <div class="flex-shrink-0 h-5 w-5 relative flex items-center justify-center"
-                                         aria-hidden="true">
-                                        <span class="absolute h-4 w-4 rounded-full bg-primary-200"></span>
-                                        <span class="relative block w-2 h-2 bg-primary-600 rounded-full"></span>
-                                    </div>
-                                {% else %}
-                                    <div class="flex-shrink-0 h-5 w-5 relative flex items-center justify-center"
-                                         aria-hidden="true">
-                                        <div class="h-2 w-2 bg-gray-300 rounded-full"></div>
-                                    </div>
-                                {% endif %}
+                                    {{ partials.offer_status_badge(offer.state, "xs") }}
 
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-500">{{ step.text|trans }}</p>
                                 </div>
                             </div>
-                        </li>
-                    {% endfor %}
+                            <div class="flex-shrink-0 self-center">
+                                <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                     fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
 
-                </ol>
+            {% if not is_granted('ROLE_ADMIN') %}
+                {% for offer in offerRepository.findUpcoming|filter((offer) => offer.state == 'published' and offer.requiresApplication and offer.isOnlineApplication and is_granted('view', offer))|slice(0, 5) %}
+                    <li>
+                        <div class="group relative flex items-start space-x-3 py-4">
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-500">
+                                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                         stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-sm font-medium text-gray-900">
+                                    <a href="{{ path('admin_offer_participants', { id: offer.id, edition: offer.edition.alias } ) }}">
+                                        <span class="absolute inset-0" aria-hidden="true"></span>
+                                        Teilnahmeliste von „{{ offer.name }}“</span>
+                                    </a>
+                                </div>
+                                <div class="mt-1 flex items-center gap-x-2 text-sm leading-5 text-gray-500 dark:text-gray-100/40">
 
-            {% endblock %}
+                                    {% if offer.dates is not empty %}
+                                        {% set startDate = offer.dates|first.begin %}
+                                        <time datetime="{{ startDate|date('c') }}">{{ startDate|format_datetime(pattern="E, dd.MM.yyyy HH:mm") }}</time>
+                                    {% else %}
+                                        <span>Dauerangebot</span>
+                                    {% endif %}
 
-        {% endembed %}
-    {% endfor %}
+                                    {% if offer.requiresApplication and offer.onlineApplication %}
+                                        <p class="flex items-center space-x-1" title="aktuelle Anmeldungen">
+                                            <span class="{{ (offer.maxParticipants and offer.attendancesConfirmed|length >= offer.maxParticipants) ? 'text-red-700' : 'text-green-700' }}">
+                                                <svg viewBox="0 0 2 2" class="h-2 w-2 fill-current">
+                                                    <circle cx="1" cy="1" r="1"/>
+                                                </svg>
+                                            </span>
 
+                                            <span>
+                                                {{ offer.attendancesConfirmedOrWaitlisted|length ~ ' / ' ~ (offer.maxParticipants ?: '∞') ~ '' }}
+                                            </span>
+
+                                            {% if offer.attendancesWaiting|length %}
+                                                <span title="nicht-zugeteilte Teilnehmende"
+                                                      class="mt-0.5 text-orange-600 w-4 h-4">{{ source("@FerienpassAdmin/icons/exclamation-triangle.micro.svg") }}</span>
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 self-center">
+                                <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                     fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
+
+            {% for edition in editionRepository.findWithActiveTask('host_editing_stage') %}
+                <li>
+                    <div class="group relative flex items-start space-x-3 py-4">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-500">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                     stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-medium text-gray-900">
+                                <a href="{{ path('admin_offers_new', { edition: edition.alias }) }}">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    Neue Veranstaltung in <span class="italic">{{ edition.name }}</span>
+                                </a>
+                            </div>
+                            <p class="text-sm text-gray-500">Erstellen Sie jetzt eine neue Veranstaltung für <span
+                                        class="italic">{{ edition.name }}</span>!</p>
+                        </div>
+                        <div class="flex-shrink-0 self-center">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                 fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+
+            {% if is_granted('ROLE_ADMIN') and editionRepository.findPrevious is not empty and editionRepository.findUpcoming is empty %}
+                <li>
+                    <div class="group relative flex items-start space-x-3 py-4">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-pink-500">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                     stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46"/>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-medium text-gray-900">
+                                <a href="{{ path('admin_editions_create') }}">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    Neue Ferienpass-Saison erstellen
+                                </a>
+                            </div>
+                            <p class="text-sm text-gray-500">Es schaut so aus, als wäre es Zeit für einen neuen
+                                Ferienpass.</p>
+                        </div>
+                        <div class="flex-shrink-0 self-center">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                 fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <li>
+                    <div class="group relative flex items-start space-x-3 py-4">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500">
+                                <span class="h-6 w-6 text-white" aria-hidden="true">
+                                    {{ source('@FerienpassAdmin/icons/user-plus.outline.svg') }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-medium text-gray-900">
+                                <a href="{{ path('admin_tools_registration') }}" data-turbo-frame="modal">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    Neue Anmeldung
+                                </a>
+                            </div>
+                            <p class="text-sm text-gray-500">Ergänzen Sie hier neue Teilnehmende.</p>
+                        </div>
+                        <div class="flex-shrink-0 self-center">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                 fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+
+        </ul>
+    </div>
+{#
+    <div>
+        <h2 class="text-base font-semibold leading-6 text-gray-900">Sind Sie auf Kurs?</h2>
+        <p class="mt-1 text-sm text-gray-500">Hier können Sie sehen, was zuletzt alles passiert ist.</p>
+        <ul role="list" class="mt-6 divide-y divide-gray-200 border-b border-t border-gray-200">
+            <li class="py-4">
+                <div class="flex items-center gap-x-3">
+                    <img src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                         alt="" class="h-6 w-6 flex-none rounded-full bg-gray-800">
+                    <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Michael Foster</h3>
+                    <time datetime="2023-01-23T11:00" class="flex-none text-xs text-gray-500">1h</time>
+                </div>
+                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span class="text-gray-700">ios-app</span>
+                    (<span class="font-mono text-gray-700">2d89f0c8</span> on <span class="text-gray-700">main</span>)
+                </p>
+            </li>
+            <li class="py-4">
+                <div class="flex items-center gap-x-3">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                         alt="" class="h-6 w-6 flex-none rounded-full bg-gray-800">
+                    <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Lindsay Walton</h3>
+                    <time datetime="2023-01-23T09:00" class="flex-none text-xs text-gray-500">3h</time>
+                </div>
+                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span class="text-gray-700">mobile-api</span> (<span
+                            class="font-mono text-gray-700">249df660</span> on <span class="text-gray-700">main</span>)
+                </p>
+            </li>
+            <li class="py-4">
+                <div class="flex items-center gap-x-3">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                         alt="" class="h-6 w-6 flex-none rounded-full bg-gray-800">
+                    <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Courtney Henry</h3>
+                    <time datetime="2023-01-23T00:00" class="flex-none text-xs text-gray-500">12h</time>
+                </div>
+                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span class="text-gray-700">ios-app</span>
+                    (<span class="font-mono text-gray-700">11464223</span> on <span class="text-gray-700">main</span>)
+                </p>
+            </li>
+            <li class="py-4">
+                <div class="flex items-center gap-x-3">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                         alt="" class="h-6 w-6 flex-none rounded-full bg-gray-800">
+                    <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Courtney Henry</h3>
+                    <time datetime="2023-01-21T13:00" class="flex-none text-xs text-gray-500">2d</time>
+                </div>
+                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span
+                            class="text-gray-700">tailwindui.com</span> (<span
+                            class="font-mono text-gray-700">dad28e95</span> on <span class="text-gray-700">main</span>)
+                </p>
+            </li>
+            <li class="py-4">
+                <div class="flex items-center gap-x-3">
+                    <img src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                         alt="" class="h-6 w-6 flex-none rounded-full bg-gray-800">
+                    <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-gray-900">Michael Foster</h3>
+                    <time datetime="2023-01-18T12:34" class="flex-none text-xs text-gray-500">5d</time>
+                </div>
+                <p class="mt-3 truncate text-sm text-gray-500">Pushed to <span
+                            class="text-gray-700">relay-service</span> (<span
+                            class="font-mono text-gray-700">624bc94c</span> on <span class="text-gray-700">main</span>)
+                </p>
+            </li>
+        </ul>
+
+    </div>#}
 </div>

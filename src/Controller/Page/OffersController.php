@@ -30,6 +30,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 #[Route('/angebote/{edition?null}')]
 final class OffersController extends AbstractController
@@ -152,6 +153,56 @@ final class OffersController extends AbstractController
         return $this->render('@FerienpassAdmin/page/offers/delete.html.twig', [
             'item' => $item,
             'form' => $form,
+        ]);
+    }
+    #[Route('/{id}/absagen', name: 'admin_offers_cancel', requirements: ['id' => '\d+'])]
+    public function cancel(int $id, OfferRepositoryInterface $repository, Request $request, EntityManagerInterface $entityManager, WorkflowInterface $offerStateMachine, Breadcrumb $breadcrumb): Response
+    {
+        if (null === $offer = $repository->find($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted(OfferInterface::TRANSITION_CANCEL, $offer);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_offers_cancel', ['id' => $id]),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $offerStateMachine->apply($offer, OfferInterface::TRANSITION_CANCEL);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/offers/cancel.html.twig', [
+            'offer' => $offer,
+            'cancel' => $form,
+            'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName()),
+        ]);
+    }
+    #[Route('/{id}/wiederherstellen', name: 'admin_offers_relaunch', requirements: ['id' => '\d+'])]
+    public function relaunch(int $id, OfferRepositoryInterface $repository, Request $request, EntityManagerInterface $entityManager, WorkflowInterface $offerStateMachine, Breadcrumb $breadcrumb): Response
+    {
+        if (null === $offer = $repository->find($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted(OfferInterface::TRANSITION_RELAUNCH, $offer);
+
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_offers_relaunch', ['id' => $id]),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $offerStateMachine->apply($offer, OfferInterface::TRANSITION_RELAUNCH);
+            $entityManager->flush();
+        }
+
+        return $this->render('@FerienpassAdmin/page/offers/relaunch.html.twig', [
+            'offer' => $offer,
+            'relaunch' => $form,
+            'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName()),
         ]);
     }
 }

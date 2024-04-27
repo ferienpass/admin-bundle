@@ -1,0 +1,53 @@
+{% extends "@FerienpassAdmin/layout/modalBase.html.twig" %}
+
+{% block main %}
+
+    {% trans_default_domain 'admin' %}
+    {% set type = app.request.get('_route')|split('_')[1] %}
+
+    <div class="sm:flex sm:items-start">
+        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-600/70 sm:mx-0 sm:h-10 sm:w-10">
+            <span class="block h-6 w-6 text-red-600 dark:text-red-100/90">{{ source('@FerienpassAdmin/icons/exclamation.svg') }}</span>
+        </div>
+        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100"
+                id="modal-headline">Angebot wiederherstellen</h3>
+            <div class="mt-2">
+                <p class="text-sm leading-5 text-gray-500 dark:text-gray-300">
+                    Sind Sie sicher, dass Sie folgendes Angebot wiederherstellen möchten?
+                </p>
+
+                <p class="text-sm leading-5 text-gray-500 mt-2 sm:mt-1">
+                    <span class="font-medium">{{ offer.name }}</span>
+                </p>
+                <p class="text-sm font-medium leading-5 text-gray-600 mt-2">
+                    {% if offer.onlineApplication %}
+                        <span>Alle Teilnhemer:innen werden wieder zugesagt und informiert.</span>
+                    {% else %}
+                        <span>Stellen Sie sicher, dass Sie alle Teilnehmer:innen wieder informieren!</span>
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+    </div>
+    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+
+        {{ form_start(relaunch) }}
+
+        <button type="submit"
+                class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+        >
+            Absagen
+        </button>
+
+        {{ form_end(relaunch) }}
+
+        <form method="dialog">
+            <button class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                Abbrechen
+            </button>
+        </form>
+    </div>
+
+{% endblock %}

@@ -106,7 +106,7 @@ class ActionsBuilder
 
         $root->addChild('proof', [
             'label' => 'offers.action.proof',
-            'route' => 'admin_offer_proof',
+            'route' => 'admin_offers_proof',
             'routeParameters' => array_filter(['id' => $item->getId(), 'edition' => $item->getEdition()?->getAlias()]),
             'display' => $this->isGranted('view', $item),
             'extras' => ['icon' => 'pencil-solid'],

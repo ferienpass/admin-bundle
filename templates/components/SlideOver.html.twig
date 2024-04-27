@@ -1,22 +1,16 @@
-{% trans_default_domain 'admin' %}
+<div {{ attributes.defaults(stimulus_controller('ferienpass/admin-slideover')) }}>
 
-<div {{ attributes.defaults(stimulus_controller('ferienpass/admin-slideover')) }}
-        {{ stimulus_action('ferienpass/admin-slideover', 'show', 'admin:slideover:open') }}
-        class="hidden"
-        data-poll>
-
-    <div class="relative z-10"
-         aria-labelledby="slide-over-title"
-         role="dialog"
-         aria-modal="true"
-         x-show="open">
-        <div class="fixed inset-0" x-show="open"></div>
+    <dialog
+            {{ stimulus_target('ferienpass/admin-slideover', 'dialog') }}
+            {{ stimulus_action('ferienpass/admin-slideover', 'hide', 'close') }}
+            class="relative z-10"
+         aria-labelledby="slide-over-title">
+        <div class="fixed inset-0"></div>
 
         <div class="fixed inset-0 overflow-hidden">
             <div class="absolute inset-0 overflow-hidden">
                 <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-                    <div {{ stimulus_target('ferienpass/admin-slideover', 'panel') }}
-                            {{ stimulus_action('ferienpass/admin-slideover', 'hide', 'admin:slideover:close') }}
+                    <div
                             data-transition-enter="transform transition ease-in-out duration-500 sm:duration-700"
                             data-transition-enter-start="translate-x-full"
                             data-transition-enter-end="translate-x-0"
@@ -45,7 +39,7 @@
                             </div>
                             <div class="relative mt-6 flex-1 px-4 sm:px-6">
 
-                                {% block content %}{% endblock %}
+                                <turbo-frame id="slideover" {{ stimulus_target('ferienpass/admin-slideover', 'dynamicContent') }}></turbo-frame>
 
                             </div>
                         </div>
@@ -53,6 +47,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </dialog>
 
 </div>

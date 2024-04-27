@@ -96,7 +96,17 @@
 
                                 {% if loop.first %}
                                     <td class="whitespace-nowrap py-2 pl-2 pr-1 text-sm font-medium text-gray-900 dark:text-gray-100/90 sm:pl-0 max-w-xs truncate overflow-hidden">
-                                        {{ include(template_from_string(td)) }}
+
+                                        {% if showUrl is defined %}
+                                            <a href="{{ include(template_from_string(showUrl)) }}"
+                                               class="hover:underline"
+                                               data-turbo-frame="slideover">
+                                                {{ include(template_from_string(td)) }}
+                                            </a>
+                                        {% else %}
+                                            {{ include(template_from_string(td)) }}
+                                        {% endif %}
+
                                     </td>
                                 {% else %}
                                     <td class="whitespace-nowrap py-2 pl-2 pr-1 text-sm text-gray-700 dark:text-gray-100/50 max-w-xs truncate overflow-hidden">
@@ -110,21 +120,18 @@
 
                                 <div class="flex items-center gap-x-2">
 
-                                    {% if item.activity is defined %}
-                                        <button type="button"
-                                                data-action="live#emit"
-                                                data-live-event-param="view"
-                                                data-live-id-param="{{ item.id }}"
-                                        >
+                                    {% if item.comments is defined and showUrl is defined %}
+                                        <a href="{{ include(template_from_string(showUrl)) }}"
+                                           data-turbo-frame="slideover">
                                             <span class="flex w-16 gap-x-1" title="Bearbeitungsnotizen">
                                                 <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24"
                                                      stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                           d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
                                                 </svg>
-                                                <span class="text-xs leading-6 text-gray-700">{{ item.activity|filter(a => a.isComment)|length }}</span>
+                                                <span class="text-xs leading-6 text-gray-700">{{ item.comments|length }}</span>
                                             </span>
-                                        </button>
+                                        </a>
                                     {% endif %}
 
 

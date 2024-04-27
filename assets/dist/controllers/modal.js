@@ -45,5 +45,4 @@ export default class default_1 extends Controller {
         leave(this.dialogTarget);
     }
 }
-default_1.values = {};
 default_1.targets = ["dialog", "dynamicContent"];

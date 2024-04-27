@@ -7,6 +7,7 @@
         routeParameters: app.request.query.all,
         searchable: searchable,
         config: {
+            showUrl: '{{ path("admin_participants_show", { id: item.id }) }}',
             columns: {
                 name: '{{ item.name }}',
                 dateOfBirth: '{{ item.dateOfBirth|date("d.m.Y") }}',

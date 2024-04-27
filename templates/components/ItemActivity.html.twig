@@ -1,17 +1,14 @@
+{% trans_default_domain 'admin' %}
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 
-<div>
-    <h1 class="text-xl font-bold text-gray-900 sm:text-2xl">{{ item.name }}</h1>
-
-    {% block summary %}
-    {% endblock %}
+<div {{ attributes }} data-poll>
 
     <h2 class="mt-6 text-base font-semibold leading-6 text-gray-900">Aktivität</h2>
 
     <div class="flow-root">
         <ul role="list" class="-mb-8 mt-2">
-            {% for activity in this.activity %}
-                {% if activity.isComment %}
+            {% for log in activity %}
+                {% if log.isComment %}
                     <li>
                         <div class="relative pb-8">
                             {% if not loop.last %}
@@ -21,7 +18,7 @@
                             <div class="relative flex items-start space-x-3">
                                 <div class="relative">
                                     <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-500 ring-8 ring-white">
-                                        <span class="font-medium leading-none text-white">{{ activity.user.firstname|first|upper ~ activity.user.lastname|first|upper }}</span>
+                                        <span class="font-medium leading-none text-white">{{ log.user.firstname|first|upper ~ log.user.lastname|first|upper }}</span>
                                     </span>
 
                                     <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
@@ -36,18 +33,18 @@
                                 <div class="min-w-0 flex-1">
                                     <div>
                                         <p class="text-sm">
-                                            <span class="font-medium text-gray-900">{{ activity.user.name }}</span>
+                                            <span class="font-medium text-gray-900">{{ log.user.name }}</span>
                                             <span class="text-gray-500">
                                                 kommentierte
-                                                <time datetime="{{ activity.createdAt|date('c') }}"
-                                                      class="">{{ activity.createdAt|ago }}
+                                                <time datetime="{{ log.createdAt|date('c') }}"
+                                                      class="">{{ log.createdAt|ago }}
                                                 </time>
                                             </span>
                                         </p>
 
                                     </div>
                                     <div class="mt-2 text-sm text-gray-700">
-                                        <p>{{ activity.comment|nl2br }}</p>
+                                        <p>{{ log.comment|nl2br }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -55,7 +52,7 @@
                     </li>
                 {% endif %}
 
-                {% if activity.isTransition and activity.attendance|default(null) is not null %}
+                {% if log.isTransition and log.attendance|default(null) is not null %}
                     <li>
                         <div class="relative pb-8">
                             {% if not loop.last %}
@@ -79,23 +76,23 @@
                                 <div class="min-w-0 flex-1 py-0">
                                     <div class="text-sm leading-8 text-gray-500">
                                         <span class="mr-0.5">
-                                            <span class="font-medium text-gray-900">{{ activity.user ? activity.user.name : (activity.applicationSystem|default ? "applicationSystem.#{activity.applicationSystem}"|trans([], 'admin') : '') }}</span>
-                                            {{ activity.transition.name == 'create' ? 'meldete' : 'setzte den Status von' }}
-                                            <span class="font-medium text-gray-900">{{ activity.attendance.offer.name }}</span>
-                                            {% if activity.transition.tos is not empty and activity.transition.tos|first is not empty %}
-                                                {{ activity.transition.name == 'create' ? 'an mit Status' : 'auf' }}
+                                            <span class="font-medium text-gray-900">{{ log.user ? log.user.name : (log.applicationSystem|default ? "applicationSystem.#{log.applicationSystem}"|trans([], 'admin') : '') }}</span>
+                                            {{ log.transition.name == 'create' ? 'meldete' : 'setzte den Status von' }}
+                                            <span class="font-medium text-gray-900">{{ log.attendance.offer.name }}</span>
+                                            {% if log.transition.tos is not empty and log.transition.tos|first is not empty %}
+                                                {{ log.transition.name == 'create' ? 'an mit Status' : 'auf' }}
                                             {% else %}
-                                                {{ activity.transition.name == 'create' ? 'an' }}
+                                                {{ log.transition.name == 'create' ? 'an' }}
                                             {% endif %}
                                         </span>
-                                        {% if activity.transition.tos is not empty %}
+                                        {% if log.transition.tos is not empty %}
                                             <span class="mr-0.5">
-                                                {{ partials.status_badge(activity.transition.tos|first) }}
+                                                {{ partials.status_badge(log.transition.tos|first) }}
                                             </span>
                                         {% endif %}
                                         <span class="whitespace-nowrap">
-                                            <time datetime="{{ activity.createdAt|date('c') }}"
-                                                  class="">{{ activity.createdAt|ago }}
+                                            <time datetime="{{ log.createdAt|date('c') }}"
+                                                  class="">{{ log.createdAt|ago }}
                                             </time>
                                         </span>
                                     </div>
@@ -104,7 +101,7 @@
                         </div>
                     </li>
                 {% endif %}
-                {% if activity.isTransition and activity.offer|default(null) is not null %}
+                {% if log.isTransition and log.offer|default(null) is not null %}
                     <li>
                         <div class="relative pb-8">
                             {% if not loop.last %}
@@ -128,17 +125,17 @@
                                 <div class="min-w-0 flex-1 py-0">
                                     <div class="text-sm leading-8 text-gray-500">
                                         <span class="mr-0.5">
-                                            <span class="font-medium text-gray-900">{{ activity.user.name }}</span>
+                                            <span class="font-medium text-gray-900">{{ log.user.name }}</span>
                                             {{ 'setzte Status auf' }}
                                         </span>
-                                        {% if activity.transition.tos is not empty %}
+                                        {% if log.transition.tos is not empty %}
                                             <span class="mr-0.5">
-                                                {{ partials.offer_status_badge(activity.transition.tos|first) }}
+                                                {{ partials.offer_status_badge(log.transition.tos|first) }}
                                             </span>
                                         {% endif %}
                                         <span class="whitespace-nowrap">
-                                            <time datetime="{{ activity.createdAt|date('c') }}"
-                                                  class="">{{ activity.createdAt|ago }}
+                                            <time datetime="{{ log.createdAt|date('c') }}"
+                                                  class="">{{ log.createdAt|ago }}
                                             </time>
                                         </span>
                                     </div>
@@ -150,4 +147,30 @@
             {% endfor %}
         </ul>
     </div>
+
+
+    <div class="mt-6 flex gap-x-3">
+        <span class="flex-none inline-flex items-center justify-center h-6 w-6 rounded-full bg-gray-400">
+            <span class="text-xs font-medium leading-none text-white">{{ app.user.firstname|first|upper ~ app.user.lastname|first|upper }}</span>
+        </span>
+        <form action="#" class="relative flex-auto">
+            <div class="overflow-hidden rounded-lg pb-12 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-primary-600">
+                <label for="comment" class="sr-only">Verfasse deinen Kommentar…</label>
+                <textarea rows="2" name="comment" id="comment"
+                          data-model="newComment"
+                          class="block w-full resize-none border-0 bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                          placeholder="Verfasse deinen Kommentar…"></textarea>
+            </div>
+
+            <div class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2">
+                <button type="submit"
+                        data-action="live#action:prevent"
+                        data-live-action-param="comment"
+                        class="rounded-md bg-white dark:bg-gray-100/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-0 hover:bg-gray-50 dark:hover:bg-gray-100/10">
+                    Kommentieren
+                </button>
+            </div>
+        </form>
+    </div>
+
 </div>

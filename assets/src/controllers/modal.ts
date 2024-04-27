@@ -6,8 +6,6 @@ import {enter, leave} from "el-transition";
 //import {Component, getComponent} from '@symfony/ux-live-component';
 
 export default class extends Controller {
-    static values = {};
-
     static targets = ["dialog", "dynamicContent"];
 
     declare readonly dialogTarget: HTMLDialogElement;

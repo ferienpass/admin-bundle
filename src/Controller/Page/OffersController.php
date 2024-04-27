@@ -80,8 +80,23 @@ final class OffersController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'admin_offer_proof', requirements: ['id' => '\d+'])]
-    public function show(int $id, OfferRepositoryInterface $repository, PdfExports $pdfExports, Breadcrumb $breadcrumb): Response
+    #[Route('/{id}', name: 'admin_offers_show', requirements: ['id' => '\d+'])]
+    public function show(int $id, OfferRepositoryInterface $repository, Breadcrumb $breadcrumb): Response
+    {
+        if (null === $offer = $repository->find($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted('view', $offer);
+
+        return $this->render('@FerienpassAdmin/page/offers/show.html.twig', [
+            'item' => $offer,
+            'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName()),
+        ]);
+    }
+
+    #[Route('/{id}/korrekturabzug', name: 'admin_offers_proof', requirements: ['id' => '\d+'])]
+    public function proof(int $id, OfferRepositoryInterface $repository, PdfExports $pdfExports, Breadcrumb $breadcrumb): Response
     {
         if (null === $offer = $repository->find($id)) {
             throw $this->createNotFoundException();

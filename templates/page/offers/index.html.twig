@@ -54,6 +54,7 @@
 ',
                 ],
                 prepend: '{{ component("Admin:OfferWorkflowButton", { offer: item, key: item.id,  id: "owb"~item.id~item.state }) }}',
+                showUrl: '{{ path("admin_offers_show", { id: item.id }) }}',
                 columns: {
                     name: '<span class="{{ item.cancelled ? "line-through" : "" }}">{{ item.name }}</span>',
                     hosts: '{{ item.hosts|map(h => h.name)|join(", ") }}',

@@ -105,7 +105,22 @@ final class ParticipantsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'admin_participants_attendances', requirements: ['id' => '\d+'])]
+    #[Route('/{id}', name: 'admin_participants_show', requirements: ['id' => '\d+'])]
+    public function show(int $id, ParticipantRepositoryInterface $repository, Breadcrumb $breadcrumb): Response
+    {
+        if (null === $participant = $repository->find($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted('view', $participant);
+
+        return $this->render('@FerienpassAdmin/page/participants/show.html.twig', [
+            'item' => $participant,
+            'breadcrumb' => $breadcrumb->generate(['participants.title', ['route' => 'admin_participants_index']], $participant->getName()),
+        ]);
+    }
+
+    #[Route('/{id}/anmeldungen', name: 'admin_participants_attendances', requirements: ['id' => '\d+'])]
     public function attendances(int $id, ParticipantRepositoryInterface $participantRepository, Request $request, Breadcrumb $breadcrumb, EventDispatcherInterface $dispatcher): Response
     {
         $participant = $participantRepository->find($id);

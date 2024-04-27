@@ -16,6 +16,7 @@ namespace Ferienpass\AdminBundle\Form;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Ferienpass\AdminBundle\Form\CompoundType\ApplicationExtraFieldsType;
 use Ferienpass\AdminBundle\Form\CompoundType\OfferDatesType;
 use Ferienpass\CoreBundle\Entity\Edition;
 use Ferienpass\CoreBundle\Entity\Host;
@@ -80,6 +81,7 @@ class EditOfferType extends AbstractType implements FormSubscriberAwareInterface
             ->add('minParticipants', IntegerType::class, ['attr' => ['placeholder' => '-', 'min' => 0], 'fieldset_group' => 'applications', 'width' => '1/3'])
             ->add('maxParticipants', IntegerType::class, ['attr' => ['placeholder' => 'ohne Begrenzung', 'min' => 0], 'fieldset_group' => 'applications', 'width' => '1/3'])
             ->add('applyText', null, ['help' => 'offers.help.applyText', 'fieldset_group' => 'applications', 'width' => '1/2'])
+            ->add('applicationExtra', ApplicationExtraFieldsType::class, ['fieldset_group' => 'applicationExtra'])
             ->add('contactUser', EntityType::class, [
                 'class' => User::class,
                 'query_builder' => function (EntityRepository $er): QueryBuilder {

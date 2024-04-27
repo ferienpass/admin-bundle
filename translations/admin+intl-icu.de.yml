@@ -103,6 +103,9 @@ offers:
   legend.applications:
     - Anmeldungen
     - Geben Sie an, welche Anmeldungen Sie zulassen.
+  legend.applicationExtra:
+    - Anmeldeformular Extra-Angaben
+    - "Wenn Sie von den Teilnehmenden weitere Angaben brauchen, die nicht standardmäßig abgefragt werden, so können Sie diese hier festlegen. Gängige Beispiele wären: Allergien (Texteingabe), Schuhgröße (Zahleingabe) oder Schwimmabzeichen (Ja/Nein-Eingabe)"
   legend.media:
     - Foto
     - Laden Sie ein Foto zur Veröffentlichung hoch. Nutzen Sie nur gemeinfreie Fotos und geben Sie in jedem Fall den/die Fotografin an.
@@ -149,6 +152,12 @@ offers:
     onlineApplication: Die Anmeldungen über das Online-System laufen lassen.
     applicationDeadline: Ab folgendem Tag sind Anmeldungen zum Angebot nicht mehr möglich.
     requiresAgreementLetter: Sie können ein PDF-Dokument hochladen.
+  applicationExtra:
+    question: Fragewort
+    type: Typ
+    txt: Text
+    int: Zahl
+    yn: Ja/Nein-Eingabe
   filter.edition: Saisons
   filter.host: Veranstaltende
   filter.requiresApplication: Anmeldung erforderlich
@@ -157,6 +166,7 @@ offers:
   filter.status: Status
   edit_offer_dates_add: Zusätzliche Zeit zu diesem Termin
   edit_offer_dates_entry_delete: Zeitraum löschen
+  edit_offer_applicationExtra_add: Neue Frage
   dropzonePlaceholder: Wählen Sie ein Bild aus oder platzieren Sie es hier mittels Drag'n'Drop
   uncompletedOffers: Sie haben Angebote im Entwurfsmodus. Bitte markieren Sie alle Angebote als vollständig, damit sie im Ferienpass berücksichtigt werden können.
   deleteModal.headline: Angebot löschen

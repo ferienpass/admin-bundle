@@ -1,5 +1,10 @@
 {% extends "@FerienpassAdmin/layout/list.html.twig" %}
 
+{% set extra = {} %}
+{% for extra in offer.applicationExtra %}
+    {% set extra = extra|merge({ e: "{{ item.extra('#{extra.question}') }}" }) %}
+{% endfor %}
+
 {% set config = {
     columns: {
         name: '{{ item.participant ? item.participant.name : "Gelöschter Teillnehmer" }}',
@@ -10,7 +15,7 @@
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 {{ partials.status_badge(item.status, "sm", "-ml-2") }}
 ',
-    }
+    }|merge(extra)
 } %}
 
 {% block headline_actions %}

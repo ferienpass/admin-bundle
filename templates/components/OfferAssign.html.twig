@@ -5,23 +5,23 @@
 
 {% macro column(status, attendances, autoAssign = false, max = null) %}
     <div {{ stimulus_target('ferienpass/admin-offer-assign', status~'Column') }}
-            class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+            class="bg-white dark:bg-gray-900 dark:border dark:border-gray-800 overflow-hidden shadow dark:shadow-none rounded-lg">
+        <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-5 sm:px-6">
             <div class="flex justify-between">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                <h3 class="text-lg leading-6 font-medium">
                     {{ partials.status_badge(status, 'base', '-ml-2.5') }}
                 </h3>
                 <div class="flex items-center">
                     {% if max is null %}
-                        <span class="ml-auto inline-block py-0.5 px-3 font-medium text-gray-600 text-xs leading-4 rounded-full bg-gray-100 font-normal">{{ attendances|length }}</span>
+                        <span class="ml-auto inline-block py-0.5 px-3 font-medium text-gray-600 dark:text-gray-100/50 text-xs leading-4 rounded-full bg-gray-100 dark:bg-gray-800/50 font-normal">{{ attendances|length }}</span>
                     {% endif %}
                 </div>
             </div>
-            <p class="mt-2 text-xs leading-4 text-gray-500">{{ ('statusDescription.'~status)|trans }}</p>
+            <p class="mt-2 text-xs leading-4 text-gray-500 dark:text-gray-300">{{ ('statusDescription.'~status)|trans }}</p>
         </div>
         {% if max is not null %}
-            <div class="px-4 border-b border-t -mt-px py-2 sm:px-6 {% if max is not null and attendances|length > max %}bg-yellow-50 border-orange-200{% else %}bg-gray-50 border-gray-200{% endif %}">
-                <p class="leading-5 {% if max is not null and attendances|length > max %}text-orange-700{% else %}text-gray-700{% endif %}"
+            <div class="px-4 border-b border-t -mt-px py-2 sm:px-6 {% if max is not null and attendances|length > max %}bg-yellow-50 border-orange-200{% else %}bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800{% endif %}">
+                <p class="leading-5 {% if max is not null and attendances|length > max %}text-orange-700{% else %}text-gray-700 dark:text-gray-300{% endif %}"
                 >
                     <span class="ml-auto inline-block py-0.5 px-3 mr-1 -ml-2 text-xs leading-4 rounded-full font-medium {% if attendances|length > max %}bg-yellow-200 text-orange-700{% else %} bg-gray-200 text-gray-600{% endif %}"
                     >{{ attendances|length }}</span>von {% if max %}{{ max }} Kindern{% else %}∞{% endif %}
@@ -44,11 +44,11 @@
             {% endif %}
             <ul data-attendance-status="{{ status }}">
                 {% for attendance in attendances %}
-                    <li class="group cursor-move bg-gray-50 px-2 py-2 border border-transparent rounded mb-4 hover:bg-gray-100 hover:border-gray-100 hover:shadow-sm"
+                    <li class="group cursor-move bg-gray-50 dark:bg-gray-100/5 px-2 py-2 border border-transparent rounded mb-4 hover:bg-gray-100 dark:hover:bg-indigo-100/10 hover:border-gray-100 dark:hover:border-gray-800 hover:shadow-sm dark:hover:shadow-none"
                         data-attendance-id="{{ attendance.id }}">
                         <div class="flex">
                             <div class="mr-1">
-                                <span class="h-5 w-5 block -ml-1 text-gray-400 group-hover:text-gray-500">{% include '@FerienpassCore/Icons/dots-vertical.svg.twig' %}</span>
+                                <span class="h-5 w-5 block -ml-1 text-gray-400 dark:text-gray-800 group-hover:text-gray-500 dark:group-hover:text-gray-900">{% include '@FerienpassCore/Icons/dots-vertical.svg.twig' %}</span>
                             </div>
 
                             <div class="w-full">
@@ -58,14 +58,14 @@
                                             Teilnehmer</span>
                                     {% else %}
                                         <a href="{{ path('admin_participants_edit', { id: attendance.participant.id }) }}"
-                                           class="font-medium block text-sm text-gray-700 truncate"
+                                           class="font-medium block text-sm text-gray-700 dark:text-gray-300 truncate"
                                            target="_blank"
                                         >
                                             {{ attendance.participant.name }}
                                         </a>
                                         <div>
                                             {% if attendance.participant.user %}
-                                                <a class="text-gray-400 hover:text-gray-500"
+                                                <a class="text-gray-400 dark:text-gray-50 hover:text-gray-500"
                                                    href="{{ path('admin_accounts_edit', { id: attendance.participant.user.id }) }}"
                                                    target="_blank"
                                                 >
@@ -76,12 +76,12 @@
                                     {% endif %}
                                 </div>
                                 {% set firstDate = attendance.offer.dates|first %}
-                                <p class="text-gray-500 text-sm mb-1">{{ attendance.participant ? attendance.participant.age(firstDate ? firstDate.begin : null) : attendance.age }} Jahre</p>
-                                <p class="text-gray-500 text-xs flex items-center">
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mb-1">{{ attendance.participant ? attendance.participant.age(firstDate ? firstDate.begin : null) : attendance.age }} Jahre</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-xs flex items-center">
                                     <span>{{ 'enrolledBefore'|trans({days: date(attendance.createdAt).diff(date()).days}) }}</span>
                                 </p>
                                 {% if attendance.participant %}
-                                    <a class="text-gray-500 text-xs"
+                                    <a class="text-gray-500 dark:text-gray-400 text-xs"
                                        href="{{ path('admin_participants_attendances', { id: attendance.participant.id }) }}"
                                        target="_blank"
                                     >
@@ -90,7 +90,7 @@
                                 {% endif %}
                                 {% if attendance.activity is defined %}
                                     <button type="button"
-                                            class="text-gray-500 text-xs"
+                                            class="text-gray-500 dark:text-gray-400 text-xs"
                                             data-action="live#emit"
                                             data-live-event-param="view"
                                             data-live-id-param="{{ attendance.id }}"

@@ -16,11 +16,13 @@ namespace Ferienpass\AdminBundle\Form;
 use Ferienpass\CoreBundle\Entity\User;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -44,12 +46,14 @@ class PersonalDataType extends AbstractType
                     new NotBlank(),
                 ],
                 'width' => '1/2',
+                'fieldset_group' => 'personal',
             ])
             ->add('lastname', options: [
                 'constraints' => [
                     new NotBlank(),
                 ],
                 'width' => '1/2',
+                'fieldset_group' => 'personal',
             ])
             ->add('email', EmailType::class, [
                 'attr' => [
@@ -60,34 +64,35 @@ class PersonalDataType extends AbstractType
                     new Email(),
                 ],
                 'width' => '2/3',
+                'fieldset_group' => 'personal',
             ])
             ->add('phone', options: [
                 'constraints' => [
                     new PhoneNumber(defaultRegion: ' DE'),
                 ],
                 'width' => '1/2',
+                'fieldset_group' => 'personal',
             ])
             ->add('mobile', TextType::class, [
                 'constraints' => [
                     new PhoneNumber(type: PhoneNumber::MOBILE, defaultRegion: 'DE'),
                 ],
                 'width' => '1/2',
+                'fieldset_group' => 'personal',
             ])
-//            ->add('public_fields', ChoiceType::class, [
-//                'label' => 'tl_member.public_fields.0',
-//                'choices' => [
-//                    'E-Mail-Adresse' => 'email',
-//                    'Telefonnummer' => 'phone',
-//                    'Mobil' => 'mobile',
-//                ],
-//                'translation_domain' => 'contao_tl_member',
-//                'help' => 'tl_member.public_fields.1',
-//                'required' => false,
-//                'expanded' => true,
-//                'multiple' => true,
-//                'constraints' => [
-//                ],
-//            ])
+            ->add('publicFields', ChoiceType::class, [
+                'choices' => [
+                    'email',
+                    'phone',
+                    'mobile',
+                ],
+                'choice_label' => function (string $choice): TranslatableMessage {
+                    return new TranslatableMessage('user.label.'.$choice, domain: 'admin');
+                },
+                'expanded' => true,
+                'multiple' => true,
+                'fieldset_group' => 'public',
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Daten speichern',
             ])

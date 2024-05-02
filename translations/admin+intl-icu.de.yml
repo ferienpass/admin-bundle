@@ -387,11 +387,15 @@ user:
   logout: Abmelden
   impersonation_exit: Zurück zu {impersonator}
   password.title: Passwort ändern
+  legend.personal.0: Kontaktdaten
+  legend.public.0: Öffentliches Profil
+  legend.public.1: Wählen Sie aus, welche Daten auf der Ferienpass-Seite neben dem Angebot veröffentlicht werden dürfen.
   label.firstname: Vorname
   label.lastname: Nachname
   label.email: E-Mail-Adresse
   label.phone: Telefonnummer
   label.mobile: Handynummer
+  label.publicFields: Öffentlich einsehbar
 
 editConfirm: Die Daten wurden erfolgreich gespeichert.
 

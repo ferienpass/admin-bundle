@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Controller\Page;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Dbafs;
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Form\EditNotificationType;
+use Ferienpass\AdminBundle\Service\FileUploader;
 use Ferienpass\CoreBundle\Entity\Edition;
 use Ferienpass\CoreBundle\Entity\Notification;
 use Ferienpass\CoreBundle\Notification\AbstractNotification;
@@ -26,6 +29,7 @@ use Ferienpass\CoreBundle\Repository\NotificationRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +43,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_ADMIN')]
 final class NotificationsController extends AbstractController
 {
-    public function __construct(private readonly TranslatorInterface $translator, private readonly NormalizerInterface $normalizer)
+    public function __construct(private readonly TranslatorInterface $translator, private readonly NormalizerInterface $normalizer, #[Autowire(service: 'ferienpass.file_uploader.notifications')] private readonly FileUploader $fileUploader, private readonly ContaoFramework $contaoFramework)
     {
     }
 
@@ -80,6 +84,16 @@ final class NotificationsController extends AbstractController
                 $flash->addConfirmation(text: 'Die Benachrichtigung für die Saison wurde gelöscht.');
 
                 return $this->redirectToRoute('admin_notifications', ['type' => $type]);
+            }
+
+            $pdfFile = $form->get('emailAttachment')->getData();
+            if ($pdfFile) {
+                $this->contaoFramework->initialize();
+
+                $pdfFilePath = $this->fileUploader->upload($pdfFile);
+                $fileModel = Dbafs::addResource($pdfFilePath);
+
+                $entity->setEmailAttachment($fileModel->uuid);
             }
 
             $flash->addConfirmation(text: 'Die Änderungen wurden gespeichert.');

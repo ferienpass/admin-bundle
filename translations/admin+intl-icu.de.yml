@@ -500,12 +500,15 @@ notifications:
   label.emailReplyTo: Antwortadresse
   label.emailSubject: Betreff
   label.emailText: Text
+  label.emailAttachment: PDF-Anhang
   label.smsText: Textnachricht
   label.disabled: Benachrichtigung deaktivieren
   label.submit: Speichern
   help.emailText: Geben Sie den Text ohne Anrede ein.
   help.smsText: Geben Sie den Text für die Kurznachricht ein.
   help.disable: Wenn Sie diese Benachrichtigung deaktivieren, dann wird sie nicht versendet. Wenn zutreffend, wird die Standard-Benachrichtigung weiterhin verwendet.
+  help.emailAttachment: Sie können eine PDF-Datei der E-Mail anhängen.
+  dropzonePlaceholder: Wählen Sie eine Datei aus oder platzieren Sie sie hier mittels Drag'n'Drop
   attendance_newly_confirmed.0: Anmeldung › Nachrücker-Bestätigung
   attendance_newly_confirmed.1: Wird an Teilnehmende geschickt, die nachrücken, bzw. deren Teilnahmestatus sich auf "zugesagt" ändern.
   attendance_confirmed:

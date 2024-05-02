@@ -27,6 +27,10 @@ export default class extends Controller {
         this.component = await getComponent(this.element);
 
         [this.confirmedColumnTarget, this.waitlistedColumnTarget, this.waitingColumnTarget, this.withdrawnColumnTarget].forEach((column) => {
+            if (!(column instanceof HTMLElement)) {
+                return;
+            }
+
             const list = column.querySelector('ul[data-attendance-status]')
             if (!(list instanceof HTMLElement)) {
                 return;

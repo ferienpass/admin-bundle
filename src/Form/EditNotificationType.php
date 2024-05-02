@@ -25,6 +25,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\UX\Dropzone\Form\DropzoneType;
 
 class EditNotificationType extends AbstractType
 {
@@ -88,6 +90,22 @@ class EditNotificationType extends AbstractType
                     'attr' => ['rows' => 5],
                     'fieldset_group' => 'email',
                     'help' => 'notifications.help.emailText',
+                ])
+                ->add('emailAttachment', DropzoneType::class, [
+                    'fieldset_group' => 'email',
+                    'attr' => ['placeholder' => 'notifications.dropzonePlaceholder'],
+                    'mapped' => false,
+                    'help' => 'notifications.help.emailAttachment',
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '1024k',
+                            'mimeTypes' => [
+                                'application/pdf',
+                                'application/x-pdf',
+                            ],
+                            'mimeTypesMessage' => 'Please upload a valid PDF document',
+                        ]),
+                    ],
                 ])
             ;
         }

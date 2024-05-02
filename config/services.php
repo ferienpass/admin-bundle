@@ -126,6 +126,11 @@ return function(ContainerConfigurator $container): void {
         ->arg(0, '%kernel.project_dir%')
         ->arg(1, '%contao.upload_path%/Einverständniserklärungen')
     ;
+    $services->set('ferienpass.file_uploader.notifications')
+        ->parent(FileUploader::class)
+        ->arg(0, '%kernel.project_dir%')
+        ->arg(1, '%contao.upload_path%/Benachrichtigungen')
+    ;
 
     $services->set(StringLoaderExtension::class);
 };

@@ -214,6 +214,11 @@
                           aria-label="{{ ("offers.status."~child.vars.value)|trans([], "admin") }}"><span
                                 title="{{ ("offers.status."~child.vars.value)|trans([], "admin") }}" aria-hidden="true"
                                 class="text-green-600 inline-block w-8 h-8">{{ source("@FerienpassAdmin/icons/check-circle.solid.svg") }}</span></span>
+               {% elseif "unpublished" == child.vars.value %}
+                    <span class="leading-0"
+                          aria-label="{{ ("offers.status."~child.vars.value)|trans([], "admin") }}"><span
+                                title="{{ ("offers.status."~child.vars.value)|trans([], "admin") }}" aria-hidden="true"
+                                class="text-gray-500 inline-block w-8 h-8">{{ source("@FerienpassAdmin/icons/x-circle.outline.svg") }}</span></span>
                 {% endif %}
 
 

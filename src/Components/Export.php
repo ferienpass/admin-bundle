@@ -15,12 +15,14 @@ namespace Ferienpass\AdminBundle\Components;
 
 use Doctrine\DBAL\Types\Types;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
+use Ferienpass\CoreBundle\Entity\User;
 use Ferienpass\CoreBundle\Export\Offer\OfferExporter;
+use Ferienpass\CoreBundle\Message\ExportOffers;
 use Ferienpass\CoreBundle\Repository\EditionRepository;
 use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -57,41 +59,44 @@ final class Export extends AbstractController
     }
 
     #[ExposeInTemplate]
-    public function exporterOptions()
+    public function exporterOptions(): array
     {
         return $this->exporter->getAllNames();
     }
 
     #[ExposeInTemplate]
-    public function editionOptions()
+    public function editionOptions(): array
     {
         return $this->editionRepository->findBy(['archived' => 0]);
     }
 
     #[LiveListener('selectExport')]
-    public function selectExport(#[LiveArg] string $name)
+    public function selectExport(#[LiveArg] string $name): void
     {
         $this->export = $name;
     }
 
     #[LiveAction]
-    public function submit(UriSigner $uriSigner): Response
+    public function submit(#[CurrentUser] User $user, MessageBusInterface $messageBus): void
     {
         $this->validate();
 
         $offers = $this->queryOffers();
+        if (empty($offers)) {
+            // TODO warning
+        }
 
-        $file = $this->exporter->getExporter($this->export)->generate($offers);
+        $messageBus->dispatch(new ExportOffers($this->export, $offers, $user->getEmail()));
 
-        $url = $this->generateUrl('admin_download', ['file' => base64_encode($file)]);
-
-        return $this->redirect($uriSigner->sign($url));
+        // TODO send flash
+        $this->export = null;
     }
 
-    private function queryOffers(): iterable
+    private function queryOffers(): array
     {
         $qb = $this->offerRepository
             ->createQueryBuilder('offer')
+            ->select('offer.id')
             ->leftJoin('offer.dates', 'dates')
             ->orderBy('dates.begin', 'ASC')
         ;
@@ -109,6 +114,6 @@ final class Export extends AbstractController
             $qb->innerJoin('offer.hosts', 'hosts')->andWhere('hosts.id IN (:hosts)')->setParameter('hosts', $this->hosts, Types::SIMPLE_ARRAY);
         }
 
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery()->getSingleColumnResult();
     }
 }

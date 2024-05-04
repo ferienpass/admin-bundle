@@ -209,7 +209,7 @@ final class ToolsController extends AbstractController
     public function download(string $file, UriSigner $uriSigner, Request $request): BinaryFileResponse
     {
         if (!$uriSigner->checkRequest($request)) {
-            // throw $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
 
         return $this->file(base64_decode($file, true));

@@ -35,7 +35,7 @@ final class RegistrationController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $existingUser = $userRepository->findBy(['email' => $form->get('userEmail')->getData()]);
+            $existingUser = $userRepository->findOneBy(['email' => $form->get('userEmail')->getData()]);
             if (null !== $existingUser) {
                 $flash->addErrorModal(headline: 'Fehler', text: 'Leider können wir Ihre Registrierung nicht verarbeiten. Bitte kontaktieren Sie uns persönlich.');
 

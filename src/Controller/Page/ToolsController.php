@@ -67,14 +67,14 @@ final class ToolsController extends AbstractController
         ]);
     }
 
-    #[Route('/einstellungen', name: 'admin_tools_settings')]
+    #[Route('/system', name: 'admin_tools_settings')]
     #[IsGranted('ROLE_SUPER_ADMIN')]
     public function settings(): Response
     {
         return $this->redirectToRoute('admin_tools_settings_export');
     }
 
-    #[Route('/einstellungen/angebotskategorien', name: 'admin_tools_settings_categories')]
+    #[Route('/system/angebotskategorien', name: 'admin_tools_settings_categories')]
     #[IsGranted('ROLE_SUPER_ADMIN')]
     public function settingsCategories(Breadcrumb $breadcrumb): Response
     {
@@ -83,7 +83,7 @@ final class ToolsController extends AbstractController
         ]);
     }
 
-    #[Route('/einstellungen/export', name: 'admin_tools_settings_export')]
+    #[Route('/system/export', name: 'admin_tools_settings_export')]
     #[IsGranted('ROLE_SUPER_ADMIN')]
     public function settingsExports(Breadcrumb $breadcrumb): Response
     {
@@ -122,7 +122,7 @@ final class ToolsController extends AbstractController
         ]);
     }
 
-    #[Route('/einstellungen/zugangscodes', name: 'admin_accessCodes_index')]
+    #[Route('/system/zugangscodes', name: 'admin_accessCodes_index')]
     public function accessCodes(Breadcrumb $breadcrumb, AccessCodeStrategyRepository $repository): Response
     {
         $qb = $repository->createQueryBuilder('i');

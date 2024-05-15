@@ -19,10 +19,10 @@ use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\FrontendUser;
 use Ferienpass\AdminBundle\State\PrivacyConsent;
 use Ferienpass\CoreBundle\Ux\Flash;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Security;
 
 final class MissingPrivacyStatementAlert
 {

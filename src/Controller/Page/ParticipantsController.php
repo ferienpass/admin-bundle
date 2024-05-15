@@ -199,7 +199,7 @@ final class ParticipantsController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $payment = new Payment($this->numberGenerator->generate(), $user);
+            $payment = new Payment($this->numberGenerator->generate(), $user, Payment::STATUS_PAID);
             $dto->toPayment($payment);
 
             $payment->getItems()->map(fn (PaymentItem $item) => $item->getAttendance()->setPaid());

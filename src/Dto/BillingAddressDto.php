@@ -35,9 +35,9 @@ class BillingAddressDto
         $self = new self();
 
         $self->address = <<<EOF
-$user->getFirstname() $user->getLastname()
-$user->getStreet()
-$user->getPostal() $user->getCity()
+{$user->getName()}
+{$user->getStreet()}
+{$user->getPostal()} {$user->getCity()}
 EOF;
 
         $self->email = $user->getEmail();

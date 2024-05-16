@@ -193,6 +193,10 @@ class EditOfferType extends AbstractType implements FormSubscriberAwareInterface
                         ]),
                     ],
                 ]);
+
+                if ($this->security->isGranted('ROLE_ADMIN')) {
+                    $form->add('deferAgreementLetter', CheckboxType::class, ['help' => 'offers.help.deferAgreementLetter', 'fieldset_group' => 'agreementLetter', 'width' => '1/2']);
+                }
             }
         });
     }

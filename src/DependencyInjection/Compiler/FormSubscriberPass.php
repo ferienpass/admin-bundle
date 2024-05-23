@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class FormSubscriberPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $taggedServices = $container->findTaggedServiceIds('ferienpass_admin.form_subscriber');
 

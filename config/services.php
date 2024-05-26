@@ -3,6 +3,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ferienpass\AdminBundle\Form\Filter\AccountsFilter;
+use Ferienpass\AdminBundle\Form\Filter\ConsentsFilter;
 use Ferienpass\AdminBundle\Form\Filter\HostsFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\EditionFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\HostFilter;
@@ -50,6 +51,10 @@ return function(ContainerConfigurator $container): void {
     ;
     $services
         ->get(PaymentsFilter::class)
+        ->tag('ferienpass_admin.filter')
+    ;
+    $services
+        ->get(ConsentsFilter::class)
         ->tag('ferienpass_admin.filter')
     ;
     $services

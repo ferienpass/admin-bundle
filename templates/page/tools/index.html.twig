@@ -141,7 +141,8 @@
                             {{ 'settings.title'|trans }}
                         </a>
                     </h3>
-                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Hier verstecken sich Systeminformationen und weitere Einstellungen, für die keine eigene Kachel gereicht hat.</p>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Hier verstecken sich Systeminformationen
+                        und weitere Einstellungen, für die keine eigene Kachel gereicht hat.</p>
                 </div>
                 <span class="pointer-events-none absolute right-6 top-6 text-gray-300 dark:text-gray-100/10 group-hover:text-gray-400 dark:group-hover:text-gray-100/20"
                       aria-hidden="true">
@@ -152,6 +153,32 @@
             </div>
         {% endif %}
         {% if is_granted('ROLE_SUPER_ADMIN') %}
+            <div class="group relative bg-white dark:bg-gray-900/50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                <div>
+                    <span class="inline-flex rounded-lg p-3 bg-rose-50 dark:bg-rose-900/50 text-rose-700 dark:text-rose-400/50">
+                        <span class="h-6 w-6">{{ source('@FerienpassAdmin/icons/identification.outline.svg') }}</span>
+                    </span>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-100/90">
+                        <a href="{{ path('admin_consents_index') }}" class="focus:outline-none">
+                            <span class="absolute inset-0" aria-hidden="true"></span>
+                            Einwilligungen
+                        </a>
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">Hier können Sie sehen, welche
+                        Veranstaltenden die Datenschutzerklärung und welche Eltern die Einverständniserklärung
+                        unterzeichnet haben.</p>
+                </div>
+                <span class="pointer-events-none absolute right-6 top-6 text-gray-300 dark:text-gray-100/10 group-hover:text-gray-400 dark:group-hover:text-gray-100/20"
+                      aria-hidden="true">
+                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z"/>
+                    </svg>
+                </span>
+            </div>
+        {% endif %}
+        {# {% if is_granted('ROLE_SUPER_ADMIN') %}
             <div class="group relative bg-white dark:bg-gray-900/50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
                 <div>
                     <span class="inline-flex rounded-lg p-3 bg-rose-50 dark:bg-rose-900/50 text-rose-700 dark:text-rose-400/50">
@@ -176,7 +203,7 @@
                     </svg>
                 </span>
             </div>
-        {% endif %}
+        {% endif %} #}
         {% if is_granted('ROLE_SUPER_ADMIN') %}
             <div class="group relative bg-white dark:bg-gray-900/50 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
                 <div>

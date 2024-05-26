@@ -664,5 +664,13 @@ applicationSystem:
   lot: Losverfahren
   firstcome: Windhundverfahren
 
+consents:
+  title: Einwilligungen
+  th.user: Nutzer:in
+  th.status: Status
+  th.type: Art der Einwilligung
+  th.date: Datum der Zeichnung
+  sorting.signedAt: Sortieren nach Datum
+
 privacyConsent:
   title: Datenschutzverpflichtung

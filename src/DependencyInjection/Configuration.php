@@ -20,13 +20,10 @@ final class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('ferienpass_host_portal');
+        $treeBuilder = new TreeBuilder('ferienpass_admin');
         $treeBuilder->getRootNode()
             ->children()
-            ->scalarNode('privacy_consent')
-                ->beforeNormalization()
-                ->ifString()
-            ->then(static fn ($v) => file_get_contents($v))
+                ->scalarNode('privacy_consent_text')->defaultNull()
             ->end()
         ;
 

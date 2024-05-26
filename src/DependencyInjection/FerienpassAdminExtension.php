@@ -15,7 +15,6 @@ namespace Ferienpass\AdminBundle\DependencyInjection;
 
 use DoctrineExtensions\Query\Mysql\DateFormat;
 use DoctrineExtensions\Query\Mysql\TimestampDiff;
-use Ferienpass\AdminBundle\State\PrivacyConsent;
 use Ferienpass\AdminBundle\State\SystemStatus;
 use Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonSearch;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -29,14 +28,12 @@ final class FerienpassAdminExtension extends Extension implements PrependExtensi
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
-        // $container->getParameter('router.request_context.host')
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.php');
 
-        $definition = $container->getDefinition(PrivacyConsent::class);
-        $definition->setArgument(2, $config['privacy_consent'] ?? '');
+        $container->setParameter('ferienpass_admin.privacy_consent_text', $config['privacy_consent_text'] ?? null);
     }
 
     public function prepend(ContainerBuilder $container): void

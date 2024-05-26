@@ -1,0 +1,24 @@
+{% extends "@FerienpassAdmin/layout/base.html.twig" %}
+
+{% block content %}
+
+    <div class="mt-6 max-w-3xl mx-auto">
+
+        <div class="prose max-w-none">
+            {{ consentText|markdown_to_html }}
+        </div>
+
+        {% if consent is defined %}
+            <div class="mt-6">
+                {% include '@FerienpassCore/Alert/confirmation.html.twig' with { message: 'Sie haben diese Erklärung am '~(consent.signedAt|format_datetime('long'))~' unterzeichnet.' } %}
+            </div>
+        {% endif %}
+
+        {% if form is defined %}
+            <div class="mt-8">
+                {{ form(form) }}
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

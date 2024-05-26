@@ -50,11 +50,17 @@
 
     {% if missingPrivacyStatement|default %}
 
-        <twig:Admin:Alert type="error" message="missingPrivacyStatement"/>
+        <twig:Admin:Alert type="error" class="mt-6">
+            <twig:block name="content">
+                <span>{{ 'missingPrivacyStatement'|trans({}, 'admin') }}</span>
+                <a class="block mt-2 font-semibold hover:underline" href="{{ path('admin_privacy_consent') }}">Zur
+                    Datenschutzerklärung</a>
+            </twig:block>
+        </twig:Admin:Alert>
 
     {% elseif notReleased|default %}
 
-        <twig:Admin:Alert type="error" message="participantListNotReleased"/>
+        <twig:Admin:Alert type="error" message="participantListNotReleased" class="mt-6"/>
 
     {% else %}
 

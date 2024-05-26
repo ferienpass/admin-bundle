@@ -663,3 +663,6 @@ accessCodes:
 applicationSystem:
   lot: Losverfahren
   firstcome: Windhundverfahren
+
+privacyConsent:
+  title: Datenschutzverpflichtung

@@ -17,11 +17,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\ApplicationSystem\ParticipantList;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Form\MultiSelectType;
-use Ferienpass\AdminBundle\State\PrivacyConsent;
 use Ferienpass\CoreBundle\Entity\User;
 use Ferienpass\CoreBundle\Export\ParticipantList\PdfExport;
 use Ferienpass\CoreBundle\Facade\AttendanceFacade;
+use Ferienpass\CoreBundle\Repository\HostConsentRepository;
 use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
+use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,11 +32,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/angebote/{edition?null}/{id}/teilnahmeliste{_suffix}', name: 'admin_offer_participants', requirements: ['id' => '\d+'], defaults: ['_suffix' => ''])]
 final class OfferParticipantsController extends AbstractController
 {
-    public function __construct(private readonly PrivacyConsent $privacyConsent, private readonly ParticipantList $participantList)
+    public function __construct(private readonly ParticipantList $participantList, private readonly HostConsentRepository $consents)
     {
     }
 
-    public function __invoke(string $_suffix, int $id, OfferRepositoryInterface $offerRepository, Request $request, PdfExport $pdfExport, EntityManagerInterface $em, AttendanceFacade $attendanceFacade, Breadcrumb $breadcrumb, \Ferienpass\CoreBundle\Session\Flash $flash): Response
+    public function __invoke(string $_suffix, int $id, OfferRepositoryInterface $offerRepository, Request $request, PdfExport $pdfExport, EntityManagerInterface $em, AttendanceFacade $attendanceFacade, Breadcrumb $breadcrumb, Flash $flash): Response
     {
         if (null === $offer = $offerRepository->find($id)) {
             throw $this->createNotFoundException();
@@ -53,9 +54,10 @@ final class OfferParticipantsController extends AbstractController
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        if ($this->isPrivacyStatementMissing($user)) {
+        if ($this->privacyConsentIsMissing($user)) {
             return $this->render('@FerienpassAdmin/page/offers/participant_list.html.twig', [
                 'missingPrivacyStatement' => true,
+                'offer' => $offer,
             ]);
         }
 
@@ -111,8 +113,8 @@ final class OfferParticipantsController extends AbstractController
         // $this->denyAccessUnlessGranted('participants.add', $offer);
     }
 
-    private function isPrivacyStatementMissing(User $user): bool
+    private function privacyConsentIsMissing(User $user): bool
     {
-        return !$this->privacyConsent->isSignedFor((int) $user->getId());
+        return null === $this->consents->findValid($user);
     }
 }

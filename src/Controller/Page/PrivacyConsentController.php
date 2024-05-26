@@ -13,124 +13,50 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Controller\Page;
 
-use Contao\Config;
-use Doctrine\DBAL\Connection;
-use Ferienpass\AdminBundle\State\PrivacyConsent as PrivacyConsentState;
-use Ferienpass\CmsBundle\Form\SimpleType\ContaoRequestTokenType;
+use Doctrine\ORM\EntityManagerInterface;
+use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
+use Ferienpass\CoreBundle\Entity\HostConsent;
 use Ferienpass\CoreBundle\Entity\User;
+use Ferienpass\CoreBundle\Repository\HostConsentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Constraints\EqualTo;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
+#[Route('/datenschutz-einwilligung', name: 'admin_privacy_consent')]
 class PrivacyConsentController extends AbstractController
 {
-    public function __construct(private readonly Connection $connection, private readonly PrivacyConsentState $consentState)
+    public function __invoke(#[CurrentUser] User $user, HostConsentRepository $consents, Breadcrumb $breadcrumb, Request $request, #[Autowire(param: 'ferienpass_admin.privacy_consent_text')] string $consentText, EntityManagerInterface $em): Response
     {
-    }
-
-    public function __invoke(Request $request): Response
-    {
-        $error = null;
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            return new Response('', Response::HTTP_NO_CONTENT);
+        $consent = $consents->findValid($user);
+        if (null !== $consent) {
+            return $this->render('@FerienpassAdmin/page/profile/privacy_consent.html.twig', [
+                'consent' => $consent,
+                'consentText' => $consentText,
+                'breadcrumb' => $breadcrumb->generate('profile.title', 'privacyConsent.title'),
+            ]);
         }
 
-        $statement = $this->connection->createQueryBuilder()
-            ->select('tstamp', 'statement_hash')
-            ->from('tl_ferienpass_host_privacy_consent')
-            ->where('member=:member')
-            ->andWhere('type="sign"')
-            ->setParameter('member', $user->getId())
-            ->setMaxResults(1)
-            ->orderBy('tstamp', 'DESC')
-            ->executeQuery()
-            ->fetchAssociative();
+        $form = $this->createFormBuilder()->add('submit', SubmitType::class, ['label' => 'Unterzeichnen'])->getForm();
 
-        $isSigned = false !== $statement;
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $consent = HostConsent::fromText($consentText, $user);
 
-        if ($isSigned) {
-            if ($this->consentState->hashIsValid($statement['statement_hash'])) {
-                return $this->render('@FerienpassAdmin/fragment/privacy_consent.html.twig', [
-                    'confirmation' => sprintf('Sie haben diese Erklärung am %s unterzeichnet.', date(Config::get('dateFormat'), (int) $statement['tstamp'])),
-                    'signed' => $isSigned,
-                    'statement' => $this->consentState->getFormattedConsentText(),
-                ]);
-            }
+            $em->persist($consent);
+            $em->flush();
 
-            $error = sprintf('Sie haben eine veraltete Version der Erklärung am %s unterzeichnet. Bitte unterzeichnen Sie die neue Version', date(Config::get('dateFormat'), (int) $statement['tstamp']));
-        }
-
-        $form = null;
-        if (!$isSigned || $error) {
-            $form = $this->consentForm($user);
-
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $this->sign($form, $user);
-
-                return $this->redirect($request->getRequestUri());
-            }
+            return $this->redirect($request->getRequestUri());
         }
 
         /** @noinspection FormViewTemplate `createView()` messes ups error handling/redirect */
-        return $this->render('@FerienpassAdmin/fragment/privacy_consent.html.twig', [
-            'signed' => $isSigned,
-            'error' => $error ?? null,
-            'statement' => $this->consentState->getFormattedConsentText(),
+        return $this->render('@FerienpassAdmin/page/profile/privacy_consent.html.twig', [
             'form' => $form,
+            'consentText' => $consentText,
+            'breadcrumb' => $breadcrumb->generate('profile.title', 'privacyConsent.title'),
         ]);
-    }
-
-    private function consentForm(User $user): FormInterface
-    {
-        $formBuilder = $this->createFormBuilder(null, ['csrf_protection' => false])
-            ->add('request_token', ContaoRequestTokenType::class)
-            ->add('firstname', TextType::class, [
-                'label' => 'tl_member.firstname.0',
-                'translation_domain' => 'contao_tl_member',
-                'attr' => ['placeholder' => $user->getFirstname()],
-                'constraints' => [
-                    new EqualTo(['value' => $user->getFirstname()]),
-                ],
-            ])
-            ->add('lastname', TextType::class, [
-                'label' => 'tl_member.lastname.0',
-                'attr' => ['placeholder' => $user->getLastname()],
-                'translation_domain' => 'contao_tl_member',
-                'constraints' => [
-                    new EqualTo(['value' => $user->getLastname()]),
-                ],
-            ])
-            ->add('submit', SubmitType::class, ['label' => 'Unterzeichnen'])
-        ;
-
-        return $formBuilder->getForm();
-    }
-
-    private function sign(FormInterface $form, User $user): void
-    {
-        $this->connection->createQueryBuilder()
-            ->insert('tl_ferienpass_host_privacy_consent')
-            ->values([
-                'tstamp' => '?',
-                'member' => '?',
-                'type' => '?',
-                'form_data' => '?',
-                'statement_hash' => '?',
-            ])
-            ->setParameters([
-                time(),
-                $user->getId(),
-                'sign',
-                json_encode($form->getData(), \JSON_THROW_ON_ERROR),
-                sha1($this->consentState->getFormattedConsentText()),
-            ])
-            ->executeQuery()
-        ;
     }
 }

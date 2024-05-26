@@ -20,6 +20,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -52,6 +53,8 @@ class EditEditionType extends AbstractType
                 'autocomplete' => true,
             ])
             ->add('hostsCanAssign', CheckboxType::class, ['fieldset_group' => 'hosts', 'help' => 'editions.help.hostsCanAssign'])
+            ->add('hasAgreementLetter', CheckboxType::class, ['fieldset_group' => 'agreementLetter', 'help' => 'editions.help.hasAgreementLetter'])
+            ->add('agreementLetterText', TextareaType::class, ['fieldset_group' => 'agreementLetter'])
             ->add('submit', SubmitType::class, [
                 'label' => 'Daten speichern',
             ])

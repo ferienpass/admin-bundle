@@ -36,11 +36,11 @@
                         <span>{{ (payment.totalAmount/100)|format_currency('EUR', locale='de') }}</span>
 
                         {% if payment.status is null %}
-                            {{ partials.badge_orange("?", "sm", "-ml-2") }}
-                        {% else %}
                             <span title="Unbekannter Status bedeutet, dass die Transaktion gestartet und nicht zu Ende geführt wurde. Entweder wurde die Seite verlassen oder die Bestellung korrigiert und diese dann bezahlt.">
-                                {{ partials.badge_green(("payments.status."~item.status)|trans, "sm", "-ml-2") }}
+                                {{ partials.badge_orange("?", "sm") }}
                             </span>
+                        {% else %}
+                            {{ partials.badge_green(("payments.status."~payment.status)|trans, "sm") }}
                         {% endif %}
 
                     </dd>
@@ -53,6 +53,12 @@
                             <span>
                                 {{ payment.user.firstname ~ ' '~payment.user.lastname }}
                             </span>
+                        </dd>
+                    {% endif %}
+                    {% if payment.pmPaymentTransactionId|default %}
+                        <dt class="mt-5 text-sm font-semibold leading-6 text-gray-900">{{ 'payments.pmPaymentTransactionId'|trans }}</dt>
+                        <dd class="font-normal text-sm leading-5 text-gray-500">
+                            <span>{{ payment.pmPaymentTransactionId }}</span>
                         </dd>
                     {% endif %}
                 </dl>

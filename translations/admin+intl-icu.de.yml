@@ -356,6 +356,7 @@ payments:
   payable: Zu bezahlen
   amount: Belegsumme
   user: Benutzer:in
+  pmPaymentTransactionId: pmPayment-ID
   downloadReceipt: Beleg herunterladen (PDF)
   action.receipt: Beleg öffnen
   status.paid: bezahlt

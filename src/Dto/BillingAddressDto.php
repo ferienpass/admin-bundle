@@ -27,6 +27,8 @@ class BillingAddressDto
     #[Assert\Email]
     public ?string $email = null;
 
+    public bool $paid = false;
+
     /** @var Collection<PaymentItem> */
     public Collection $items;
 
@@ -74,6 +76,7 @@ EOF;
     {
         $payment->setBillingAddress($this->address);
         $payment->setBillingEmail($this->email);
+        $payment->setStatus($this->paid ? Payment::STATUS_PAID : Payment::STATUS_UNPAID);
 
         foreach ($this->items as $item) {
             $payment->addItem(new PaymentItem($item->getAttendance(), $item->getAmount()));

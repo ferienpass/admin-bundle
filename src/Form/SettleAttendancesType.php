@@ -15,6 +15,7 @@ namespace Ferienpass\AdminBundle\Form;
 
 use Ferienpass\AdminBundle\Form\CompoundType\PaymentItemType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -58,6 +59,10 @@ class SettleAttendancesType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'required' => false,
+            ])
+            ->add('paid', CheckboxType::class, [
+                'required' => false,
+                'attr' => ['checked' => 'checked']
             ])
             // Carry the selection from multi-select, so that after page-submit the collection is still available
             // If we don't add this, and do not have knowledge about the original items submitted via the multi-select, the collection types do not work since it won't recognize the entities.

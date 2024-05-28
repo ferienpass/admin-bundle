@@ -29,7 +29,11 @@
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 {% trans_default_domain "admin" %}
 
-{{ partials.badge_green(("payments.status."~item.status)|trans, "sm", "-ml-2") }}
+{% if item.status is null %}
+    {{ partials.badge_orange("?", "sm", "-ml-2") }}
+{% else %}
+    {{ partials.badge_green(("payments.status."~item.status)|trans, "sm", "-ml-2") }}
+{% endif %}
 '
         }
     }}) }}

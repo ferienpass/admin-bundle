@@ -62,7 +62,7 @@ class SettleAttendancesType extends AbstractType
             ])
             ->add('paid', CheckboxType::class, [
                 'required' => false,
-                'attr' => ['checked' => 'checked']
+                'attr' => ['checked' => 'checked'],
             ])
             // Carry the selection from multi-select, so that after page-submit the collection is still available
             // If we don't add this, and do not have knowledge about the original items submitted via the multi-select, the collection types do not work since it won't recognize the entities.

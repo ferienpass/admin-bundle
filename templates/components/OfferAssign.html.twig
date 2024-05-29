@@ -45,7 +45,7 @@
             <ul data-attendance-status="{{ status }}">
                 {% for attendance in attendances %}
                     <li class="group cursor-move bg-gray-50 dark:bg-gray-100/5 px-2 py-2 border border-transparent rounded mb-4 hover:bg-gray-100 dark:hover:bg-indigo-100/10 hover:border-gray-100 dark:hover:border-gray-800 hover:shadow-sm dark:hover:shadow-none"
-                        data-attendance-id="{{ attendance.id }}">
+                        data-attendance-id="{{ attendance.id }}" id="{{ 'aa-'~attendance.id }}">
                         <div class="flex">
                             <div class="mr-1">
                                 <span class="h-5 w-5 block -ml-1 text-gray-400 dark:text-gray-800 group-hover:text-gray-500 dark:group-hover:text-gray-900">{% include '@FerienpassCore/Icons/dots-vertical.svg.twig' %}</span>

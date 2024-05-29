@@ -340,7 +340,7 @@ participants:
   th.fee: Gebühr
   th.status: Status
   th.attendances: Anmeldungen
-  th.paid: davon bezahlt/bestätigt
+  th.paid: bestätigt
   deleteModal.headline: Teilnehmer löschen
   deleteModal.submit: Teilnehmer löschen
   deleteModal.confirm: Sind Sie sicher, dass Sie folgenden Teilnehmer löschen möchten?

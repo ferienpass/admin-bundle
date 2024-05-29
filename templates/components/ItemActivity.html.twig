@@ -74,7 +74,7 @@
                                     </div>
                                 </div>
                                 <div class="min-w-0 flex-1 py-0">
-                                    <div class="text-sm leading-8 text-gray-500">
+                                    <div class="text-sm leading-6 text-gray-500">
                                         <span class="mr-0.5">
                                             <span class="font-medium text-gray-900">{{ log.user ? log.user.name : (log.applicationSystem|default ? "applicationSystem.#{log.applicationSystem}"|trans([], 'admin') : '') }}</span>
                                             {{ log.transition.name == 'create' ? 'meldete' : 'setzte den Status von' }}
@@ -123,7 +123,7 @@
                                     </div>
                                 </div>
                                 <div class="min-w-0 flex-1 py-0">
-                                    <div class="text-sm leading-8 text-gray-500">
+                                    <div class="text-sm leading-6 text-gray-500">
                                         <span class="mr-0.5">
                                             <span class="font-medium text-gray-900">{{ log.user.name }}</span>
                                             {{ 'setzte Status auf' }}

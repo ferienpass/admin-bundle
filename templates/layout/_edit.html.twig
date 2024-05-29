@@ -1,18 +1,18 @@
 {% macro fields(fields) %}
 
-    <div class="grid grid-cols-6 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-6">
 
         {% for field in fields %}
 
             <div
                     {% if field.vars['width'] is defined and '1/3' in field.vars['width']|split('|') %}
-                        class="col-span-2"
+                        class="md:col-span-2"
                     {% elseif field.vars['width'] is defined and '1/2' in field.vars['width']|split('|') %}
-                        class="col-span-3"
+                        class="col-span-2 md:col-span-3"
                     {% elseif field.vars['width'] is defined and '2/3' in field.vars['width']|split('|') %}
-                        class="col-span-4"
+                        class="col-span-2 md:col-span-4"
                     {% else %}
-                        class="col-span-6"
+                        class="col-span-2 md:col-span-6"
                     {% endif %}
             >
                 {{ form_row(field) }}

@@ -14,11 +14,11 @@
 
     {% set headline = "#{translationPrefix}.#{action}.title"|trans %}
 
-    <div class="flex justify-between">
+    <div class="sm:flex sm:justify-between">
 
         {{ partials.h1((headline == "#{translationPrefix}.#{action}.title") ? "#{translationPrefix}.title"|trans : headline) }}
 
-        <div class="flex space-x-3 justify-end">
+        <div class="mt-4 sm:mt-0 flex space-x-3 sm:justify-end">
 
             {% block headline_actions %}
 

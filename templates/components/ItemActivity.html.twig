@@ -85,7 +85,7 @@
                                                 {{ log.transition.name == 'create' ? 'an' }}
                                             {% endif %}
                                         </span>
-                                        {% if log.transition.tos is not empty %}
+                                        {% if log.transition.tos is not empty and log.transition.tos|first %}
                                             <span class="mr-0.5">
                                                 {{ partials.status_badge(log.transition.tos|first) }}
                                             </span>

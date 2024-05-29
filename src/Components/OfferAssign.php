@@ -27,7 +27,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
-#[AsLiveComponent]
+#[AsLiveComponent(route: 'live_component_admin')]
 class OfferAssign extends AbstractController
 {
     use DefaultActionTrait;

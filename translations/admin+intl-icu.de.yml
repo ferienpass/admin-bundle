@@ -675,3 +675,6 @@ consents:
 
 privacyConsent:
   title: Datenschutzverpflichtung
+
+consent.host_consent: Datenschutzverpflichtung für Veranstalter
+consent.edition_agreement_letter: Einwilligungserklärung

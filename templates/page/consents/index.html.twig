@@ -21,14 +21,14 @@
 -
 {% endif %}
 ',
+            type: '{{ "consent.#{item.type}"|trans({}, "admin") }} {{ item.type == "edition_agreement_letter" ? item.edition.name : "" }}',
+            date: '{{ item.signedAt|date("d.m.Y H:i") }}',
             status: '
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 {% trans_default_domain "admin" %}
 
 {{ partials.badge_green("unterzeichnet", "sm", "-ml-2") }}
 ',
-            type: 'test',
-            date: '{{ item.signedAt|date("d.m.Y H:i") }}',
         }
     }}) }}
 {% endblock %}

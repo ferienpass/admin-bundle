@@ -35,7 +35,7 @@ final class ConsentsController extends AbstractController
             'qb' => $qb,
             'filterType' => ConsentsFilter::class,
             'searchable' => [],
-            'breadcrumb' => $breadcrumb->generate('consents.title'),
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'consents.title'),
         ]);
     }
 }

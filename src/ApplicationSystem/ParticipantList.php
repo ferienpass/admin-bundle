@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\ApplicationSystem;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\CoreBundle\Entity\Attendance;
 use Ferienpass\CoreBundle\Message\AttendanceStatusChanged;
 use Ferienpass\CoreBundle\Message\ParticipantListChanged;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ParticipantList
 {
-    public function __construct(private readonly MessageBusInterface $messageBus, private readonly ManagerRegistry $doctrine, private readonly Security $security)
+    public function __construct(private readonly MessageBusInterface $messageBus, private readonly EntityManagerInterface $entityManager)
     {
     }
 
@@ -41,19 +40,19 @@ class ParticipantList
                 continue;
             }
 
-            $attendance->setStatus(Attendance::STATUS_CONFIRMED, $this->security->getUser());
+            $attendance->setStatus(Attendance::STATUS_CONFIRMED);
 
-            $this->dispatchMessage(new AttendanceStatusChanged($attendance->getId(), $oldStatus, $attendance->getStatus(), $notify));
+            $this->messageBus->dispatch(new AttendanceStatusChanged($attendance->getId(), $oldStatus, $attendance->getStatus(), $notify));
         }
 
-        $this->doctrine->getManager()->flush();
+        $this->entityManager->flush();
 
         if (false === $reorder) {
             return;
         }
 
         foreach (array_unique(array_map(fn (Attendance $a) => $a->getOffer()->getId(), $attendances)) as $offerId) {
-            $this->dispatchMessage(new ParticipantListChanged($offerId));
+            $this->messageBus->dispatch(new ParticipantListChanged($offerId));
         }
     }
 
@@ -73,24 +72,19 @@ class ParticipantList
                 continue;
             }
 
-            $attendance->setStatus(Attendance::STATUS_WITHDRAWN, $this->security->getUser());
+            $attendance->setStatus(Attendance::STATUS_WITHDRAWN);
 
-            $this->dispatchMessage(new AttendanceStatusChanged($attendance->getId(), $oldStatus, $attendance->getStatus(), $notify));
+            $this->messageBus->dispatch(new AttendanceStatusChanged($attendance->getId(), $oldStatus, $attendance->getStatus(), $notify));
         }
 
-        $this->doctrine->getManager()->flush();
+        $this->entityManager->flush();
 
         if (false === $reorder) {
             return;
         }
 
         foreach (array_unique(array_map(fn (Attendance $a) => $a->getOffer()->getId(), $attendances)) as $offerId) {
-            $this->dispatchMessage(new ParticipantListChanged($offerId));
+            $this->messageBus->dispatch(new ParticipantListChanged($offerId));
         }
-    }
-
-    private function dispatchMessage($message, array $stamps = []): void
-    {
-        $this->messageBus->dispatch($message, $stamps);
     }
 }

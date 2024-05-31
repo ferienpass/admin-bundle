@@ -73,7 +73,7 @@ class OfferAssign extends AbstractController
         $offer = $attendance->getOffer();
         $oldStatus = $attendance->getStatus();
 
-        $attendance->setStatus($newStatus, $this->getUser());
+        $attendance->setStatus($newStatus);
         $attendance->setSorting(($newIndex * 128) + 64);
 
         $messageBus->dispatch(new AttendanceStatusChanged($attendance->getId(), $oldStatus, $attendance->getStatus(), notify: $this->autoAssign));

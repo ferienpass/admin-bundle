@@ -137,7 +137,7 @@ final class PaymentsController extends AbstractController
                     continue;
                 }
 
-                $item->getAttendance()->setStatus(Attendance::STATUS_WITHDRAWN, $user);
+                $item->getAttendance()->setStatus(Attendance::STATUS_WITHDRAWN);
 
                 $messageBus->dispatch(new ParticipantListChanged($item->getAttendance()->getOffer()->getId()));
             }

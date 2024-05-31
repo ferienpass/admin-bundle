@@ -52,7 +52,7 @@ class OfferAssign extends AbstractController
         $sorting = $lastAttendance ? $lastAttendance->getSorting() : 0;
 
         foreach ($attendances as $attendance) {
-            $attendance->setStatus(Attendance::STATUS_CONFIRMED, user: $this->getUser());
+            $attendance->setStatus(Attendance::STATUS_CONFIRMED);
             $attendance->setSorting($sorting += 128);
 
             $messageBus->dispatch(new AttendanceStatusChanged($attendance->getId(), Attendance::STATUS_WAITING, $attendance->getStatus(), notify: $this->autoAssign));
@@ -74,7 +74,12 @@ class OfferAssign extends AbstractController
         $oldStatus = $attendance->getStatus();
 
         $attendance->setStatus($newStatus);
-        $attendance->setSorting(($newIndex * 128) + 64);
+        $this->reorderList($attendance, $newIndex);
+
+        $em->flush();
+
+        // Refresh because we changed the order of the attendances off-reference and that messes re-render
+        $em->refresh($this->offer);
 
         $messageBus->dispatch(new AttendanceStatusChanged($attendance->getId(), $oldStatus, $attendance->getStatus(), notify: $this->autoAssign));
 
@@ -84,8 +89,6 @@ class OfferAssign extends AbstractController
         if ($this->autoAssign && !$attendance->isWaitlisted()) {
             $messageBus->dispatch(new ParticipantListChanged($offer->getId()));
         }
-
-        $em->flush();
     }
 
     #[LiveListener('indexUpdated')]
@@ -93,6 +96,17 @@ class OfferAssign extends AbstractController
     {
         $this->denyAccessUnlessGranted('participants.view', $attendance->getOffer());
 
+        $this->reorderList($attendance, $newIndex);
+
+        $em->flush();
+
+        // Refresh because we changed the order of the attendances off-reference and that messes re-render
+        $em->refresh($this->offer);
+    }
+
+    private function reorderList(Attendance $attendance, int $newIndex): void
+    {
+        /** @var Attendance[] $attendances */
         $attendances = array_values($attendance->getOffer()->getAttendancesWithStatus($attendance->getStatus())->toArray());
         $fromIndex = array_search($attendance, $attendances, true);
 
@@ -102,7 +116,5 @@ class OfferAssign extends AbstractController
         foreach ($attendances as $a) {
             $a->setSorting(++$i * 128);
         }
-
-        $em->flush();
     }
 }

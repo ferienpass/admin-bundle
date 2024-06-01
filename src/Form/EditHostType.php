@@ -39,8 +39,7 @@ class EditHostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', null, ['fieldset_group' => 'base', 'width' => '1/2'])
-            ->add('alias', null, ['fieldset_group' => 'base', 'width' => '1/2', 'help' => 'hosts.help.alias'])
+            ->add('name', null, ['fieldset_group' => 'base', 'width' => '2/3'])
             ->add('phone', null, ['fieldset_group' => 'contact', 'width' => '1/2'])
             ->add('fax', null, ['fieldset_group' => 'contact', 'width' => '1/2'])
             ->add('mobile', null, ['fieldset_group' => 'contact', 'width' => '1/2'])

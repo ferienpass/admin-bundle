@@ -222,8 +222,6 @@ hosts:
   sorting.createdAt: Sortieren nach Datum
   sorting.name: Sortieren nach Name
   sorting.numberOffers: Sortieren nach Anzahl Angeboten
-  help:
-    alias: Der Alias wird automatisch generiert.
   deleteModal.headline: Veranstalter löschen
   deleteModal.submit: Veranstalter löschen
   deleteModal.confirm: Sind Sie sicher, dass Sie folgenden Veranstalter löschen möchten?
@@ -639,6 +637,7 @@ outbox:
     Ferienpass\CoreBundle\Message\AttendanceCreated: Veranstaltungsanmeldung
     Ferienpass\CoreBundle\Message\SendAttendanceDecisions: Zulassungsbescheid
     Ferienpass\CoreBundle\Message\AttendanceStatusChanged: Teilnahme-Status geändert
+    Ferienpass\CoreBundle\Message\AccountRegistrationHelp: Registrierungshilfe
 
 accessCodes:
   title: Zugangscodes

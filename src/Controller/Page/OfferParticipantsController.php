@@ -54,10 +54,9 @@ final class OfferParticipantsController extends AbstractController
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        if ($this->privacyConsentIsMissing($user)) {
-            return $this->render('@FerienpassAdmin/page/offers/participant_list.html.twig', [
-                'missingPrivacyStatement' => true,
-                'offer' => $offer,
+        if (null === $this->consents->findValid($user)) {
+            return $this->render('@FerienpassAdmin/page/missing_privacy_statement.html.twig', [
+                'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName(), 'Anmeldungen'),
             ]);
         }
 
@@ -111,10 +110,5 @@ final class OfferParticipantsController extends AbstractController
         //        }
 
         // $this->denyAccessUnlessGranted('participants.add', $offer);
-    }
-
-    private function privacyConsentIsMissing(User $user): bool
-    {
-        return null === $this->consents->findValid($user);
     }
 }

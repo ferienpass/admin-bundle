@@ -15,8 +15,10 @@ namespace Ferienpass\AdminBundle\Controller\Page;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
+use Ferienpass\CoreBundle\Entity\User;
 use Ferienpass\CoreBundle\Export\ParticipantList\PdfExport;
 use Ferienpass\CoreBundle\Export\ParticipantList\WordExport;
+use Ferienpass\CoreBundle\Repository\HostConsentRepository;
 use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -24,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[Route('/angebote/{edition?null}/{id}/zuordnen', requirements: ['id' => '\d+'])]
 class OfferAssignController extends AbstractController
@@ -33,7 +36,7 @@ class OfferAssignController extends AbstractController
     }
 
     #[Route('', name: 'admin_offer_assign')]
-    public function __invoke(int $id, Request $request, OfferRepositoryInterface $offerRepository, Session $session, ManagerRegistry $doctrine, Breadcrumb $breadcrumb): Response
+    public function __invoke(int $id, #[CurrentUser] User $user, Request $request, OfferRepositoryInterface $offerRepository, Session $session, ManagerRegistry $doctrine, HostConsentRepository $consents, Breadcrumb $breadcrumb): Response
     {
         if (null === $offer = $offerRepository->find($id)) {
             throw $this->createNotFoundException();
@@ -41,6 +44,12 @@ class OfferAssignController extends AbstractController
 
         if (!$offer->getEdition()->hostsCanAssign()) {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        }
+
+        if (null === $consents->findValid($user)) {
+            return $this->render('@FerienpassAdmin/page/missing_privacy_statement.html.twig', [
+                'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName(), 'Anmeldungen'),
+            ]);
         }
 
         $autoAssign = $session->get('admin--auto-assign', false);

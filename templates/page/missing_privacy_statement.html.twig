@@ -1,0 +1,13 @@
+{% extends "@FerienpassAdmin/layout/base.html.twig" %}
+
+{% block main %}
+
+    <twig:Admin:Alert type="error" class="mt-6">
+        <twig:block name="content">
+            <span>{{ 'missingPrivacyStatement'|trans({}, 'admin') }}</span>
+            <a class="block mt-2 font-semibold hover:underline" href="{{ path('admin_privacy_consent') }}">Zur
+                Datenschutzerklärung</a>
+        </twig:block>
+    </twig:Admin:Alert>
+
+{% endblock %}

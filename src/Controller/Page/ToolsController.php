@@ -17,8 +17,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Form\EditAccessCodesType;
 use Ferienpass\CoreBundle\Entity\AccessCodeStrategy;
+use Ferienpass\CoreBundle\Entity\User;
 use Ferienpass\CoreBundle\Facade\EraseDataFacade;
 use Ferienpass\CoreBundle\Repository\AccessCodeStrategyRepository;
+use Ferienpass\CoreBundle\Repository\HostConsentRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -27,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -51,8 +54,14 @@ final class ToolsController extends AbstractController
     }
 
     #[Route('/rundmail', name: 'admin_tools_mailing')]
-    public function mailing(Breadcrumb $breadcrumb): Response
+    public function mailing(#[CurrentUser] User $user, Breadcrumb $breadcrumb, HostConsentRepository $consents): Response
     {
+        if (null === $consents->findValid($user)) {
+            return $this->render('@FerienpassAdmin/page/missing_privacy_statement.html.twig', [
+                'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'mailing.title'),
+            ]);
+        }
+
         return $this->render('@FerienpassAdmin/page/tools/mailing.html.twig', [
             'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], 'mailing.title'),
         ]);

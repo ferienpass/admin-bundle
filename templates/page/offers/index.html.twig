@@ -47,8 +47,12 @@
             </svg>
         </span>
         <span>
-            {{ item.attendancesNotWithdrawn|length ~ \' / \' ~ (item.maxParticipants ?: \'∞\') ~ \'\' }}
+            {{ item.attendancesConfirmedOrWaitlisted|length ~ \' / \' ~ (item.maxParticipants ?: \'∞\') ~ \'\' }}
         </span>
+        {% if item.attendancesWaiting|length %}
+            <span title="nicht-zugeteilte Teilnehmende"
+                  class="mt-0.5 text-orange-600 w-4 h-4">{{ source("@FerienpassAdmin/icons/exclamation-triangle.micro.svg") }}</span>
+        {% endif %}
     </p>
 {% endif %}
 ',

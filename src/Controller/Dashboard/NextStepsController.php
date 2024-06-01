@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Controller\Dashboard;
 
+use Ferienpass\CoreBundle\Facade\EraseDataFacade;
 use Ferienpass\CoreBundle\Repository\EditionRepository;
 use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,15 +21,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NextStepsController extends AbstractController
 {
-    public function __construct(private readonly EditionRepository $editionRepository, private readonly OfferRepositoryInterface $offerRepository)
+    public function __construct()
     {
     }
 
-    public function __invoke(): Response
+    public function __invoke(OfferRepositoryInterface $offers, EditionRepository $editions, EraseDataFacade $eraseData): Response
     {
         return $this->render('@FerienpassAdmin/fragment/dashboard/next_steps.html.twig', [
-            'editionRepository' => $this->editionRepository,
-            'offerRepository' => $this->offerRepository,
+            'editions' => $editions,
+            'offers' => $offers,
+            'expiredParticipants' => $eraseData->expiredParticipants(),
         ]);
     }
 }

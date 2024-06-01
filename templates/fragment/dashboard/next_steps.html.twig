@@ -9,7 +9,7 @@
         <ul role="list" class="mt-6 divide-y divide-gray-200 dark:divide-gray-800 border-b border-t border-gray-200 dark:border-gray-800">
 
             {% if not is_granted('ROLE_ADMIN') %}
-                {% for offer in offerRepository.findUpcoming|filter((offer) => offer.state == 'draft' and is_granted('view', offer)) %}
+                {% for offer in offers.findUpcoming|filter((offer) => offer.state == 'draft' and is_granted('view', offer)) %}
                     <li>
                         <div class="group relative flex items-start space-x-3 py-4">
                             <div class="flex-shrink-0">
@@ -55,7 +55,7 @@
             {% endif %}
 
             {% if not is_granted('ROLE_ADMIN') %}
-                {% for offer in offerRepository.findUpcoming|filter((offer) => offer.state == 'published' and offer.requiresApplication and offer.isOnlineApplication and is_granted('view', offer))|slice(0, 5) %}
+                {% for offer in offers.findUpcoming|filter((offer) => offer.state == 'published' and offer.requiresApplication and offer.isOnlineApplication and is_granted('view', offer))|slice(0, 5) %}
                     <li>
                         <div class="group relative flex items-start space-x-3 py-4">
                             <div class="flex-shrink-0">
@@ -116,7 +116,7 @@
                 {% endfor %}
             {% endif %}
 
-            {% for edition in editionRepository.findWithActiveTask('host_editing_stage') %}
+            {% for edition in editions.findWithActiveTask('host_editing_stage') %}
                 <li>
                     <div class="group relative flex items-start space-x-3 py-4">
                         <div class="flex-shrink-0">
@@ -150,7 +150,7 @@
                 </li>
             {% endfor %}
 
-            {% if is_granted('ROLE_ADMIN') and editionRepository.findPrevious is not empty and editionRepository.findUpcoming is empty %}
+            {% if is_granted('ROLE_ADMIN') and editions.findPrevious is not empty and editions.findUpcoming is empty %}
                 <li>
                     <div class="group relative flex items-start space-x-3 py-4">
                         <div class="flex-shrink-0">
@@ -202,6 +202,37 @@
                                 </a>
                             </div>
                             <p class="text-sm text-gray-500 dark:text-gray-300">Ergänzen Sie hier neue Teilnehmende.</p>
+                        </div>
+                        <div class="flex-shrink-0 self-center">
+                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                 fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') and expiredParticipants is not empty %}
+                <li>
+                    <div class="group relative flex items-start space-x-3 py-4">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-500">
+                                <span class="h-6 w-6 text-white" aria-hidden="true">
+                                    {{ source('@FerienpassAdmin/icons/trash.outline.svg') }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
+                                <a href="{{ path('admin_erase_data') }}">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    Daten löschen
+                                </a>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Es ist Zeit, die personenbezogenen Daten der Teilnehmenden zu löschen.</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
                             <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"

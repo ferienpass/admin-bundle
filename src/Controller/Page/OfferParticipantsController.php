@@ -36,9 +36,9 @@ final class OfferParticipantsController extends AbstractController
     {
     }
 
-    public function __invoke(string $_suffix, int $id, OfferRepositoryInterface $offerRepository, Request $request, PdfExport $pdfExport, EntityManagerInterface $em, AttendanceFacade $attendanceFacade, Breadcrumb $breadcrumb, Flash $flash): Response
+    public function __invoke(string $_suffix, int $id, OfferRepositoryInterface $offers, Request $request, PdfExport $pdfExport, EntityManagerInterface $em, AttendanceFacade $attendanceFacade, Breadcrumb $breadcrumb, Flash $flash): Response
     {
-        if (null === $offer = $offerRepository->find($id)) {
+        if (null === $offer = $offers->find($id)) {
             throw $this->createNotFoundException();
         }
 

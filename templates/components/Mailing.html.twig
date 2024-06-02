@@ -114,7 +114,7 @@
 
                 {% endif %}
 
-                {% if ('participants' == group and not offers) or hostsWithOffer %}
+                {% if ('participants' == group and not selectedOffers) or hostsWithOffer %}
 
                     <fieldset>
                         <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Saisons</legend>
@@ -124,14 +124,14 @@
                             {% for edition in editionOptions %}
                                 <div class="relative flex gap-x-3">
                                     <div class="flex items-center">
-                                        <input id="editions{{ loop.index }}"
-                                               data-model="editions[]"
+                                        <input id="edition-{{ loop.index }}"
+                                               data-model="selectedEditions[]"
                                                type="checkbox"
                                                value="{{ edition.id }}"
                                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                                     </div>
                                     <div class="text-sm leading-6">
-                                        <label for="editions{{ loop.index }}"
+                                        <label for="edition-{{ loop.index }}"
                                                class="font-medium text-gray-900 dark:text-gray-100">{{ edition.name }}</label>
                                     </div>
                                 </div>
@@ -141,7 +141,7 @@
 
                 {% endif %}
 
-                {% if 'participants' == group and offers is not empty %}
+                {% if 'participants' == group and selectedOffers is not empty %}
 
                     <fieldset>
                         <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Angebote</legend>
@@ -150,14 +150,14 @@
                             {% for offer in offerOptions %}
                                 <div class="relative flex gap-x-3">
                                     <div class="flex items-center">
-                                        <input id="editions{{ loop.index }}"
-                                               data-model="offers[]"
+                                        <input id="offer-{{ loop.index }}"
+                                               data-model="selectedOffers[]"
                                                type="checkbox"
                                                value="{{ offer.id }}"
                                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                                     </div>
                                     <div class="text-sm leading-6">
-                                        <label for="editions{{ loop.index }}"
+                                        <label for="offer-{{ loop.index }}"
                                                class="font-medium text-gray-900 dark:text-gray-100">{{ offer.name }}</label>
                                     </div>
                                 </div>
@@ -191,7 +191,7 @@
 
                 {% endif %}
 
-                {% if hosts is not empty %}
+                {% if selectedHosts is not empty %}
 
                     <fieldset>
                         <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Veranstalter-Profile</legend>
@@ -202,14 +202,14 @@
                             {% for host in hostOptions %}
                                 <div class="relative flex gap-x-3">
                                     <div class="flex items-center">
-                                        <input id="hosts{{ loop.index }}"
-                                               data-model="hosts[]"
+                                        <input id="host-{{ loop.index }}"
+                                               data-model="selectedHosts[]"
                                                type="checkbox"
                                                value="{{ host.id }}"
                                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                                     </div>
                                     <div class="text-sm leading-6">
-                                        <label for="hosts{{ loop.index }}"
+                                        <label for="host-{{ loop.index }}"
                                                class="font-medium text-gray-900 dark:text-gray-100">{{ host.name }}</label>
                                     </div>
                                 </div>

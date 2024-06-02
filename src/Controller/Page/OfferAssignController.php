@@ -36,9 +36,9 @@ class OfferAssignController extends AbstractController
     }
 
     #[Route('', name: 'admin_offer_assign')]
-    public function __invoke(int $id, #[CurrentUser] User $user, Request $request, OfferRepositoryInterface $offerRepository, Session $session, ManagerRegistry $doctrine, HostConsentRepository $consents, Breadcrumb $breadcrumb): Response
+    public function __invoke(int $id, #[CurrentUser] User $user, Request $request, OfferRepositoryInterface $offers, Session $session, ManagerRegistry $doctrine, HostConsentRepository $consents, Breadcrumb $breadcrumb): Response
     {
-        if (null === $offer = $offerRepository->find($id)) {
+        if (null === $offer = $offers->find($id)) {
             throw $this->createNotFoundException();
         }
 

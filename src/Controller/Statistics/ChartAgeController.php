@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChartAgeController extends AbstractController
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository)
+    public function __construct(private readonly AttendanceRepository $attendances)
     {
     }
 
@@ -35,7 +35,7 @@ class ChartAgeController extends AbstractController
 
     private function getData(int $passEdition): array
     {
-        $ageAndCount = $this->attendanceRepository->createQueryBuilder('a')
+        $ageAndCount = $this->attendances->createQueryBuilder('a')
             ->select(<<<'SQL'
 (
     CASE

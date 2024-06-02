@@ -31,7 +31,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ActionsBuilder
 {
-    public function __construct(private readonly FactoryInterface $factory, private readonly AuthorizationCheckerInterface $authorizationChecker, private readonly EditionRepository $editionRepository, private readonly PaymentRepository $paymentRepository, private readonly EventDispatcherInterface $dispatcher)
+    public function __construct(private readonly FactoryInterface $factory, private readonly AuthorizationCheckerInterface $authorizationChecker, private readonly EditionRepository $editions, private readonly PaymentRepository $payments, private readonly EventDispatcherInterface $dispatcher)
     {
     }
 
@@ -129,7 +129,7 @@ class ActionsBuilder
                 'extras' => ['icon' => 'duplicate-solid'],
             ]);
         } else {
-            foreach ($this->editionRepository->findWithActiveTask('host_editing_stage') as $edition) {
+            foreach ($this->editions->findWithActiveTask('host_editing_stage') as $edition) {
                 $root->addChild('copy'.$edition->getId(), [
                     'label' => 'offers.action.copyTo',
                     'route' => 'admin_offers_copy',
@@ -192,7 +192,7 @@ class ActionsBuilder
             'extras' => ['icon' => 'pencil-solid'],
         ]);
 
-        $payments = $this->paymentRepository->createQueryBuilder('pay')
+        $payments = $this->payments->createQueryBuilder('pay')
             ->innerJoin('pay.items', 'i')
             ->innerJoin('i.attendance', 'a')
             ->innerJoin('a.participant', 'p')

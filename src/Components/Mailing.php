@@ -57,13 +57,13 @@ class Mailing extends AbstractController
     public bool $hostsWithOffer = false;
 
     #[LiveProp(writable: true)]
-    public array $editions = [];
+    public array $selectedEditions = [];
 
     #[LiveProp(writable: true, onUpdated: 'onOffersUpdated', url: true)]
-    public array $offers = [];
+    public array $selectedOffers = [];
 
     #[LiveProp(writable: true, url: true)]
-    public array $hosts = [];
+    public array $selectedHosts = [];
 
     #[LiveProp(writable: true)]
     #[Assert\NotBlank()]
@@ -76,7 +76,7 @@ class Mailing extends AbstractController
     #[LiveProp(writable: true)]
     public array $attendanceStatus = [];
 
-    public function __construct(private readonly EditionRepository $editionRepository, private readonly ParticipantRepositoryInterface $participantRepository, private readonly UserRepository $userRepository, private readonly HostRepository $hostRepository, private readonly OfferRepositoryInterface $offerRepository, private readonly Environment $twig, private readonly RequestStack $requestStack, private readonly NormalizerInterface $normalizer, private readonly Notifier $notifier, private readonly MailingNotification $mailingNotification)
+    public function __construct(private readonly EditionRepository $editions, private readonly ParticipantRepositoryInterface $participants, private readonly UserRepository $users, private readonly HostRepository $hosts, private readonly OfferRepositoryInterface $offers, private readonly Environment $twig, private readonly RequestStack $requestStack, private readonly NormalizerInterface $normalizer, private readonly Notifier $notifier, private readonly MailingNotification $mailingNotification)
     {
     }
 
@@ -99,13 +99,13 @@ class Mailing extends AbstractController
             return;
         }
 
-        $this->offers = $previous;
+        $this->selectedOffers = $previous;
     }
 
     #[ExposeInTemplate]
     public function countAllHosts()
     {
-        $qb = $this->userRepository->createQueryBuilder('u')
+        $qb = $this->users->createQueryBuilder('u')
             ->innerJoin('u.hostAssociations', 'ha')
             ->innerJoin('ha.host', 'host')
         ;
@@ -118,7 +118,7 @@ class Mailing extends AbstractController
     #[ExposeInTemplate]
     public function countAllParticipants()
     {
-        $qb = $this->participantRepository->createQueryBuilder('p')
+        $qb = $this->participants->createQueryBuilder('p')
             ->innerJoin('p.attendances', 'attendances')
             ->innerJoin('attendances.offer', 'offer')
             ->leftJoin('p.user', 'u')
@@ -130,20 +130,20 @@ class Mailing extends AbstractController
     }
 
     #[ExposeInTemplate]
-    public function context()
+    public function context(): array
     {
         $context = [];
 
         $context['baseUrl'] = $this->requestStack->getCurrentRequest()?->getSchemeAndHttpHost().$this->requestStack->getCurrentRequest()?->getBaseUrl();
 
-        if (1 === \count($this->editions)) {
-            $context['edition'] = $this->editionRepository->find(array_values($this->editions)[0]);
+        if (1 === \count($this->selectedEditions)) {
+            $context['edition'] = $this->editions->find(array_values($this->selectedEditions)[0]);
         }
-        if (1 === \count($this->offers)) {
-            $context['offer'] = $this->offerRepository->find(array_values($this->offers)[0]);
+        if (1 === \count($this->selectedOffers)) {
+            $context['offer'] = $this->offers->find(array_values($this->selectedOffers)[0]);
         }
-        if (1 === \count($this->hosts)) {
-            $context['host'] = $this->hostRepository->find(array_values($this->hosts)[0]);
+        if (1 === \count($this->selectedHosts)) {
+            $context['host'] = $this->hosts->find(array_values($this->selectedHosts)[0]);
         }
 
         return $context;
@@ -152,15 +152,15 @@ class Mailing extends AbstractController
     #[ExposeInTemplate]
     public function editionOptions()
     {
-        return $this->editionRepository->findBy(['archived' => 0]);
+        return $this->editions->findBy(['archived' => 0]);
     }
 
     #[ExposeInTemplate]
     public function offerOptions()
     {
-        $qb = $this->offerRepository->createQueryBuilder('o')
+        $qb = $this->offers->createQueryBuilder('o')
             ->where('o.id IN (:ids)')
-            ->setParameter('ids', $this->offers);
+            ->setParameter('ids', $this->selectedOffers);
 
         if (!$this->isGranted('ROLE_ADMIN')) {
             $user = $this->getUser();
@@ -173,9 +173,9 @@ class Mailing extends AbstractController
     #[ExposeInTemplate]
     public function hostOptions()
     {
-        $qb = $this->hostRepository->createQueryBuilder('h')
+        $qb = $this->hosts->createQueryBuilder('h')
             ->where('h.id IN (:ids)')
-            ->setParameter('ids', $this->hosts)
+            ->setParameter('ids', $this->selectedHosts)
         ;
 
         if (!$this->isGranted('ROLE_ADMIN')) {
@@ -274,7 +274,7 @@ class Mailing extends AbstractController
 
     private function queryHostAccounts()
     {
-        $qb = $this->userRepository
+        $qb = $this->users
             ->createQueryBuilder('u')
             ->innerJoin('u.hostAssociations', 'ha')
             ->innerJoin('ha.host', 'host')
@@ -288,13 +288,13 @@ class Mailing extends AbstractController
             $qb->innerJoin('host.offers', 'offers');
             $qb->leftJoin('offers.edition', 'edition');
 
-            if ($this->editions) {
-                $qb->andWhere('edition IN (:editions)')->setParameter('editions', $this->editions);
+            if ($this->selectedEditions) {
+                $qb->andWhere('edition IN (:editions)')->setParameter('editions', $this->selectedEditions);
             }
         }
 
-        if ($this->hosts) {
-            $qb->andWhere('host IN (:hosts)')->setParameter('hosts', $this->hosts);
+        if ($this->selectedHosts) {
+            $qb->andWhere('host IN (:hosts)')->setParameter('hosts', $this->selectedHosts);
         }
 
         return $qb->getQuery()->getResult();
@@ -312,7 +312,7 @@ class Mailing extends AbstractController
 
     private function queryParticipants()
     {
-        $qb = $this->participantRepository
+        $qb = $this->participants
             ->createQueryBuilder('p')
             ->innerJoin('p.attendances', 'attendances')
             ->innerJoin('attendances.offer', 'offer')
@@ -324,12 +324,12 @@ class Mailing extends AbstractController
             $qb->innerJoin('offer.hosts', 'hosts')->andWhere('hosts IN (:hosts)')->setParameter('hosts', $user instanceof User ? $user->getHosts() : []);
         }
 
-        if ($this->offers) {
-            $qb->andWhere('offer IN (:offers)')->setParameter('offers', $this->offers);
+        if ($this->selectedOffers) {
+            $qb->andWhere('offer IN (:offers)')->setParameter('offers', $this->selectedOffers);
         }
 
-        if ($this->editions) {
-            $qb->andWhere('edition IN (:editions)')->setParameter('editions', $this->editions);
+        if ($this->selectedEditions) {
+            $qb->andWhere('edition IN (:editions)')->setParameter('editions', $this->selectedEditions);
         }
 
         if ($this->attendanceStatus) {

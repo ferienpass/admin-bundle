@@ -38,7 +38,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 #[Route('/angebote/{edition?null}')]
 final class OfferEditController extends AbstractController
 {
-    public function __construct(#[Autowire(service: 'ferienpass.file_uploader.offer_media')] private readonly FileUploader $fileUploader, #[Autowire(service: 'ferienpass.file_uploader.agreement_letters')] private readonly FileUploader $pdfFileUploader, private readonly ManagerRegistry $doctrine, private readonly WorkflowInterface $offerStateMachine, private readonly ContaoFramework $contaoFramework, private readonly OfferRepositoryInterface $offerRepository)
+    public function __construct(#[Autowire(service: 'ferienpass.file_uploader.offer_media')] private readonly FileUploader $fileUploader, #[Autowire(service: 'ferienpass.file_uploader.agreement_letters')] private readonly FileUploader $pdfFileUploader, private readonly ManagerRegistry $doctrine, private readonly WorkflowInterface $offerStateMachine, private readonly ContaoFramework $contaoFramework, private readonly OfferRepositoryInterface $offers)
     {
     }
 
@@ -111,7 +111,7 @@ final class OfferEditController extends AbstractController
         $offer = null;
         if (null !== $offerId) {
             /** @var OfferInterface $offer */
-            $offer = $this->offerRepository->find($offerId);
+            $offer = $this->offers->find($offerId);
         }
 
         if ('admin_offers_edit' === $request->get('_route') && null === $offer) {
@@ -119,7 +119,7 @@ final class OfferEditController extends AbstractController
         }
 
         if (null === $offer) {
-            $offer = $this->offerRepository->createNew();
+            $offer = $this->offers->createNew();
             $offer->setEdition($edition);
             $offer->addDate(new OfferDate($offer));
 
@@ -131,7 +131,7 @@ final class OfferEditController extends AbstractController
         }
 
         if ('admin_offers_copy' === $request->get('_route')) {
-            $copy = $this->offerRepository->createCopy($offer);
+            $copy = $this->offers->createCopy($offer);
             $copy->setEdition($edition);
 
             $this->denyAccessUnlessGranted('view', $offer);
@@ -143,7 +143,7 @@ final class OfferEditController extends AbstractController
         }
 
         if ('admin_offers_new_variant' === $request->get('_route')) {
-            $copy = $this->offerRepository->createVariant($offer);
+            $copy = $this->offers->createVariant($offer);
             $copy->setEdition($edition);
 
             $this->denyAccessUnlessGranted('view', $offer);

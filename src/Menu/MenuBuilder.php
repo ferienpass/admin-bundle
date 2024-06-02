@@ -30,7 +30,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class MenuBuilder
 {
-    public function __construct(private readonly FactoryInterface $factory, private readonly LogoutUrlGenerator $logoutUrlGenerator, private readonly AuthorizationCheckerInterface $authorizationChecker, private readonly RequestStack $requestStack, private readonly EditionRepository $editionRepository, private readonly Security $security, private readonly HostRepository $hostRepository, private readonly EventDispatcherInterface $dispatcher)
+    public function __construct(private readonly FactoryInterface $factory, private readonly LogoutUrlGenerator $logoutUrlGenerator, private readonly AuthorizationCheckerInterface $authorizationChecker, private readonly RequestStack $requestStack, private readonly EditionRepository $editions, private readonly Security $security, private readonly HostRepository $hosts, private readonly EventDispatcherInterface $dispatcher)
     {
     }
 
@@ -38,7 +38,7 @@ class MenuBuilder
     {
         $menu = $this->factory->createItem('root');
 
-        $edition = $this->editionRepository->findDefaultForHost();
+        $edition = $this->editions->findDefaultForHost();
         if (null !== $edition) {
             $menu->addChild('offers.title', [
                 'route' => 'admin_offers_index',
@@ -153,7 +153,7 @@ class MenuBuilder
             'extras' => ['icon' => 'calendar-solid'],
         ]);
 
-        foreach ($this->editionRepository->findWithActiveTask('host_editing_stage') as $edition) {
+        foreach ($this->editions->findWithActiveTask('host_editing_stage') as $edition) {
             $menu->addChild('copy'.$edition->getId(), [
                 'label' => 'offers.action.copy',
                 'route' => 'admin_offers_new',
@@ -244,8 +244,8 @@ class MenuBuilder
         $editionNav = $this->factory->createItem('edition');
         $hostNav = $this->factory->createItem('host');
 
-        $editions = $this->editionRepository->findBy([], ['id' => 'DESC'], 5);
-        $defaultEdition = $this->editionRepository->findDefaultForHost();
+        $editions = $this->editions->findBy([], ['id' => 'DESC'], 5);
+        $defaultEdition = $this->editions->findDefaultForHost();
         foreach ($editions as $edition) {
             $editionNav->addChild((string) $edition->getAlias(), [
                 'label' => $edition->getName(),
@@ -257,8 +257,8 @@ class MenuBuilder
             ]);
         }
 
-        $edition = $this->editionRepository->findDefaultForHost();
-        foreach ($this->hostRepository->findByUser($user) as $host) {
+        $edition = $this->editions->findDefaultForHost();
+        foreach ($this->hosts->findByUser($user) as $host) {
             $hostNav->addChild((string) $host->getAlias(), [
                 'label' => $host->getName(),
                 'route' => 'admin_offers_index',

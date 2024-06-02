@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChartAttendancesController extends AbstractController
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository)
+    public function __construct(private readonly AttendanceRepository $attendances)
     {
     }
 
@@ -34,7 +34,7 @@ class ChartAttendancesController extends AbstractController
 
     private function getData(int $passEdition): array
     {
-        $daysAndCount = $this->attendanceRepository->createQueryBuilder('a')
+        $daysAndCount = $this->attendances->createQueryBuilder('a')
             ->select("DATE_FORMAT(a.createdAt, '%Y-%m-%d') AS day")
             ->addSelect('COUNT(a.id) as count')
             ->innerJoin('a.offer', 'o')

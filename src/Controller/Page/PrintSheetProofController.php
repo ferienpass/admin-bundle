@@ -31,7 +31,7 @@ final class PrintSheetProofController extends AbstractController
     {
     }
 
-    public function __invoke(int $id, string $_format, Request $request, OfferRepositoryInterface $offerRepository)
+    public function __invoke(int $id, string $_format, Request $request, OfferRepositoryInterface $repository)
     {
         if (!\in_array($_format, ['pdf', 'jpg', 'jpeg', 'png'], true)) {
             throw new PageNotFoundException('Format not supported: '.$_format);
@@ -41,7 +41,7 @@ final class PrintSheetProofController extends AbstractController
             throw new PageNotFoundException('No print template');
         }
 
-        if (null === $offer = $offerRepository->find($id)) {
+        if (null === $offer = $repository->find($id)) {
             return new Response('Item not found', Response::HTTP_NOT_FOUND);
         }
 

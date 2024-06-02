@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChartUtilizationController extends AbstractController
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository, private readonly TranslatorInterface $translator)
+    public function __construct(private readonly AttendanceRepository $attendances, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -36,7 +36,7 @@ class ChartUtilizationController extends AbstractController
     private function getData(int $passEdition): array
     {
         $return = [];
-        $result = $this->attendanceRepository->createQueryBuilder('a')
+        $result = $this->attendances->createQueryBuilder('a')
             ->select('a.status')
             ->addSelect('o.id as offer_id')
             ->addSelect('o.name as offer_title')

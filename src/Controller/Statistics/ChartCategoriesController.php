@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChartCategoriesController extends AbstractController
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository)
+    public function __construct(private readonly AttendanceRepository $attendances)
     {
     }
 
@@ -40,7 +40,7 @@ class ChartCategoriesController extends AbstractController
 
     private function getData(int $passEdition): ?array
     {
-        $qb = $this->attendanceRepository->createQueryBuilder('a')
+        $qb = $this->attendances->createQueryBuilder('a')
             ->select('c.name AS category', 'COUNT(a.id) AS count')
             ->innerJoin('a.offer', 'o')
             ->innerJoin('o.categories', 'c')

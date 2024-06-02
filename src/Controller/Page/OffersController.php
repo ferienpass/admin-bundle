@@ -36,7 +36,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 final class OffersController extends AbstractController
 {
     #[Route('{_suffix?}', name: 'admin_offers_index')]
-    public function index(#[MapEntity(mapping: ['edition' => 'alias'])] ?Edition $edition, ?string $_suffix, OfferRepositoryInterface $repository, Breadcrumb $breadcrumb, FactoryInterface $factory, EditionRepository $editionRepository, XlsxExport $xlsxExport, EntityManagerInterface $entityManager): Response
+    public function index(#[MapEntity(mapping: ['edition' => 'alias'])] ?Edition $edition, ?string $_suffix, OfferRepositoryInterface $repository, Breadcrumb $breadcrumb, FactoryInterface $factory, EditionRepository $editions, XlsxExport $xlsxExport, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -55,7 +55,7 @@ final class OffersController extends AbstractController
 
         $menu = $factory->createItem('offers.editions');
 
-        foreach ($editionRepository->findBy(['archived' => false], ['createdAt' => 'DESC']) as $e) {
+        foreach ($editions->findBy(['archived' => false], ['createdAt' => 'DESC']) as $e) {
             if (!$this->isGranted('ROLE_ADMIN') && !$e->getHosts()->isEmpty() && !$e->getHosts()->contains($user->getHosts()->first())) {
                 continue;
             }

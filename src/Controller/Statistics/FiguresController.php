@@ -16,14 +16,13 @@ namespace Ferienpass\AdminBundle\Controller\Statistics;
 use Ferienpass\CoreBundle\Entity\Attendance;
 use Ferienpass\CoreBundle\Entity\Edition;
 use Ferienpass\CoreBundle\Repository\AttendanceRepository;
-use Ferienpass\CoreBundle\Repository\EditionRepository;
 use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 class FiguresController extends AbstractController
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository, private readonly OfferRepositoryInterface $offerRepository, private readonly EditionRepository $editionRepository)
+    public function __construct(private readonly AttendanceRepository $attendances, private readonly OfferRepositoryInterface $offers)
     {
     }
 
@@ -44,7 +43,7 @@ class FiguresController extends AbstractController
             return null;
         }
 
-        return (int) $this->attendanceRepository->createQueryBuilder('a')
+        return (int) $this->attendances->createQueryBuilder('a')
             ->select('COUNT(DISTINCT COALESCE(IDENTITY(a.participant), a.participantPseudonym))')
             ->innerJoin('a.offer', 'o')
             ->andWhere('o.edition = :edition')
@@ -60,7 +59,7 @@ class FiguresController extends AbstractController
             return null;
         }
 
-        return (int) $this->attendanceRepository->createQueryBuilder('a')
+        return (int) $this->attendances->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->innerJoin('a.offer', 'o')
             ->andWhere('o.edition = :edition')
@@ -78,7 +77,7 @@ class FiguresController extends AbstractController
             return null;
         }
 
-        return (int) $this->offerRepository->createQueryBuilder('o')
+        return (int) $this->offers->createQueryBuilder('o')
             ->select('COUNT(o.id) AS count')
             ->andWhere('o.edition = :edition')
             ->setParameter('edition', $edition->getId())
@@ -93,7 +92,7 @@ class FiguresController extends AbstractController
             return null;
         }
 
-        return (int) $this->offerRepository->createQueryBuilder('o')
+        return (int) $this->offers->createQueryBuilder('o')
             ->select('COUNT(o.id) AS count')
             ->andWhere('o.variantBase IS NULL')
             ->andWhere('o.edition = :edition')
@@ -109,7 +108,7 @@ class FiguresController extends AbstractController
             return null;
         }
 
-        return (int) $this->offerRepository->createQueryBuilder('o')
+        return (int) $this->offers->createQueryBuilder('o')
             ->select('COUNT(DISTINCT h.id) AS count')
             ->innerJoin('o.hosts', 'h')
             ->andWhere('o.edition = :edition')

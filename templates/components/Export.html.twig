@@ -45,14 +45,14 @@
                     {% for edition in editionOptions %}
                         <div class="relative flex gap-x-3">
                             <div class="flex items-center">
-                                <input id="editions{{ loop.index }}"
-                                       data-model="editions[]"
+                                <input id="edition-{{ loop.index }}"
+                                       data-model="selectedEditions[]"
                                        type="checkbox"
                                        value="{{ edition.id }}"
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                             </div>
                             <div class="text-sm leading-6">
-                                <label for="editions{{ loop.index }}"
+                                <label for="edition-{{ loop.index }}"
                                        class="font-medium text-gray-900 dark:text-gray-100">{{ edition.name }}</label>
                             </div>
                         </div>

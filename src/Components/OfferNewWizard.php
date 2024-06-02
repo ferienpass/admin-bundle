@@ -35,7 +35,7 @@ class OfferNewWizard extends AbstractController
 
     public ?string $action = null;
 
-    public function __construct(private readonly OfferRepositoryInterface $offerRepository)
+    public function __construct(private readonly OfferRepositoryInterface $offers)
     {
     }
 
@@ -75,9 +75,7 @@ class OfferNewWizard extends AbstractController
 
     private function prepareQueryBuilder(?string $action): QueryBuilder
     {
-        /** @var \Doctrine\ORM\EntityRepository $repository */
-        $repository = $this->offerRepository;
-        $qb = $repository->createQueryBuilder('o');
+        $qb = $this->offers->createQueryBuilder('o');
 
         if ('createVariant' === $action) {
             $qb->andWhere($qb->expr()->eq('o.edition', ':edition'));

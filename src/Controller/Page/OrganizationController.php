@@ -27,14 +27,14 @@ use Symfony\Component\Routing\Attribute\Route;
 final class OrganizationController extends AbstractController
 {
     #[Route('/{host?}', name: 'admin_profile_index')]
-    public function index(#[MapEntity(mapping: ['host' => 'alias'])] ?Host $host, HostRepository $hostRepository, Breadcrumb $breadcrumb, FactoryInterface $factory): Response
+    public function index(#[MapEntity(mapping: ['host' => 'alias'])] ?Host $host, HostRepository $repository, Breadcrumb $breadcrumb, FactoryInterface $factory): Response
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        $hosts = $hostRepository->findByUser($user);
+        $hosts = $repository->findByUser($user);
         if (null === $host) {
             $host = $hosts[0] ?? null;
             if (\count($hosts) > 1) {

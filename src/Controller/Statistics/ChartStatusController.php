@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChartStatusController extends AbstractController
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository, private readonly TranslatorInterface $translator)
+    public function __construct(private readonly AttendanceRepository $attendances, private readonly TranslatorInterface $translator)
     {
     }
 
@@ -35,7 +35,7 @@ class ChartStatusController extends AbstractController
 
     private function getData(int $passEdition): array
     {
-        $statusAndCount = $this->attendanceRepository->createQueryBuilder('a')
+        $statusAndCount = $this->attendances->createQueryBuilder('a')
             ->select('a.status')
             ->addSelect('COUNT(a.id) as count')
             ->innerJoin('a.offer', 'o')

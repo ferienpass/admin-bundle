@@ -27,16 +27,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[AsMessageHandler]
 class WhenHostInviteThenNotify
 {
-    public function __construct(private readonly Notifier $notifier, private readonly HostRepository $hostRepository, private readonly UserRepository $userRepository, private readonly UrlGeneratorInterface $urlGenerator, private readonly UriSigner $uriSigner)
+    public function __construct(private readonly Notifier $notifier, private readonly HostRepository $hosts, private readonly UserRepository $users, private readonly UrlGeneratorInterface $urlGenerator, private readonly UriSigner $uriSigner)
     {
     }
 
     public function __invoke(HostInvite $message): void
     {
         /** @var User $user */
-        $user = $this->userRepository->find($message->getUserId());
+        $user = $this->users->find($message->getUserId());
         /** @var Host $host */
-        $host = $this->hostRepository->find($message->getHostId());
+        $host = $this->hosts->find($message->getHostId());
         if (null === $user || null === $host) {
             return;
         }

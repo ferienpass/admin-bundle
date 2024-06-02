@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GanttController extends AbstractController
 {
-    public function __construct(private readonly TranslatorInterface $translator, private readonly EditionRepository $editionRepository)
+    public function __construct(private readonly TranslatorInterface $translator, private readonly EditionRepository $editions)
     {
     }
 
@@ -36,7 +36,7 @@ class GanttController extends AbstractController
         $now = new \DateTimeImmutable();
         $editions = [];
 
-        foreach ($this->editionRepository->findAll() as $edition) {
+        foreach ($this->editions->findAll() as $edition) {
             $tasks = [];
             foreach ($edition->getTasks() as $task) {
                 if (null === $task->getPeriodEnd() || null === $task->getPeriodBegin()) {

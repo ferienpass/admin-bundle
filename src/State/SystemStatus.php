@@ -18,7 +18,7 @@ use Ferienpass\CoreBundle\Repository\AttendanceRepository;
 
 class SystemStatus
 {
-    public function __construct(private readonly AttendanceRepository $attendanceRepository)
+    public function __construct(private readonly AttendanceRepository $attendances)
     {
     }
 
@@ -29,7 +29,7 @@ class SystemStatus
 
     public function generateWarnings()
     {
-        $unassignedParticipants = $this->attendanceRepository->createQueryBuilder('attendance')
+        $unassignedParticipants = $this->attendances->createQueryBuilder('attendance')
             ->innerJoin('attendance.offer', 'offer')
             ->innerJoin('offer.edition', 'edition')
             ->innerJoin('offer.dates', 'dates')

@@ -28,14 +28,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/registrierung', name: 'admin_registration')]
 final class RegistrationController extends AbstractController
 {
-    public function __invoke(Request $request, EntityManagerInterface $em, MessageBusInterface $messageBus, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository, \Ferienpass\CoreBundle\Session\Flash $flash): Response
+    public function __invoke(Request $request, EntityManagerInterface $em, MessageBusInterface $messageBus, UserPasswordHasherInterface $passwordHasher, UserRepository $users, \Ferienpass\CoreBundle\Session\Flash $flash): Response
     {
         $dto = new HostRegistrationDto();
         $form = $this->createForm(HostRegistrationType::class, $dto);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $existingUser = $userRepository->findOneBy(['email' => $form->get('userEmail')->getData()]);
+            $existingUser = $users->findOneBy(['email' => $form->get('userEmail')->getData()]);
             if (null !== $existingUser) {
                 $flash->addErrorModal(headline: 'Fehler', text: 'Leider können wir Ihre Registrierung nicht verarbeiten. Bitte kontaktieren Sie uns persönlich.');
 

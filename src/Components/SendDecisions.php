@@ -48,14 +48,14 @@ class SendDecisions extends AbstractController
     #[LiveProp(writable: true, url: true)]
     public ?Edition $edition = null;
 
-    public function __construct(private readonly EditionRepository $editionRepository, private readonly ParticipantRepositoryInterface $participantRepository, private readonly UserRepository $userRepository, private readonly HostRepository $hostRepository, private readonly OfferRepositoryInterface $offerRepository, private readonly Environment $twig, private readonly RequestStack $requestStack, private readonly NormalizerInterface $normalizer, private readonly Notifier $notifier, private readonly MailingNotification $mailingNotification, private readonly DecisionsFacade $unconfirmedApplications)
+    public function __construct(private readonly EditionRepository $editions, private readonly ParticipantRepositoryInterface $participants, private readonly UserRepository $users, private readonly HostRepository $hosts, private readonly OfferRepositoryInterface $offers, private readonly Environment $twig, private readonly RequestStack $requestStack, private readonly NormalizerInterface $normalizer, private readonly Notifier $notifier, private readonly MailingNotification $mailingNotification, private readonly DecisionsFacade $unconfirmedApplications)
     {
     }
 
     #[ExposeInTemplate]
     public function editionOptions()
     {
-        $qb = $this->editionRepository->createQueryBuilder('e');
+        $qb = $this->editions->createQueryBuilder('e');
 
         return $qb->getQuery()->getResult();
     }

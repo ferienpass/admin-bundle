@@ -28,7 +28,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 class HostFilter extends AbstractFilterType
 {
-    public function __construct(private readonly Security $security, private readonly HostRepository $hostRepository)
+    public function __construct(private readonly Security $security, private readonly HostRepository $hosts)
     {
     }
 
@@ -76,7 +76,7 @@ class HostFilter extends AbstractFilterType
                 return;
             }
 
-            $hosts = $this->hostRepository->findByUser($user);
+            $hosts = $this->hosts->findByUser($user);
             $qb->innerJoin('i.hosts', 'h', Join::WITH, 'h IN (:hosts)')->setParameter('hosts', $hosts);
 
             return;

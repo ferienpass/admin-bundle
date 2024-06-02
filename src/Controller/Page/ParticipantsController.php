@@ -73,13 +73,13 @@ final class ParticipantsController extends AbstractController
 
     #[Route('/neu', name: 'admin_participants_create')]
     #[Route('/{id}/bearbeiten', name: 'admin_participants_edit', requirements: ['id' => '\d+'])]
-    public function edit(?int $id, Request $request, Breadcrumb $breadcrumb, ParticipantRepositoryInterface $participantRepository): Response
+    public function edit(?int $id, Request $request, Breadcrumb $breadcrumb, ParticipantRepositoryInterface $repository): Response
     {
-        if (null !== $id && null === ($participant = $participantRepository->find($id))) {
+        if (null !== $id && null === ($participant = $repository->find($id))) {
             throw $this->createNotFoundException();
         }
 
-        $participant ??= $participantRepository->createNew();
+        $participant ??= $repository->createNew();
 
         $em = $this->doctrine->getManager();
         $form = $this->createForm(EditParticipantType::class, $participant);
@@ -224,7 +224,7 @@ final class ParticipantsController extends AbstractController
     /**
      * @return array<Attendance>
      */
-    private function getAttendancesFromRequest(AttendanceRepository $attendanceRepository, Request $request): array
+    private function getAttendancesFromRequest(AttendanceRepository $attendances, Request $request): array
     {
         if ($request->request->has(MultiSelectType::FORM_NAME)) {
             $ids = $request->get(MultiSelectType::FORM_NAME)['items'] ?? [];
@@ -238,6 +238,6 @@ final class ParticipantsController extends AbstractController
             return [];
         }
 
-        return $attendanceRepository->findBy(['id' => $ids]);
+        return $attendances->findBy(['id' => $ids]);
     }
 }

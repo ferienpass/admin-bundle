@@ -26,14 +26,14 @@ use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 #[AsMessageHandler]
 class WhenLostPasswordThenNotify
 {
-    public function __construct(private readonly Notifier $notifier, private readonly UserRepository $repository, private readonly ResetPasswordHelperInterface $resetPasswordHelper, private readonly UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly Notifier $notifier, private readonly UserRepository $users, private readonly ResetPasswordHelperInterface $resetPasswordHelper, private readonly UrlGeneratorInterface $urlGenerator)
     {
     }
 
     public function __invoke(HostLostPassword $message): void
     {
         /** @var User $user */
-        $user = $this->repository->findOneBy(['email' => $message->getEmail()]);
+        $user = $this->users->findOneBy(['email' => $message->getEmail()]);
         if (null === $user) {
             return;
         }

@@ -46,15 +46,15 @@ final class Export extends AbstractController
     public ?string $export = null;
 
     #[LiveProp(writable: true)]
-    public array $editions = [];
+    public array $selectedEditions = [];
 
     #[LiveProp(writable: true)]
-    public array $hosts = [];
+    public array $selectedHosts = [];
 
     #[LiveProp(writable: true)]
     public bool $onlyPublished = true;
 
-    public function __construct(private readonly OfferRepositoryInterface $offerRepository, private readonly EditionRepository $editionRepository, private readonly OfferExporter $exporter)
+    public function __construct(private readonly OfferRepositoryInterface $offers, private readonly EditionRepository $editions, private readonly OfferExporter $exporter)
     {
     }
 
@@ -67,7 +67,7 @@ final class Export extends AbstractController
     #[ExposeInTemplate]
     public function editionOptions(): array
     {
-        return $this->editionRepository->findBy(['archived' => 0]);
+        return $this->editions->findBy(['archived' => 0]);
     }
 
     #[LiveListener('selectExport')]
@@ -94,7 +94,7 @@ final class Export extends AbstractController
 
     private function queryOffers(): array
     {
-        $qb = $this->offerRepository
+        $qb = $this->offers
             ->createQueryBuilder('offer')
             ->select('offer.id')
             ->leftJoin('offer.dates', 'dates')
@@ -106,12 +106,12 @@ final class Export extends AbstractController
             $qb->setParameter('state_published', OfferInterface::STATE_PUBLISHED);
         }
 
-        if ($this->editions) {
-            $qb->andWhere('offer.edition IN (:editions)')->setParameter('editions', $this->editions, Types::SIMPLE_ARRAY);
+        if ($this->selectedEditions) {
+            $qb->andWhere('offer.edition IN (:editions)')->setParameter('editions', $this->selectedEditions, Types::SIMPLE_ARRAY);
         }
 
-        if ($this->hosts) {
-            $qb->innerJoin('offer.hosts', 'hosts')->andWhere('hosts.id IN (:hosts)')->setParameter('hosts', $this->hosts, Types::SIMPLE_ARRAY);
+        if ($this->selectedHosts) {
+            $qb->innerJoin('offer.hosts', 'hosts')->andWhere('hosts.id IN (:hosts)')->setParameter('hosts', $this->selectedHosts, Types::SIMPLE_ARRAY);
         }
 
         return $qb->getQuery()->getSingleColumnResult();

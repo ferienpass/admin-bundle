@@ -16,6 +16,7 @@ namespace Ferienpass\AdminBundle\Components;
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Dto\AddAttendanceDto;
 use Ferienpass\AdminBundle\Form\AddAttendanceType;
+use Ferienpass\CoreBundle\Entity\Attendance;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
 use Ferienpass\CoreBundle\Entity\Participant\ParticipantInterface;
 use Ferienpass\CoreBundle\Facade\AttendanceFacade;
@@ -43,6 +44,8 @@ class AddAttendance extends AbstractController
     #[LiveProp]
     public bool $isNewParticipant = false;
 
+    public ?Attendance $success = null;
+
     public function __construct(private readonly FormFactoryInterface $formFactory)
     {
     }
@@ -56,6 +59,9 @@ class AddAttendance extends AbstractController
     #[LiveAction]
     public function preview(AttendanceFacade $attendanceFacade): void
     {
+        $this->submitForm(false);
+        $this->success = null;
+
         /** @var AddAttendanceDto $dto */
         $dto = $this->getForm()->getData();
 
@@ -69,7 +75,7 @@ class AddAttendance extends AbstractController
     }
 
     #[LiveAction]
-    public function submit(AttendanceFacade $attendanceFacade, EntityManagerInterface $entityManager)
+    public function submit(AttendanceFacade $attendanceFacade, EntityManagerInterface $entityManager): void
     {
         $this->submitForm();
 
@@ -80,19 +86,10 @@ class AddAttendance extends AbstractController
             $entityManager->persist($dto->getParticipant());
         }
 
-        $attendanceFacade->create($dto->getOffer(), $dto->getParticipant(), $dto->getStatus(), $dto->shallNotify());
-
+        $this->success = $attendanceFacade->create($dto->getOffer(), $dto->getParticipant(), $dto->getStatus(), $dto->shallNotify());
         $this->isNewParticipant = false;
 
-        if (null !== $this->offer) {
-            return $this->redirectToRoute('admin_offer_participants', ['id' => $this->offer->getId(), 'edition' => $this->offer->getEdition()?->getAlias()]);
-        }
-
-        if (null !== $this->participant) {
-            return $this->redirectToRoute('admin_participants_attendances', ['id' => $this->participant->getId()]);
-        }
-
-        return $this->redirectToRoute('admin_index');
+        $this->resetForm();
     }
 
     protected function instantiateForm(): FormInterface

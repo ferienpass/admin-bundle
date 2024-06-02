@@ -10,6 +10,16 @@
         }
     }) }}
 
+    {% if success is not null %}
+        <twig:Admin:Alert type="confirm" class="mb-4 shadow border border-green-700/30">
+            Anmeldung (<a target="_blank" class="font-medium underline hover:no-underline"
+                          href="{{ path('admin_participants_attendances', {id: success.participant.id}) }}">{{ success.participant.name }}</a>,
+            <a target="_blank" class="font-medium underline hover:no-underline"
+               href="{{ path('admin_offer_participants', {id: success.offer.id}) }}">{{ success.offer.name }}</a>)
+            wurde erfasst.
+        </twig:Admin:Alert>
+    {% endif %}
+
     {% set dto = form.vars.data %}
 
     {{ partials.h2('Neue Anmeldung') }}

@@ -22,9 +22,14 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
+use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-abstract class AbstractFilter extends AbstractType
+abstract class AbstractFilter extends AbstractType implements ServiceSubscriberInterface
 {
+    use ServiceMethodsSubscriberTrait;
+
     protected array $filterTypes = [];
 
     public function getSearchable(): array
@@ -57,6 +62,7 @@ abstract class AbstractFilter extends AbstractType
         $resolver->setDefaults([
             'translation_domain' => 'admin',
             'required' => false,
+            'prepopulate' => false,
         ]);
     }
 
@@ -76,11 +82,14 @@ abstract class AbstractFilter extends AbstractType
             ])
         ;
 
-        //        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (PreSubmitEvent $event): void {
-        //            $session = $this->requestStack->getSession();
-        //
-        //            $session->get('ferienpass_admin.filter.' . self::class, $event->getData());
-        //        });
+        if ($options['prepopulate']) {
+            return;
+        }
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (PreSubmitEvent $event): void {
+            // TODO: Currently considers "0" (boolean false) as empty
+            $this->requestStack()->getSession()->set('ferienpass_admin.filter.'.static::class, array_filter($event->getData()));
+        });
     }
 
     public function apply(QueryBuilder $qb, FormInterface $form): void
@@ -103,4 +112,10 @@ abstract class AbstractFilter extends AbstractType
     }
 
     abstract protected function getSorting(): array;
+
+    #[SubscribedService]
+    private function requestStack(): RequestStack
+    {
+        return $this->container->get(__METHOD__);
+    }
 }

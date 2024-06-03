@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -132,15 +133,18 @@ class SearchableQueryableList extends AbstractController
     }
 
     #[LiveAction]
-    public function unsetFilter(#[LiveArg] string $filterName)
+    public function unsetFilter(#[LiveArg] string $filterName): Response
     {
         unset($this->routeParameters[$filterName]);
+
+        $filter = $this->getFilter();
+        $this->requestStack->getSession()->set('ferienpass_admin.filter.'.$filter::class, array_filter($this->requestStack->getSession()->get('ferienpass_admin.filter.'.$filter::class, []), fn (string $k) => $k !== $filterName, \ARRAY_FILTER_USE_KEY));
 
         return $this->redirectToRoute($this->routeName, array_filter($this->routeParameters));
     }
 
     #[LiveAction]
-    public function paginate(#[LiveArg] int $page)
+    public function paginate(#[LiveArg] int $page): void
     {
         $this->routeParameters['page'] = $page;
     }
@@ -159,11 +163,13 @@ class SearchableQueryableList extends AbstractController
 
         $filterDataFromUrl = array_filter($this->routeParameters, fn (string $key) => \in_array($key, $this->getFilters(), true), \ARRAY_FILTER_USE_KEY);
 
-        //        $session = $this->requestStack->getSession();
-        //        $filterDataFromSession = $session->get('ferienpass_admin.filter.' . $filter::class, []);
+        $session = $this->requestStack->getSession();
+        $filterDataFromSession = $session->get('ferienpass_admin.filter.'.$filter::class, []);
 
-        $filterForm = $this->formFactory->create($filter::class);
-        $filterForm->submit($filterDataFromUrl);
+        $filterData = array_merge($filterDataFromSession, $filterDataFromUrl);
+
+        $filterForm = $this->formFactory->create($filter::class, options: ['prepopulate' => true]);
+        $filterForm->submit($filterData);
 
         return $this->formFactory->create($filter::class, $filterForm->getData());
     }

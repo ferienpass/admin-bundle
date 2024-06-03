@@ -69,6 +69,6 @@ class StatusFilter extends AbstractFilterType
 
     protected function getHumanReadableValue(FormInterface $form): null|string|TranslatableInterface
     {
-        return $form->getData();
+        return new TranslatableMessage('offers.status.'.$form->getData(), domain: 'admin');
     }
 }

@@ -59,7 +59,7 @@ class AddAttendance extends AbstractController
     #[LiveAction]
     public function preview(AttendanceFacade $attendanceFacade): void
     {
-        //$this->submitForm(false);
+        // $this->submitForm(false);
         $this->success = null;
 
         /** @var AddAttendanceDto $dto */

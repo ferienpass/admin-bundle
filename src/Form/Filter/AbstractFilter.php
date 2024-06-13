@@ -63,7 +63,7 @@ abstract class AbstractFilter extends AbstractType implements ServiceSubscriberI
             'translation_domain' => 'admin',
             'required' => false,
             'prepopulate' => false,
-            'attr' => ['autocomplete' => 'off']
+            'attr' => ['autocomplete' => 'off'],
         ]);
     }
 

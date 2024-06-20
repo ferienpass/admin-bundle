@@ -124,10 +124,11 @@ final class AccountsController extends AbstractController
             }
 
             $em->flush();
-
             $flash->addConfirmation(text: new TranslatableMessage('editConfirm', domain: 'admin'));
 
-            return $this->redirectToRoute('admin_accounts_edit', ['id' => $user->getId()]);
+            $alias = array_search($user->getRoles()[0] ?? '', self::ROLES, true);
+
+            return $this->redirectToRoute('admin_accounts_edit', ['role' => $alias ?: null, 'id' => $user->getId()]);
         }
 
         $breadcrumbTitle = $user->getId() ? sprintf('%s (bearbeiten)', $user->getName()) : 'accounts.new';

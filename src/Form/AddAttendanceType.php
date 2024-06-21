@@ -13,11 +13,8 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Form;
 
-use Doctrine\ORM\EntityRepository;
 use Ferienpass\AdminBundle\Dto\AddAttendanceDto;
 use Ferienpass\CoreBundle\Entity\Attendance;
-use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -29,7 +26,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class AddAttendanceType extends AbstractType
 {
-    public function __construct(#[Autowire(param: 'ferienpass.model.offer.class')] private readonly string $offerEntityClass, #[Autowire(param: 'ferienpass.model.participant.class')] private readonly string $participantEntityClass)
+    public function __construct(#[Autowire(param: 'ferienpass.model.participant.class')] private readonly string $participantEntityClass)
     {
     }
 
@@ -52,30 +49,11 @@ class AddAttendanceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['add_offer']) {
-            $builder->add('offer', EntityType::class, [
-                'class' => $this->offerEntityClass,
-                'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('o')
-                    ->leftJoin('o.dates', 'dates')
-                    ->where('dates.begin >= CURRENT_TIMESTAMP()')
-                    ->andWhere('o.onlineApplication = 1')
-                    ->orderBy('o.name'),
-                'choice_label' => function (OfferInterface $choice, string $key, mixed $value): TranslatableMessage|string {
-                    return sprintf('%s (%s)', $choice->getName(), $choice->getEdition()?->getName());
-                },
-                'autocomplete' => true,
-                'placeholder' => '-',
-            ]);
+            $builder->add('offer', AddAttendanceOfferType::class);
         }
 
         if ($options['add_participant'] && !$options['new_participant']) {
-            $builder->add('participant', EntityType::class, [
-                'class' => $this->participantEntityClass,
-                'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('p')
-                    ->orderBy('p.lastname'),
-                'choice_label' => 'name',
-                'autocomplete' => true,
-                'placeholder' => '-',
-            ]);
+            $builder->add('participant', AddAttendanceParticipantType::class);
         }
 
         if ($options['new_participant']) {

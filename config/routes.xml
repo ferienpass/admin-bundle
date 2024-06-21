@@ -28,5 +28,8 @@
     >
         <default key="_live_action">get</default>
     </route>
-
+    <route id="ux_entity_autocomplete_admin"
+           path="/admin/autocomplete/{alias}"
+           controller="ux.autocomplete.entity_autocomplete_controller"
+    />
 </routes>

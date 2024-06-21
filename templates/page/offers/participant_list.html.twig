@@ -24,6 +24,54 @@
 
         {{ parent() }}
 
+        <twig:Admin:ButtonWithDropdown href="{{ path('admin_offer_assign_pdf', {id: offer.id, edition: offer.edition.alias}) }}">
+            <twig:block name="buttonText">
+                <span class="-ml-1 mr-2 h-5 w-5 text-gray-500">{% include'@FerienpassCore/Icons/document-download-solid.svg.twig' %}</span>
+                PDF-Export
+            </twig:block>
+            <twig:block name="dropdown">
+                <div class="py-1">
+                    <a href="{{ path('admin_offers_edit', { id: offer.id }) }}"
+                       class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                       role="menuitem">
+                        <span class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">{% include '@FerienpassCore/Icons/pencil-solid.svg.twig' %}</span>
+                        Bearbeiten
+                    </a>
+                </div>
+                <div class="border-t border-gray-100"></div>
+                <div class="py-1">
+                    <a href="{{ path('admin_offer_assign_pdf', {id: offer.id, edition: offer.edition.alias}) }}"
+                       target="_blank"
+                       class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                       role="menuitem">
+                        <span class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">{% include '@FerienpassCore/Icons/document-download-solid.svg.twig' %}</span>
+                        PDF-Export
+                    </a>
+                    {% if hasWordExport|default %}
+                        <a href="{{ path('admin_offer_assign_docx', {id: offer.id, edition: offer.edition.alias}) }}"
+                           target="_blank"
+                           class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                           role="menuitem">
+                            <span class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">{% include '@FerienpassCore/Icons/document-download-solid.svg.twig' %}</span>
+                            DOCX-Export
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="border-t border-gray-100"></div>
+                {% if not offer.cancelled %}
+                    <div class="py-1">
+                        <a href="{{ path('admin_offers_cancel', { id: offer.id }) }}"
+                           data-turbo-frame="modal"
+                           class="w-full group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                           role="menuitem">
+                            <span class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">{% include '@FerienpassCore/Icons/ban-solid.svg.twig' %}</span>
+                            Absagen
+                        </a>
+                    </div>
+                {% endif %}
+            </twig:block>
+        </twig:Admin:ButtonWithDropdown>
+
         <twig:Admin:Dropdown dropdownClass="w-96">
             <twig:block name="toggle">
                 <span class="relative shadow-sm inline-flex px-4 py-2 items-center border border-transparent text-sm leading-5 font-medium rounded-md focus:outline-none focus:shadow-outline-blue border-transparent text-white bg-primary-600 hover:bg-primary-500 focus:border-primary-700 active:bg-primary-700">

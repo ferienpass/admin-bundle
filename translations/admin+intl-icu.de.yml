@@ -10,6 +10,7 @@ accounts:
     address.0: Postanschrift
     account.0: Account-Status
   action.impersonate: Anmelden als {user}
+  action.password: Passwort zurücksetzen
   action.delete: Löschen
   ROLE_MEMBER: Eltern
   ROLE_HOST: Veranstaltende

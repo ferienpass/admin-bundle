@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -119,8 +120,10 @@ final class AccountsController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $password = false;
             if (!$em->contains($user = $form->getData())) {
                 $em->persist($user);
+                $password = true;
             }
 
             $em->flush();
@@ -128,7 +131,7 @@ final class AccountsController extends AbstractController
 
             $alias = array_search($user->getRoles()[0] ?? '', self::ROLES, true);
 
-            return $this->redirectToRoute('admin_accounts_edit', ['role' => $alias ?: null, 'id' => $user->getId()]);
+            return $this->redirectToRoute($password ? 'admin_accounts_password' : 'admin_accounts_edit', ['role' => $alias ?: null, 'id' => $user->getId()]);
         }
 
         $breadcrumbTitle = $user->getId() ? sprintf('%s (bearbeiten)', $user->getName()) : 'accounts.new';
@@ -170,5 +173,58 @@ final class AccountsController extends AbstractController
             'item' => $item,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}/passwort', name: 'admin_accounts_password', requirements: ['id' => '\d+'])]
+    public function password(User $item, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $this->denyAccessUnlessGranted('password', $item);
+
+        $session = $request->getSession();
+        $form = $this->createForm(FormType::class, options: [
+            'action' => $this->generateUrl('admin_accounts_password', ['id' => $item->getId()]),
+        ]);
+
+        if ($session->has('account_password_tmp')) {
+            $password = $session->get('account_password_tmp');
+            $session->remove('account_password_tmp');
+
+            return $this->render('@FerienpassAdmin/page/accounts/password.html.twig', [
+                'item' => $item,
+                'password' => $password,
+            ]);
+        }
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $password = $this->generatePassword();
+            $encodedPassword = $passwordHasher->hashPassword($item, $password);
+
+            $session->set('account_password_tmp', $password);
+            $item->setPassword($encodedPassword);
+            $item->setModifiedAt();
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute('admin_accounts_password', ['id' => $item->getId()]);
+        }
+
+        return $this->render('@FerienpassAdmin/page/accounts/password.html.twig', [
+            'item' => $item,
+            'form' => $form,
+        ]);
+    }
+
+    private function generatePassword(): string
+    {
+        $password = '';
+        $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        $max = mb_strlen($keyspace, '8bit') - 1;
+        for ($i = 0; $i < 12; ++$i) {
+            $password .= $keyspace[random_int(0, $max)];
+        }
+
+        return $password;
     }
 }

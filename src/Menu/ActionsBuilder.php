@@ -344,6 +344,14 @@ class ActionsBuilder
             ]);
         }
 
+        $root->addChild('password', [
+            'label' => 'accounts.action.password',
+            'route' => 'admin_accounts_password',
+            'routeParameters' => array_filter(['id' => $item->getId()]),
+            'display' => $this->isGranted('password', $item),
+            'extras' => ['icon' => 'key.solid', 'attr' => ['data-turbo-frame' => 'modal']],
+        ]);
+
         $root->addChild('delete', [
             'label' => 'accounts.action.delete',
             'route' => 'admin_accounts_delete',

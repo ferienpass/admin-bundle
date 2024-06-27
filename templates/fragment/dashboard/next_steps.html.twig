@@ -55,7 +55,7 @@
             {% endif %}
 
             {% if not is_granted('ROLE_ADMIN') %}
-                {% for offer in offers.findUpcoming|filter((offer) => offer.state == 'published' and offer.requiresApplication and offer.isOnlineApplication and is_granted('view', offer))|slice(0, 5) %}
+                {% for offer in offers.findUpcoming|filter((offer) => offer.state == 'published' and offer.requiresApplication and offer.isOnlineApplication and is_granted('participants.view', offer))|slice(0, 5) %}
                     <li>
                         <div class="group relative flex items-start space-x-3 py-4">
                             <div class="flex-shrink-0">
@@ -92,7 +92,7 @@
                                             </span>
 
                                             <span>
-                                                {{ offer.attendancesConfirmedOrWaitlisted|length ~ ' / ' ~ (offer.maxParticipants ?: '∞') ~ '' }}
+                                                {{ offer.attendancesWithStatuses(["confirmed", "waitlisted", "waiting"])|length|length ~ ' / ' ~ (offer.maxParticipants ?: '∞') ~ '' }}
                                             </span>
 
                                             {% if offer.attendancesWaiting|length %}

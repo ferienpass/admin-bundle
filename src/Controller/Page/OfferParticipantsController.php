@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\ApplicationSystem\ParticipantList;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Form\MultiSelectType;
+use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
 use Ferienpass\CoreBundle\Entity\User;
 use Ferienpass\CoreBundle\Export\ParticipantList\PdfExport;
 use Ferienpass\CoreBundle\Facade\AttendanceFacade;
@@ -38,6 +39,7 @@ final class OfferParticipantsController extends AbstractController
 
     public function __invoke(string $_suffix, int $id, OfferRepositoryInterface $offers, Request $request, PdfExport $pdfExport, EntityManagerInterface $em, AttendanceFacade $attendanceFacade, Breadcrumb $breadcrumb, Flash $flash): Response
     {
+        /** @var OfferInterface $offer */
         if (null === $offer = $offers->find($id)) {
             throw $this->createNotFoundException();
         }
@@ -102,12 +104,6 @@ final class OfferParticipantsController extends AbstractController
             'offer' => $offer,
             'breadcrumb' => $breadcrumb->generate(['offers.title', ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], [$offer->getEdition()->getName(), ['route' => 'admin_offers_index', 'routeParameters' => ['edition' => $offer->getEdition()->getAlias()]]], $offer->getName(), 'Anmeldungen'),
         ]);
-
-        //        if (null !== $edition && !$edition->isParticipantListReleased()) {
-        //            return $this->render('@FerienpassAdmin/page/offers/participant_list.html.twig', [
-        //                'notReleased' => true,
-        //            ]);
-        //        }
 
         // $this->denyAccessUnlessGranted('participants.add', $offer);
     }

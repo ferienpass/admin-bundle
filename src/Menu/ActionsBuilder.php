@@ -160,7 +160,7 @@ class ActionsBuilder
         $root->addChild('mailing', [
             'label' => 'offers.action.mailing',
             'route' => 'admin_tools_mailing',
-            'routeParameters' => ['group' => 'participants', 'offers' => [$item->getId()]],
+            'routeParameters' => ['gruppe' => 'teilnehmende', 'angebote' => [$item->getId()]],
             'display' => $this->isGranted('participants.view', $item),
             'extras' => ['icon' => 'mail'],
         ]);
@@ -235,7 +235,7 @@ class ActionsBuilder
         $root->addChild('mailing', [
             'label' => 'hosts.action.mailing',
             'route' => 'admin_tools_mailing',
-            'routeParameters' => ['group' => 'hosts', 'hosts' => [$item->getId()]],
+            'routeParameters' => ['gruppe' => 'veranstaltende', 'veranstaltende' => [$item->getId()]],
             'extras' => ['icon' => 'mail'],
         ]);
 

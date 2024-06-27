@@ -35,6 +35,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\Metadata\UrlMapping;
 use Symfony\UX\LiveComponent\ValidatableComponentTrait;
 use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
 use Twig\Environment;
@@ -47,7 +48,7 @@ class Mailing extends AbstractController
     use DefaultActionTrait;
     use ValidatableComponentTrait;
 
-    #[LiveProp(writable: true, url: true)]
+    #[LiveProp(writable: true, url: new UrlMapping(as: 'gruppe'))]
     public ?string $group = null;
 
     #[LiveProp(writable: true)]
@@ -59,10 +60,10 @@ class Mailing extends AbstractController
     #[LiveProp(writable: true)]
     public array $selectedEditions = [];
 
-    #[LiveProp(writable: true, onUpdated: 'onOffersUpdated', url: true)]
+    #[LiveProp(writable: true, onUpdated: 'onOffersUpdated', url: new UrlMapping(as: 'angebote'))]
     public array $selectedOffers = [];
 
-    #[LiveProp(writable: true, url: true)]
+    #[LiveProp(writable: true, url: new UrlMapping(as: 'veranstaltende'))]
     public array $selectedHosts = [];
 
     #[LiveProp(writable: true)]
@@ -83,7 +84,7 @@ class Mailing extends AbstractController
     public function mount()
     {
         if (!$this->isGranted('ROLE_ADMIN')) {
-            $this->group = 'participants';
+            $this->group = 'veranstaltende';
         }
     }
 
@@ -191,11 +192,11 @@ class Mailing extends AbstractController
     {
         $return = [];
 
-        if ('hosts' === $this->group) {
+        if ('veranstaltende' === $this->group) {
             foreach ($this->queryHostAccounts() as $item) {
                 $return[$item->getEmail()][] = $item;
             }
-        } elseif ('participants' === $this->group) {
+        } elseif ('teilnehmende' === $this->group) {
             foreach ($this->queryParticipants() as $item) {
                 $return[$item->getEmail()][] = $item;
             }

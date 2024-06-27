@@ -22,8 +22,8 @@
                             <button
                                     data-action="live#emit"
                                     data-live-event-param="group"
-                                    data-live-group-param="hosts"
-                                    class="{{ group == 'hosts' ? 'border-indigo-600 dark:border-indigo-400/50 ring-2 ring-indigo-600 dark:border-indigo-400/50' : 'border-gray-300 dark:border-gray-800' }} text-left relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm focus:outline-none">
+                                    data-live-group-param="veranstaltende"
+                                    class="{{ group == 'veranstaltende' ? 'border-indigo-600 dark:border-indigo-400/50 ring-2 ring-indigo-600 dark:border-indigo-400/50' : 'border-gray-300 dark:border-gray-800' }} text-left relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm focus:outline-none">
                                 <span class="flex flex-1">
                                     <span class="flex flex-col">
                                         <span id="group-0-label"
@@ -33,7 +33,7 @@
                                             E-Mails</span>
                                     </span>
                                 </span>
-                                {% if group == 'hosts' %}
+                                {% if group == 'veranstaltende' %}
                                     <svg class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor"
                                          aria-hidden="true">
                                         <path fill-rule="evenodd"
@@ -42,12 +42,12 @@
                                     </svg>
                                 {% endif %}
                                 <span aria-hidden="true"
-                                      class="{{ group == 'hosts' ? 'border-indigo-600' : 'border-transparent' }} pointer-events-none absolute -inset-px rounded-lg border-2"></span>
+                                      class="{{ group == 'veranstaltende' ? 'border-indigo-600' : 'border-transparent' }} pointer-events-none absolute -inset-px rounded-lg border-2"></span>
                             </button>
                             <button data-action="live#emit"
                                     data-live-event-param="group"
-                                    data-live-group-param="participants"
-                                    class="{{ group == 'participants' ? 'border-indigo-600 dark:border-indigo-400/50 ring-2 ring-indigo-600 dark:ring-indigo-400/50' : 'border-gray-300 dark:border-gray-800' }} text-left relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm focus:outline-none">
+                                    data-live-group-param="teilnehmende"
+                                    class="{{ group == 'teilnehmende' ? 'border-indigo-600 dark:border-indigo-400/50 ring-2 ring-indigo-600 dark:ring-indigo-400/50' : 'border-gray-300 dark:border-gray-800' }} text-left relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm focus:outline-none">
                                 <span class="flex flex-1">
                                     <span class="flex flex-col">
                                         <span id="group-1-label"
@@ -57,7 +57,7 @@
                                             E-Mails</span>
                                     </span>
                                 </span>
-                                {% if group == 'participants' %}
+                                {% if group == 'teilnehmende' %}
                                     <svg class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor"
                                          aria-hidden="true">
                                         <path fill-rule="evenodd"
@@ -66,13 +66,13 @@
                                     </svg>
                                 {% endif %}
                                 <span aria-hidden="true"
-                                      class="{{ group == 'participants' ? 'border-indigo-600' : 'border-transparent' }} pointer-events-none absolute -inset-px rounded-lg border-2"></span>
+                                      class="{{ group == 'teilnehmende' ? 'border-indigo-600' : 'border-transparent' }} pointer-events-none absolute -inset-px rounded-lg border-2"></span>
                             </button>
                         </div>
                     </fieldset>
                 {% endif %}
 
-                {% if 'hosts' == group %}
+                {% if 'veranstaltende' == group %}
 
                     <fieldset>
                         <legend class="sr-only">Notifications</legend>
@@ -114,7 +114,7 @@
 
                 {% endif %}
 
-                {% if ('participants' == group and not selectedOffers) or hostsWithOffer %}
+                {% if ('teilnehmende' == group and not selectedOffers) or hostsWithOffer %}
 
                     <fieldset>
                         <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Saisons</legend>
@@ -141,7 +141,7 @@
 
                 {% endif %}
 
-                {% if 'participants' == group and selectedOffers is not empty %}
+                {% if 'teilnehmende' == group and selectedOffers is not empty %}
 
                     <fieldset>
                         <legend class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Angebote</legend>

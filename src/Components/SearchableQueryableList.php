@@ -16,15 +16,20 @@ namespace Ferienpass\AdminBundle\Components;
 use Contao\StringUtil;
 use Doctrine\ORM\QueryBuilder;
 use Ferienpass\AdminBundle\Form\Filter\AbstractFilter;
+use Ferienpass\AdminBundle\LiveComponent\MultiSelect;
+use Ferienpass\AdminBundle\LiveComponent\MultiSelectHandlerInterface;
 use Ferienpass\CoreBundle\Pagination\Paginator;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -54,6 +59,15 @@ class SearchableQueryableList extends AbstractController
     #[LiveProp]
     public QueryBuilder $qb;
 
+    #[LiveProp(useSerializerForHydration: true)]
+    public MultiSelect|null $ms = null;
+
+    #[LiveProp(writable: true)]
+    public array $selected = [];
+
+    #[LiveProp(writable: true)]
+    public bool $selectedAll = false;
+
     #[LiveProp]
     public ?string $routeName = null;
     #[LiveProp]
@@ -65,7 +79,7 @@ class SearchableQueryableList extends AbstractController
     #[LiveProp]
     public ?string $filterType = null;
 
-    public function __construct(private readonly FormFactoryInterface $formFactory, #[TaggedLocator('ferienpass_admin.filter')] private readonly ServiceLocator $filters, private readonly RequestStack $requestStack)
+    public function __construct(private readonly FormFactoryInterface $formFactory, #[TaggedLocator('ferienpass_admin.filter')] private readonly ServiceLocator $filters, private readonly RequestStack $requestStack, public readonly EventDispatcherInterface $dispatcher, private ContainerInterface $locator, #[TaggedLocator('ferienpass_admin.ms_handler')] private ServiceLocator $multiSelectHandlers)
     {
     }
 
@@ -149,6 +163,43 @@ class SearchableQueryableList extends AbstractController
         $this->routeParameters['page'] = $page;
     }
 
+    #[LiveAction]
+    public function selectAll(): void
+    {
+        $allItems = iterator_to_array($this->getPagination()->getResults());
+        if (\count($this->selected) < \count($allItems)) {
+            if (0 === \count($this->selected) && 0 !== \count($this->ms->getPreferred())) {
+                $this->selected = $this->ms->getPreferred();
+                $this->selectedAll = false;
+            } else {
+                $this->selected = array_map(fn ($item) => $item->getId(), $allItems);
+                $this->selectedAll = true;
+            }
+        } else {
+            $this->selected = [];
+            $this->selectedAll = false;
+        }
+    }
+
+    #[LiveAction]
+    public function submitMultiSelect(#[LiveArg('actionName')] string $action, Request $request): Response
+    {
+        /** @var MultiSelectHandlerInterface $controller */
+        $controller = $this->multiSelectHandlers->get($this->ms->getHandler());
+
+        return $controller->handleMultiSelect($action, $this->selected, $request);
+    }
+
+    #[ExposeInTemplate]
+    public function msButtons(): array
+    {
+        if (null === $this->ms) {
+            return [];
+        }
+
+        return $this->ms->getActions();
+    }
+
     #[ExposeInTemplate]
     public function entityClass(): string
     {
@@ -181,7 +232,8 @@ class SearchableQueryableList extends AbstractController
             $or = $this->qb->expr()->orX();
 
             foreach ($this->searchable as $i => $field) {
-                $or->add("i.$field LIKE :query_$i$j");
+                $qfield = str_contains($field, '.') ? $field : "i.$field";
+                $or->add("$qfield LIKE :query_$i$j");
                 $this->qb->setParameter("query_$i$j", "%{$token}%");
             }
 

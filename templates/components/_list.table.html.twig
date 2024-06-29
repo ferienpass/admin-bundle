@@ -4,11 +4,6 @@
 
 {% if items is not empty %}
 
-
-    {% if ms is defined %}
-        {{ form_start(ms, {'attr': {'x-data': '{ selected: [] }'}}) }}
-    {% endif %}
-
     <div class="flow-root">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -16,35 +11,17 @@
                     <thead>
                     <tr>
 
-                        {% if ms is defined and ms.items is defined %}
+                        {% if ms|default(null) is not null %}
 
                             <th scope="col"
                                 class="py-2 pl-2 pr-3 text-left text-sm sm:pl-0 w-0">
 
-                                {% do ms.items.setRendered %}
-                                <script>
-                                    function multiSelectAll(e) {
-                                        {% if msPreferred is defined %}
-                                        if (this.$el.checked && (this.selected.length > 0 || {{ msPreferred|length ? 'false' : 'true' }})) {
-                                            this.selected = [{{ items|map(i => "#{i.id}")|join(', ') }}];
-                                        } else if (this.$el.checked) {
-                                            this.selected = [{{ msPreferred|map(i => "#{i.id}")|join(', ') }}];
-                                            this.$el.checked = false;
-                                        } else {
-                                            this.selected = [];
-                                        }
-                                        {% else %}
-                                        if (this.$el.checked) {
-                                            this.selected = [{{ items|map(i => "#{i.id}")|join(', ') }}];
-                                        } else {
-                                            this.selected = [];
-                                        }
-                                        {% endif %}
-                                    }
-                                </script>
                                 <input type="checkbox"
+                                       autocomplete="off"
                                        id="cbx_ms_sa"
-                                       @change="multiSelectAll"
+                                       data-model="on(change)|selectedAll"
+                                       data-action="live#action"
+                                       data-live-action-param="selectAll"
                                        class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300">
                                 <label for="cbx_ms_sa" class="sr-only">Alle auswählen</label>
 
@@ -76,13 +53,17 @@
 
                         <tr id="tr_{{ item.id }}">
 
-                            {% if ms is defined %}
+                            {% if ms|default(null) is not null %}
 
                                 <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm sm:pl-0">
 
-                                    {% if ms.items[item.id] is defined %}
-                                        {{ form_widget(ms.items[item.id], {'attr': {'x-model': 'selected'}}) }}
-                                    {% endif %}
+                                    <input type="checkbox"
+                                           id="cbx_ms_{{ item.id }}"
+                                           data-model="selected[]"
+                                           autocomplete="off"
+                                           value="{{ item.id }}"
+                                           class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300">
+                                    <label for="cbx_ms_{{ item.id }}" class="sr-only">Auswählen Element {{ item.id }}</label>
 
                                 </td>
 
@@ -191,17 +172,21 @@
     </div>
 
 
-    {% if ms is defined %}
+    {% if ms|default(null) is not null %}
 
         <div class="flex items-center space-x-2">
 
             <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><span x-text="selected.length"></span>
                 ausgewählte:</p>
 
-            {{ form_rest(ms) }}
+            {% for action in msButtons %}
+                <button class="inline-flex items-center gap-x-0.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                       data-action="live#action"
+                       data-live-action-param="submitMultiSelect"
+                       data-live-action-name-param="{{ action }}">{{ "ms.#{action}"|trans }}</button>
+            {% endfor %}
         </div>
 
-        {{ form_end(ms) }}
     {% endif %}
 
 {% else %}

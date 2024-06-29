@@ -19,9 +19,11 @@ use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Dto\BillingAddressDto;
 use Ferienpass\AdminBundle\Export\XlsxExport;
 use Ferienpass\AdminBundle\Form\EditParticipantType;
-use Ferienpass\AdminBundle\Form\MultiSelectType;
 use Ferienpass\AdminBundle\Form\SettleAttendancesType;
+use Ferienpass\AdminBundle\LiveComponent\MultiSelect;
+use Ferienpass\AdminBundle\LiveComponent\MultiSelectHandlerInterface;
 use Ferienpass\CoreBundle\Entity\Attendance;
+use Ferienpass\CoreBundle\Entity\Participant\ParticipantInterface;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Ferienpass\CoreBundle\Entity\PaymentItem;
 use Ferienpass\CoreBundle\Message\PaymentReceiptCreated;
@@ -30,7 +32,6 @@ use Ferienpass\CoreBundle\Repository\AttendanceRepository;
 use Ferienpass\CoreBundle\Repository\ParticipantRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -40,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[IsGranted('ROLE_PARTICIPANTS_ADMIN')]
 #[Route('/teilnehmende')]
-final class ParticipantsController extends AbstractController
+final class ParticipantsController extends AbstractController implements MultiSelectHandlerInterface
 {
     public function __construct(private readonly ManagerRegistry $doctrine, private readonly ReceiptNumberGenerator $numberGenerator)
     {
@@ -121,36 +122,45 @@ final class ParticipantsController extends AbstractController
     }
 
     #[Route('/{id}/anmeldungen', name: 'admin_participants_attendances', requirements: ['id' => '\d+'])]
-    public function attendances(int $id, ParticipantRepositoryInterface $participantRepository, Request $request, Breadcrumb $breadcrumb, EventDispatcherInterface $dispatcher): Response
+    public function attendances(int $id, ParticipantRepositoryInterface $participantRepository, AttendanceRepository $attendanceRepository, Request $request, Breadcrumb $breadcrumb): Response
     {
+        /** @var ParticipantInterface $participant */
         $participant = $participantRepository->find($id);
         if (null === $participant) {
             throw $this->createNotFoundException();
         }
 
-        $items = $participant->getAttendances();
+        $qb = $attendanceRepository->createQueryBuilder('i');
+        $qb
+            ->leftJoin('i.offer', 'o')
+            ->innerJoin('i.participant', 'p')
+            ->where('p = :participant')
+            ->setParameter('participant', $participant)
+        ;
 
-        /** @var Form $ms */
-        $ms = $this->createForm(MultiSelectType::class, options: [
-            'buttons' => ['settle'],
-            'items' => $items->toArray(),
-        ]);
+        /** @var Attendance[] $items */
+        $items = $qb->getQuery()->getResult();
 
-        $ms->handleRequest($request);
-        if ($ms->isSubmitted() && $ms->isValid()) {
-            if ('settle' === $ms->getClickedButton()->getName()) {
-                return $this->redirectToRoute('admin_attendances_settle', status: 307);
-            }
-        }
+        $ms = new MultiSelect(['settle'], $this::class, array_values(array_map(fn (Attendance $a) => $a->getId(), array_filter($items, fn (Attendance $a) => $a->isConfirmed() && !$a->isPaid() && !$a->getOffer()->getEdition()?->isCompleted()))));
 
         return $this->render('@FerienpassAdmin/page/participants/attendances.html.twig', [
+            'qb' => $qb,
             'ms' => $ms,
-            'msPreferred' => $items->filter(fn (Attendance $a) => $a->isConfirmed() && !$a->isPaid() && !$a->getOffer()->getEdition()?->isCompleted())->toArray(),
-            'items' => $items,
+            'searchable' => ['o.name'],
             'participant' => $participant,
-            'dispatcher' => $dispatcher,
             'breadcrumb' => $breadcrumb->generate(['participants.title', ['route' => 'admin_participants_index']], $participant->getName().' (Anmeldungen)'),
         ]);
+    }
+
+    public function handleMultiSelect(string $action, array $selected, Request $request): Response
+    {
+        if ('settle' === $action) {
+            $request->getSession()->set('ms.settle', array_values($selected));
+
+            return $this->redirectToRoute('admin_attendances_settle');
+        }
+
+        throw new \RuntimeException('Code should not be reached');
     }
 
     #[Route('/{id}/löschen', name: 'admin_participants_delete', requirements: ['id' => '\d+'])]
@@ -186,7 +196,7 @@ final class ParticipantsController extends AbstractController
         ]);
     }
 
-    #[Route('/abrechnen', name: 'admin_attendances_settle', methods: ['POST'])]
+    #[Route('/abrechnen', name: 'admin_attendances_settle')]
     public function settle(Request $request, Breadcrumb $breadcrumb, AttendanceRepository $attendanceRepository, MessageBusInterface $messageBus, EventDispatcherInterface $dispatcher): Response
     {
         $user = $this->getUser();
@@ -226,8 +236,9 @@ final class ParticipantsController extends AbstractController
      */
     private function getAttendancesFromRequest(AttendanceRepository $attendances, Request $request): array
     {
-        if ($request->request->has(MultiSelectType::FORM_NAME)) {
-            $ids = $request->get(MultiSelectType::FORM_NAME)['items'] ?? [];
+        $session = $request->getSession();
+        if ($session->has('ms.settle')) {
+            $ids = $session->get('ms.settle');
         }
 
         if ($request->request->has(SettleAttendancesType::FORM_NAME)) {

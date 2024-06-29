@@ -1,10 +1,20 @@
 {% extends "@FerienpassAdmin/layout/list.html.twig" %}
 
-{% set config = {
-    columns: {
-        participant: '{{ item.attendance.participant.name }}',
-        offer: '{{ item.attendance.offer.name }}',
-        date: '
+
+{% block list %}
+
+        {{ component('Admin:SearchableQueryableList', {
+            qb,
+            ms,
+            searchable,
+            routeName: app.request.get('_route'),
+            routeParameters: app.request.query.all,
+            config: {
+                showUrl: '{{ path("admin_participants_show", { id: item.id }) }}',
+                columns: {
+                    participant: '{{ item.attendance.participant.name }}',
+                    offer: '{{ item.attendance.offer.name }}',
+                    date: '
 {% import "@FerienpassCore/Macro/offer.html.twig" as offer_macro %}
 
 {% if item.attendance.offer.dates is not empty %}
@@ -13,8 +23,8 @@
 Dauerangebot
 {% endif %}
 ',
-        amount: '{{ (item.amount/100)|format_currency("EUR", locale="de") }}',
-        paid: '
+                    amount: '{{ (item.amount/100)|format_currency("EUR", locale="de") }}',
+                    paid: '
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 
 {% if item.attendance.paid %}
@@ -23,5 +33,7 @@ Dauerangebot
     {{ partials.badge_red("payments.status.reversed", "sm", "-ml-2") }}
 {% endif %}
 '
-    }
-} %}
+                }
+            }}) }}
+
+{% endblock %}

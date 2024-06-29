@@ -330,6 +330,7 @@ participants:
   help.email: Wird für Benachrichtigungen verwendet.
   help.mobile: Wird für SMS verwendet.
   help.user: Wählen Sie einen Account vom Typ „Eltern“.
+  th.edition: Saison
   th.name: Name
   th.dateOfBirth: Geburtsdatum
   th.email: E-Mail-Adresse

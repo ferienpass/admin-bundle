@@ -1,9 +1,18 @@
 {% extends "@FerienpassAdmin/layout/list.html.twig" %}
 
-{% set config = {
-    columns: {
-        offer: '{{ item.offer.name }}',
-        date: '
+{% block list %}
+    {{ component('Admin:SearchableQueryableList', {
+        qb,
+        ms,
+        searchable,
+        routeName: app.request.get('_route'),
+        routeParameters: app.request.query.all,
+        config: {
+            showUrl: '{{ path("admin_participants_show", { id: item.id }) }}',
+            columns: {
+                edition: '{{ item.offer.edition ? item.offer.edition.name : "" }}',
+                offer: '{{ item.offer.name }}',
+                date: '
 {% import "@FerienpassCore/Macro/offer.html.twig" as offer_macro %}
 {% if item.offer.dates is not empty %}
   {{ offer_macro.date_single(item.offer.dates|first) }}
@@ -11,7 +20,7 @@
   Dauerangebot
 {% endif %}
 ',
-        fee: '
+                fee: '
 {% set fee = item.offer.getFeePayable(item.participant, dispatcher) %}
 {% if fee == item.offer.fee %}
         {{ (fee/100)|format_currency("EUR", locale="de") }}
@@ -20,12 +29,12 @@
         <span>{{ (fee/100)|format_currency("EUR", locale="de") }}</span>
 {% endif %}
 ',
-        status: '
+                status: '
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 
 {{ partials.status_badge(item.status, "sm", "-ml-2") }}
 ',
-        paid: '
+                paid: '
 {% import "@FerienpassAdmin/components/content_elements.html.twig" as partials %}
 
 {% if item.paid %}
@@ -34,8 +43,10 @@
     {{ partials.badge_gray("payments.status.unpaid", "sm", "-ml-2") }}
 {% endif %}
 '
-    }
-} %}
+            }
+        }}) }}
+
+{% endblock %}
 
 {% block headline_actions %}
 
@@ -48,7 +59,7 @@
                 <span class="relative shadow-sm inline-flex px-4 py-2 items-center border border-transparent text-sm leading-5 font-medium rounded-md focus:outline-none focus:shadow-outline-blue border-transparent text-white bg-primary-600 hover:bg-primary-500 focus:border-primary-700 active:bg-primary-700">
                     <span class="flex items-center space-x-1 -mr-2">
                         <span class="h-5 w-5">{{ source('@FerienpassAdmin/icons/plus-solid.svg') }}</span>
-                        <span>Neu anlegen…</span>
+                        <span>Neu anlegen</span>
                         <span class="h-5 w-5">{{ source('@FerienpassAdmin/icons/chevron-down-solid.svg') }}</span>
                     </span>
                 </span>

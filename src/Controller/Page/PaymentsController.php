@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Ferienpass\AdminBundle\Controller\Page;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Export\XlsxExport;
 use Ferienpass\AdminBundle\Form\Filter\PaymentsFilter;
-use Ferienpass\AdminBundle\Form\MultiSelectType;
+use Ferienpass\AdminBundle\LiveComponent\MultiSelect;
+use Ferienpass\AdminBundle\LiveComponent\MultiSelectHandlerInterface;
 use Ferienpass\CoreBundle\Entity\Attendance;
 use Ferienpass\CoreBundle\Entity\Payment;
 use Ferienpass\CoreBundle\Entity\PaymentItem;
@@ -26,11 +26,10 @@ use Ferienpass\CoreBundle\Export\Payments\ReceiptPdfExport;
 use Ferienpass\CoreBundle\Message\ParticipantListChanged;
 use Ferienpass\CoreBundle\Message\PaymentReceiptCreated;
 use Ferienpass\CoreBundle\Payments\ReceiptNumberGenerator;
+use Ferienpass\CoreBundle\Repository\PaymentItemRepository;
 use Ferienpass\CoreBundle\Repository\PaymentRepository;
 use Ferienpass\CoreBundle\Session\Flash;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -39,9 +38,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/zahlungen')]
-final class PaymentsController extends AbstractController
+final class PaymentsController extends AbstractController implements MultiSelectHandlerInterface
 {
-    public function __construct(private readonly ReceiptPdfExport $receiptExport)
+    public function __construct(private readonly ReceiptPdfExport $receiptExport, private readonly PaymentRepository $payments, private readonly Flash $flash, private readonly ReceiptNumberGenerator $numberGenerator, private readonly EntityManagerInterface $entityManager, private readonly MessageBusInterface $messageBus)
     {
     }
 
@@ -78,51 +77,46 @@ final class PaymentsController extends AbstractController
     }
 
     #[Route('/{id}/storno', name: 'admin_payments_reverse')]
-    public function reverse(Payment $payment, Request $request, EntityManagerInterface $em, Breadcrumb $breadcrumb, Flash $flash, ReceiptNumberGenerator $numberGenerator, MessageBusInterface $messageBus): Response
+    public function reverse(Payment $payment, PaymentItemRepository $paymentItemsRepository, Breadcrumb $breadcrumb): Response
     {
-        $items = $payment->getItems();
+        $qb = $paymentItemsRepository->createQueryBuilder('i');
+        $qb
+            ->innerJoin('i.payment', 'p')
+            ->leftJoin('i.attendance', 'a')
+            ->leftJoin('a.offer', 'o')
+            ->where('p = :payment')
+            ->setParameter('payment', $payment)
+        ;
 
-        /** @var Form $ms */
-        $ms = $this->createForm(MultiSelectType::class, options: [
-            'buttons' => ['reverse', 'reverseAndWithdraw'],
-            'items' => $items->toArray(),
-        ]);
-
-        $ms->handleRequest($request);
-        if ($ms->isSubmitted() && $ms->isValid() && \in_array($ms->getClickedButton()->getName(), ['reverse', 'reverseAndWithdraw'], true)) {
-            return $this->reverseFormSubmit($ms, $payment, $numberGenerator, $em, $flash, $messageBus, 'reverseAndWithdraw' === $ms->getClickedButton()->getName());
-        }
+        $ms = new MultiSelect(['reverse', 'reverseAndWithdraw'], $this::class);
 
         return $this->render('@FerienpassAdmin/page/payments/reverse.html.twig', [
+            'qb' => $qb,
             'ms' => $ms,
-            'items' => $items,
+            'searchable' => ['o.name'],
             'breadcrumb' => $breadcrumb->generate(['payments.title', ['route' => 'admin_payments_index']], 'Beleg #'.$payment->getReceiptNumber(), 'Storno'),
         ]);
     }
 
-    #[Route('/{id}.pdf', name: 'admin_payments_receipt_pdf', requirements: ['id' => '\d+'])]
-    public function pdf(Payment $payment): Response
+    public function handleMultiSelect(string $action, array $selected, Request $request): Response
     {
-        $path = $this->receiptExport->generate($payment);
+        if (!\in_array($action, ['reverse', 'reverseAndWithdraw'], true)) {
+            throw new \RuntimeException('Code should not be reached');
+        }
 
-        return $this->file($path, sprintf('beleg-%s.pdf', $payment->getId()));
-    }
-
-    private function reverseFormSubmit(Form $ms, Payment $payment, ReceiptNumberGenerator $numberGenerator, EntityManagerInterface $em, Flash $flash, MessageBusInterface $messageBus, bool $withdraw = false): RedirectResponse
-    {
         $user = $this->getUser();
 
-        /** @var Collection $items */
-        $items = $ms->get('items')->getData();
-        $items = $items->filter(fn (PaymentItem $pi) => $pi->getAttendance()->isPaid());
+        $items = $this->payments->findBy(['id' => $selected])->filter(fn (PaymentItem $pi) => $pi->getAttendance()->isPaid());
+        /** @var Payment $payment */
+        $payment = $items[0];
 
         if ($items->isEmpty()) {
-            $flash->addError(text: 'Es wurde nichts storniert. Entweder wurde keine Auswahl getroffen, oder die Buchungen waren schon storniert.');
+            $this->flash->addError(text: 'Es wurde nichts storniert. Entweder wurde keine Auswahl getroffen, oder die Buchungen waren schon storniert.');
 
             return $this->redirectToRoute('admin_payments_receipt', ['id' => $payment->getId()]);
         }
 
-        $reversalPayment = new Payment($numberGenerator->generate(), $user);
+        $reversalPayment = new Payment($this->numberGenerator->generate(), $user);
         $reversalPayment->setBillingAddress($payment->getBillingAddress());
         $reversalPayment->setBillingEmail($payment->getBillingEmail());
         foreach ($items as $item) {
@@ -131,7 +125,7 @@ final class PaymentsController extends AbstractController
 
         $reversalPayment->getItems()->map(fn (PaymentItem $item) => $item->getAttendance()->setPaid(false));
 
-        if ($withdraw) {
+        if ('reverseAndWithdraw' === $action) {
             foreach ($reversalPayment->getItems() as $item) {
                 if ($item->getAttendance()->isWithdrawn()) {
                     continue;
@@ -139,17 +133,25 @@ final class PaymentsController extends AbstractController
 
                 $item->getAttendance()->setStatus(Attendance::STATUS_WITHDRAWN);
 
-                $messageBus->dispatch(new ParticipantListChanged($item->getAttendance()->getOffer()->getId()));
+                $this->messageBus->dispatch(new ParticipantListChanged($item->getAttendance()->getOffer()->getId()));
             }
         }
 
-        $em->persist($reversalPayment);
-        $em->flush();
+        $this->entityManager->persist($reversalPayment);
+        $this->entityManager->flush();
 
-        $messageBus->dispatch(new PaymentReceiptCreated($reversalPayment->getId()));
+        $this->messageBus->dispatch(new PaymentReceiptCreated($reversalPayment->getId()));
 
-        $flash->addConfirmation(text: 'Der Stornobeleg wurde erstellt.');
+        $this->flash->addConfirmation(text: 'Der Stornobeleg wurde erstellt.');
 
         return $this->redirectToRoute('admin_payments_receipt', ['id' => $reversalPayment->getId()]);
+    }
+
+    #[Route('/{id}.pdf', name: 'admin_payments_receipt_pdf', requirements: ['id' => '\d+'])]
+    public function pdf(Payment $payment): Response
+    {
+        $path = $this->receiptExport->generate($payment);
+
+        return $this->file($path, sprintf('beleg-%s.pdf', $payment->getId()));
     }
 }

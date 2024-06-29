@@ -19,7 +19,7 @@ use Symfony\UX\LiveComponent\Hydration\HydrationExtensionInterface;
 
 class QueryBuilderHydrationExtension implements HydrationExtensionInterface
 {
-    public function __construct(private readonly ManagerRegistry $doctrine, private readonly \Symfony\Component\Serializer\SerializerInterface $serializer)
+    public function __construct(private readonly ManagerRegistry $doctrine)
     {
     }
 
@@ -47,13 +47,18 @@ class QueryBuilderHydrationExtension implements HydrationExtensionInterface
     {
         /** @var QueryBuilder $object */
         $dql = [];
-        $parameters = [];
 
         foreach ($object->getDQLParts() as $part => $elements) {
             if (\is_array($elements)) {
                 foreach ($elements as $idx => $element) {
                     if (\is_object($element)) {
                         $dql[$part][$idx] = $element;
+                    } else {
+                        foreach ($element as $k => $v) {
+                            if (\is_object($v)) {
+                                $dql[$part][$idx][$k] = $v;
+                            }
+                        }
                     }
                 }
             } elseif (\is_object($elements)) {
@@ -62,7 +67,5 @@ class QueryBuilderHydrationExtension implements HydrationExtensionInterface
         }
 
         return serialize([$dql, $object->getParameters()]);
-
-        return array_map(fn ($part) => \is_array($part) && !empty($part) ? array_map('strval', $part) : $part, array_filter($object->getDQLParts()));
     }
 }

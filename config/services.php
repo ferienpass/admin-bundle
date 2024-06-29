@@ -8,7 +8,6 @@ use Ferienpass\AdminBundle\Form\Filter\HostsFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\EditionFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\HostFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\OnlineApplicationFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\PublishedFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresAgreementLetterFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresApplicationFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\StatusFilter;

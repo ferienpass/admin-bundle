@@ -341,6 +341,10 @@ participants:
   th.status: Status
   th.attendances: Anmeldungen
   th.paid: bestätigt
+  sorting.createdAt: Sortieren nach Datum
+  sorting.name: Sortieren nach Name
+  sorting.numberAttendances: Sortieren nach Anmeldungen
+  filter.edition: Saison
   deleteModal.headline: Teilnehmer löschen
   deleteModal.submit: Teilnehmer löschen
   deleteModal.confirm: Sind Sie sicher, dass Sie folgenden Teilnehmer löschen möchten?
@@ -373,6 +377,7 @@ payments:
   th.paid: Zahlung
   filter.status: Bezahlstatus
   filter.user: Benutzer:in
+  filter.edition: Saison
   sorting.createdAt: Sortieren nach Datum
   sorting.amount: Sortieren nach Betrag
   index.empty: Es sind noch keine Zahlungen erfasst worden.

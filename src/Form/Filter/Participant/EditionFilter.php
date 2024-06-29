@@ -11,19 +11,24 @@ declare(strict_types=1);
  * or the documentation under <https://docs.ferienpass.online>.
  */
 
-namespace Ferienpass\AdminBundle\Form\Filter\Payment;
+namespace Ferienpass\AdminBundle\Form\Filter\Participant;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Ferienpass\AdminBundle\Form\Filter\AbstractFilterType;
-use Ferienpass\CoreBundle\Entity\User;
+use Ferienpass\CoreBundle\Entity\Edition;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-class UserFilter extends AbstractFilterType
+class EditionFilter extends AbstractFilterType
 {
+    public function __construct(private readonly Security $security)
+    {
+    }
+
     public function getParent(): string
     {
         return EntityType::class;
@@ -32,17 +37,20 @@ class UserFilter extends AbstractFilterType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'class' => User::class,
+            'class' => Edition::class,
             'query_builder' => function (EntityRepository $er): QueryBuilder {
-                return $er->createQueryBuilder('u')
-                    ->where("JSON_SEARCH(u.roles, 'one', :role) IS NOT NULL")
-                    ->setParameter('role', 'ROLE_ADMIN')
-                    ->innerJoin('u.payments', 'p')
-                    ->orderBy('u.firstname')
-                ;
+                $qb = $er->createQueryBuilder('e');
+
+                if (!$this->security->isGranted('ROLE_ADMIN')) {
+                    $qb->where('e.archived <> 1');
+                }
+
+                return $qb->orderBy('e.name');
             },
+            'choice_value' => fn (?Edition $entity) => $entity?->getAlias(),
             'choice_label' => 'name',
             'placeholder' => '-',
+            'multiple' => false,
         ]);
     }
 
@@ -55,8 +63,12 @@ class UserFilter extends AbstractFilterType
         $k = $form->getName();
         $v = $form->getData();
 
+        $expr = $qb->expr();
+
         $qb
-            ->andWhere('i.user = :q_'.$k)
+            ->leftJoin('i.attendances', 'a')
+            ->leftJoin('a.offer', 'o')
+            ->andWhere('o.edition = :q_'.$k)
             ->setParameter('q_'.$k, $v)
         ;
     }

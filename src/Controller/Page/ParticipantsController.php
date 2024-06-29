@@ -19,6 +19,7 @@ use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Dto\BillingAddressDto;
 use Ferienpass\AdminBundle\Export\XlsxExport;
 use Ferienpass\AdminBundle\Form\EditParticipantType;
+use Ferienpass\AdminBundle\Form\Filter\ParticipantFilter;
 use Ferienpass\AdminBundle\Form\SettleAttendancesType;
 use Ferienpass\AdminBundle\LiveComponent\MultiSelect;
 use Ferienpass\AdminBundle\LiveComponent\MultiSelectHandlerInterface;
@@ -51,7 +52,6 @@ final class ParticipantsController extends AbstractController implements MultiSe
     public function index(ParticipantRepositoryInterface $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExport $xlsxExport): Response
     {
         $qb = $repository->createQueryBuilder('i');
-        $qb->orderBy('i.lastname');
 
         // $filter = $this->filterFactory->create($qb)->applyFilter($request->query->all());
 
@@ -65,6 +65,7 @@ final class ParticipantsController extends AbstractController implements MultiSe
 
         return $this->render('@FerienpassAdmin/page/participants/index.html.twig', [
             'qb' => $qb,
+            'filterType' => ParticipantFilter::class,
             'exports' => ['xlsx'],
             'searchable' => ['firstname', 'lastname', 'email', 'mobile', 'phone'],
             'createUrl' => $this->generateUrl('admin_participants_create'),

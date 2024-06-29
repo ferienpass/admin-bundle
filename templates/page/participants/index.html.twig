@@ -3,6 +3,7 @@
 {% block list %}
     {{ component('Admin:SearchableQueryableList', {
         qb: qb,
+        filterType: filterType,
         routeName: app.request.get('_route'),
         routeParameters: app.request.query.all,
         searchable: searchable,

@@ -59,7 +59,7 @@ class SearchableQueryableList extends AbstractController
     #[LiveProp]
     public QueryBuilder $qb;
 
-    #[LiveProp(useSerializerForHydration: true)]
+    #[LiveProp(hydrateWith: 'hydrateMs', dehydrateWith: 'dehydrateMs')]
     public MultiSelect|null $ms = null;
 
     #[LiveProp(writable: true)]
@@ -204,6 +204,28 @@ class SearchableQueryableList extends AbstractController
     public function entityClass(): string
     {
         return explode(' ', (string) $this->qb->getDQLPart('from')[0], 2)[0];
+    }
+
+    public function dehydrateMs(MultiSelect|null $ms): array|null
+    {
+        if (null === $ms) {
+            return null;
+        }
+
+        return [
+            'actions' => $ms->getActions(),
+            'handler' => $ms->getHandler(),
+            'preferred' => $ms->getPreferred(),
+        ];
+    }
+
+    public function hydrateMs(array|null $data): MultiSelect|null
+    {
+        if (null === $data) {
+            return null;
+        }
+
+        return new MultiSelect($data['actions'], $data['handler'], $data['preferred']);
     }
 
     protected function instantiateForm(): FormInterface

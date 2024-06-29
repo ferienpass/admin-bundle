@@ -6,12 +6,12 @@ use Ferienpass\AdminBundle\Form\Filter\AccountsFilter;
 use Ferienpass\AdminBundle\Form\Filter\ConsentsFilter;
 use Ferienpass\AdminBundle\Form\Filter\HostsFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\EditionFilter;
-use Ferienpass\AdminBundle\Form\Filter\Offer\HostFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\OnlineApplicationFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresAgreementLetterFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresApplicationFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\StatusFilter;
 use Ferienpass\AdminBundle\Form\Filter\OffersFilter;
+use Ferienpass\AdminBundle\Form\Filter\ParticipantFilter;
 use Ferienpass\AdminBundle\Form\Filter\Payment\UserFilter;
 use Ferienpass\AdminBundle\Form\Filter\PaymentsFilter;
 use Ferienpass\AdminBundle\Menu\ActionsBuilder;
@@ -29,7 +29,7 @@ return function(ContainerConfigurator $container): void {
 
     $services
         ->load('Ferienpass\\AdminBundle\\', '../src/')
-        ->exclude('../src/{DependencyInjection,Entity}')
+        ->exclude(['../src/{DependencyInjection,Entity}', '../src/LiveComponent/MultiSelect.php'])
     ;
 
     // Tags by directory
@@ -53,6 +53,10 @@ return function(ContainerConfigurator $container): void {
         ->tag('ferienpass_admin.filter')
     ;
     $services
+        ->get(ParticipantFilter::class)
+        ->tag('ferienpass_admin.filter')
+    ;
+    $services
         ->get(ConsentsFilter::class)
         ->tag('ferienpass_admin.filter')
     ;
@@ -70,7 +74,7 @@ return function(ContainerConfigurator $container): void {
         ->tag('ferienpass_admin.filter.offer', ['key' => 'edition', 'priority' => 90])
     ;
     $services
-        ->get(HostFilter::class)
+        ->get(EditionFilter::class)
         ->tag('ferienpass_admin.filter.offer', ['key' => 'host', 'priority' => 90])
     ;
     $services
@@ -90,6 +94,20 @@ return function(ContainerConfigurator $container): void {
         ->tag('ferienpass_admin.filter.offer', ['key' => 'status', 'priority' => 60])
     ;
 
+    $services
+        ->get(\Ferienpass\AdminBundle\Form\Filter\Account\EditionFilter::class)
+        ->tag('ferienpass_admin.filter.account', ['key' => 'edition'])
+    ;
+
+    $services
+        ->get(\Ferienpass\AdminBundle\Form\Filter\Participant\EditionFilter::class)
+        ->tag('ferienpass_admin.filter.participant', ['key' => 'edition'])
+    ;
+
+    $services
+        ->get(\Ferienpass\AdminBundle\Form\Filter\Payment\EditionFilter::class)
+        ->tag('ferienpass_admin.filter.payment', ['key' => 'edition'])
+    ;
     $services
         ->get(\Ferienpass\AdminBundle\Form\Filter\Payment\StatusFilter::class)
         ->tag('ferienpass_admin.filter.payment', ['key' => 'status'])

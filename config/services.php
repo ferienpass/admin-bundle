@@ -105,6 +105,11 @@ return function(ContainerConfigurator $container): void {
     ;
 
     $services
+        ->get(\Ferienpass\AdminBundle\Form\Filter\Host\EditionFilter::class)
+        ->tag('ferienpass_admin.filter.host', ['key' => 'edition'])
+    ;
+
+    $services
         ->get(\Ferienpass\AdminBundle\Form\Filter\Participant\EditionFilter::class)
         ->tag('ferienpass_admin.filter.participant', ['key' => 'edition'])
     ;

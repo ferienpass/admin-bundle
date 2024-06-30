@@ -38,7 +38,7 @@ class OffersFilter extends AbstractFilter
     {
         $return = [];
         $return[] = [
-            'date' => fn (QueryBuilder $qb) => $qb->leftJoin('i.dates', 'd')->addOrderBy('d.begin', 'ASC'),
+            'date' => fn (QueryBuilder $qb) => $qb->addOrderBy('d.begin', 'ASC'),
             'name' => fn (QueryBuilder $qb) => $qb->addOrderBy('i.name', 'ASC'),
         ];
 

@@ -43,7 +43,9 @@ final class OffersController extends AbstractController
             throw new \RuntimeException('No user');
         }
 
-        $qb = $repository->createQueryBuilder('i');
+        $qb = $repository->createQueryBuilder('i')
+            ->leftJoin('i.dates', 'd')
+        ;
 
         $_suffix = ltrim((string) $_suffix, '.');
         if ('' !== $_suffix) {

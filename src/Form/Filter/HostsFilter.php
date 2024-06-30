@@ -14,10 +14,16 @@ declare(strict_types=1);
 namespace Ferienpass\AdminBundle\Form\Filter;
 
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class HostsFilter extends AbstractFilter
 {
+    public function __construct(#[TaggedIterator('ferienpass_admin.filter.host', indexAttribute: 'key')] iterable $filterTypes)
+    {
+        $this->filterTypes = $filterTypes instanceof \Traversable ? iterator_to_array($filterTypes) : $filterTypes;
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

@@ -4,6 +4,7 @@
     {{ component('Admin:SearchableQueryableList', {
         qb,
         ms,
+        filterType: filterType,
         searchable,
         routeName: app.request.get('_route'),
         routeParameters: app.request.query.all,

@@ -19,6 +19,7 @@ use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Dto\BillingAddressDto;
 use Ferienpass\AdminBundle\Export\XlsxExport;
 use Ferienpass\AdminBundle\Form\EditParticipantType;
+use Ferienpass\AdminBundle\Form\Filter\AttendancesFilter;
 use Ferienpass\AdminBundle\Form\Filter\ParticipantFilter;
 use Ferienpass\AdminBundle\Form\SettleAttendancesType;
 use Ferienpass\AdminBundle\LiveComponent\MultiSelect;
@@ -52,6 +53,13 @@ final class ParticipantsController extends AbstractController implements MultiSe
     public function index(ParticipantRepositoryInterface $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExport $xlsxExport): Response
     {
         $qb = $repository->createQueryBuilder('i');
+
+        $qb
+            ->leftJoin('i.attendances', 'a')
+            ->addSelect('a')
+            ->leftJoin('i.activity', 'l')
+            ->addSelect('l')
+        ;
 
         // $filter = $this->filterFactory->create($qb)->applyFilter($request->query->all());
 
@@ -134,9 +142,10 @@ final class ParticipantsController extends AbstractController implements MultiSe
         $qb = $attendanceRepository->createQueryBuilder('i');
         $qb
             ->leftJoin('i.offer', 'o')
+            ->leftJoin('o.dates', 'd')
             ->innerJoin('i.participant', 'p')
-            ->where('p = :participant')
-            ->setParameter('participant', $participant)
+            ->where('p.id = :participant')
+            ->setParameter('participant', $participant->getId())
         ;
 
         /** @var Attendance[] $items */
@@ -146,6 +155,7 @@ final class ParticipantsController extends AbstractController implements MultiSe
 
         return $this->render('@FerienpassAdmin/page/participants/attendances.html.twig', [
             'qb' => $qb,
+            'filterType' => AttendancesFilter::class,
             'ms' => $ms,
             'searchable' => ['o.name'],
             'participant' => $participant,

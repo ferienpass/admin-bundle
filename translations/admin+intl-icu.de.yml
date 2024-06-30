@@ -35,6 +35,7 @@ accounts:
   sorting.createdAt: Sortieren nach Datum
   sorting.firstname: Sortieren nach Vorname
   sorting.lastname: Sortieren nach Nachname
+  filter.edition: Saison
   label:
     name: Name
     firstname: Vorname
@@ -344,6 +345,7 @@ participants:
   sorting.createdAt: Sortieren nach Datum
   sorting.name: Sortieren nach Name
   sorting.numberAttendances: Sortieren nach Anmeldungen
+  sorting.date: Sortieren nach Datum
   filter.edition: Saison
   deleteModal.headline: Teilnehmer löschen
   deleteModal.submit: Teilnehmer löschen

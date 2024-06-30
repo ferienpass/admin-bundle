@@ -192,6 +192,7 @@ class ActionsBuilder
             'extras' => ['icon' => 'pencil-solid'],
         ]);
 
+        // TODO n+1 issue
         $payments = $this->payments->createQueryBuilder('pay')
             ->innerJoin('pay.items', 'i')
             ->innerJoin('i.attendance', 'a')

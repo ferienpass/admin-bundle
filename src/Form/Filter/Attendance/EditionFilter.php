@@ -11,7 +11,7 @@ declare(strict_types=1);
  * or the documentation under <https://docs.ferienpass.online>.
  */
 
-namespace Ferienpass\AdminBundle\Form\Filter\Participant;
+namespace Ferienpass\AdminBundle\Form\Filter\Attendance;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -64,7 +64,6 @@ class EditionFilter extends AbstractFilterType
         $v = $form->getData();
 
         $qb
-            ->leftJoin('a.offer', 'o')
             ->andWhere('o.edition = :q_'.$k)
             ->setParameter('q_'.$k, $v)
         ;

@@ -15,7 +15,7 @@ namespace Ferienpass\AdminBundle\Controller\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
-use Ferienpass\AdminBundle\Export\XlsxExport;
+use Ferienpass\AdminBundle\Export\ExportQueryBuilderInterface;
 use Ferienpass\AdminBundle\Form\EditHostType;
 use Ferienpass\AdminBundle\Form\Filter\HostsFilter;
 use Ferienpass\AdminBundle\Service\FileUploader;
@@ -24,6 +24,7 @@ use Ferienpass\CoreBundle\Pagination\Paginator;
 use Ferienpass\CoreBundle\Repository\HostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,34 +36,40 @@ use Symfony\Component\Translation\TranslatableMessage;
 #[Route('/veranstaltende')]
 final class HostsController extends AbstractController
 {
-    public function __construct(#[Autowire(service: 'ferienpass.file_uploader.logos')] private readonly FileUploader $fileUploader)
+    public function __construct(#[Autowire(service: 'ferienpass.file_uploader.logos')] private readonly FileUploader $fileUploader, #[TaggedLocator(ExportQueryBuilderInterface::class, defaultIndexMethod: 'getFormat')] private readonly ServiceLocator $exporters)
     {
     }
 
-    #[Route('{_suffix?}', name: 'admin_hosts_index', requirements: ['_suffix' => '\.\w+'])]
-    public function index(?string $_suffix, HostRepository $repository, Request $request, Breadcrumb $breadcrumb, XlsxExport $xlsxExport): Response
+    #[Route('', name: 'admin_hosts_index')]
+    public function index(HostRepository $repository, Request $request, Breadcrumb $breadcrumb): Response
     {
         $qb = $repository->createQueryBuilder('i');
-
-        $_suffix = ltrim((string) $_suffix, '.');
-        if ('' !== $_suffix) {
-            // TODO service-tagged exporter
-            if ('xlsx' === $_suffix) {
-                return $this->file($xlsxExport->generate($qb), 'veranstaltende.xlsx');
-            }
-        }
 
         $paginator = (new Paginator($qb))->paginate($request->query->getInt('page', 1));
 
         return $this->render('@FerienpassAdmin/page/hosts/index.html.twig', [
             'qb' => $qb,
             'filterType' => HostsFilter::class,
-            'exports' => ['xlsx'],
+            'exports' => array_keys($this->exporters->getProvidedServices()),
             'searchable' => ['name'],
             'createUrl' => $this->generateUrl('admin_hosts_create'),
             'pagination' => $paginator,
             'breadcrumb' => $breadcrumb->generate('hosts.title'),
         ]);
+    }
+
+    #[Route('/export.{format}', name: 'admin_hosts_export', requirements: ['format' => '\w+'])]
+    public function export(HostRepository $repository, string $format)
+    {
+        $qb = $repository->createQueryBuilder('i');
+
+        if (!$this->exporters->has($format)) {
+            throw $this->createNotFoundException();
+        }
+
+        $exporter = $this->exporters->get($format);
+
+        return $this->file($exporter->generate($qb), "veranstaltende.$format");
     }
 
     #[Route('/neu', name: 'admin_hosts_create')]

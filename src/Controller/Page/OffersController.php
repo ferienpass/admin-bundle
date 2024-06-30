@@ -15,7 +15,7 @@ namespace Ferienpass\AdminBundle\Controller\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
-use Ferienpass\AdminBundle\Export\XlsxExport;
+use Ferienpass\AdminBundle\Export\ExportQueryBuilderInterface;
 use Ferienpass\AdminBundle\Form\Filter\OffersFilter;
 use Ferienpass\CoreBundle\Entity\Edition;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
@@ -26,6 +26,8 @@ use Ferienpass\CoreBundle\Repository\OfferRepositoryInterface;
 use Knp\Menu\FactoryInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,8 +37,12 @@ use Symfony\Component\Workflow\WorkflowInterface;
 #[Route('/angebote/{edition?null}')]
 final class OffersController extends AbstractController
 {
-    #[Route('{_suffix?}', name: 'admin_offers_index')]
-    public function index(#[MapEntity(mapping: ['edition' => 'alias'])] ?Edition $edition, ?string $_suffix, OfferRepositoryInterface $repository, Breadcrumb $breadcrumb, FactoryInterface $factory, EditionRepository $editions, XlsxExport $xlsxExport, EntityManagerInterface $entityManager): Response
+    public function __construct(#[TaggedLocator(ExportQueryBuilderInterface::class, defaultIndexMethod: 'getFormat')] private readonly ServiceLocator $exporters)
+    {
+    }
+
+    #[Route('', name: 'admin_offers_index')]
+    public function index(#[MapEntity(mapping: ['edition' => 'alias'])] ?Edition $edition, OfferRepositoryInterface $repository, Breadcrumb $breadcrumb, FactoryInterface $factory, EditionRepository $editions): Response
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -46,14 +52,6 @@ final class OffersController extends AbstractController
         $qb = $repository->createQueryBuilder('i')
             ->leftJoin('i.dates', 'd')
         ;
-
-        $_suffix = ltrim((string) $_suffix, '.');
-        if ('' !== $_suffix) {
-            // TODO service-tagged exporter
-            if ('xlsx' === $_suffix) {
-                return $this->file($xlsxExport->generate($qb), 'angebote.xlsx');
-            }
-        }
 
         $menu = $factory->createItem('offers.editions');
 
@@ -73,7 +71,7 @@ final class OffersController extends AbstractController
             'qb' => $qb,
             'filterType' => OffersFilter::class,
             'createUrl' => null === $edition || $this->isGranted('offer.create', $edition) ? $this->generateUrl('admin_offers_new', array_filter(['edition' => $edition?->getAlias()])) : null,
-            'exports' => $this->isGranted('ROLE_ADMIN') ? ['xlsx'] : [],
+            'exports' => $this->isGranted('ROLE_ADMIN') ? array_keys($this->exporters->getProvidedServices()) : [],
             'searchable' => ['name'],
             'items' => $qb->getQuery()->getResult(),
             'edition' => $edition,
@@ -81,6 +79,21 @@ final class OffersController extends AbstractController
             'aside_nav' => $menu,
             'breadcrumb' => $breadcrumb->generate('offers.title', $edition?->getName()),
         ]);
+    }
+
+    #[Route('/export.{format}', name: 'admin_offers_export', requirements: ['format' => '\w+'])]
+    public function export(OfferRepositoryInterface $repository, string $format)
+    {
+        $qb = $repository->createQueryBuilder('i');
+        $qb->orderBy('i.createdAt', 'DESC');
+
+        if (!$this->exporters->has($format)) {
+            throw $this->createNotFoundException();
+        }
+
+        $exporter = $this->exporters->get($format);
+
+        return $this->file($exporter->generate($qb), "angebote.$format");
     }
 
     #[Route('/{id}', name: 'admin_offers_show', requirements: ['id' => '\d+'])]

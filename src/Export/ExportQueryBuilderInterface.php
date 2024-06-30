@@ -14,8 +14,12 @@ declare(strict_types=1);
 namespace Ferienpass\AdminBundle\Export;
 
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-interface QueryBuilderExportInterface
+#[AutoconfigureTag]
+interface ExportQueryBuilderInterface
 {
+    public static function getFormat(): string;
+
     public function generate(QueryBuilder $qb, string $destination = null): string;
 }

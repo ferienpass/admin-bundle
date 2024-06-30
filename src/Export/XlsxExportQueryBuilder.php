@@ -24,10 +24,15 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class XlsxExport implements QueryBuilderExportInterface
+class XlsxExportQueryBuilder implements ExportQueryBuilderInterface
 {
     public function __construct(private readonly NormalizerInterface $normalizer, private readonly TranslatorInterface $translator)
     {
+    }
+
+    public static function getFormat(): string
+    {
+        return 'xlsx';
     }
 
     public function generate(QueryBuilder $qb, string $destination = null): string

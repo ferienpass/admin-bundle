@@ -17,7 +17,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
 use Ferienpass\AdminBundle\Dto\BillingAddressDto;
-use Ferienpass\AdminBundle\Export\XlsxExport;
+use Ferienpass\AdminBundle\Export\ExportQueryBuilderInterface;
+use Ferienpass\AdminBundle\Export\XlsxExportQueryBuilder;
 use Ferienpass\AdminBundle\Form\EditParticipantType;
 use Ferienpass\AdminBundle\Form\Filter\AttendancesFilter;
 use Ferienpass\AdminBundle\Form\Filter\ParticipantFilter;
@@ -33,6 +34,8 @@ use Ferienpass\CoreBundle\Payments\ReceiptNumberGenerator;
 use Ferienpass\CoreBundle\Repository\AttendanceRepository;
 use Ferienpass\CoreBundle\Repository\ParticipantRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,12 +48,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[Route('/teilnehmende')]
 final class ParticipantsController extends AbstractController implements MultiSelectHandlerInterface
 {
-    public function __construct(private readonly ManagerRegistry $doctrine, private readonly ReceiptNumberGenerator $numberGenerator)
+    public function __construct(private readonly ManagerRegistry $doctrine, private readonly ReceiptNumberGenerator $numberGenerator, #[TaggedLocator(ExportQueryBuilderInterface::class, defaultIndexMethod: 'getFormat')] private readonly ServiceLocator $exporters)
     {
     }
 
-    #[Route('{_suffix?}', name: 'admin_participants_index', requirements: ['_suffix' => '\.\w+'])]
-    public function index(ParticipantRepositoryInterface $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExport $xlsxExport): Response
+    #[Route('', name: 'admin_participants_index')]
+    public function index(ParticipantRepositoryInterface $repository, Breadcrumb $breadcrumb, ?string $_suffix, XlsxExportQueryBuilder $xlsxExport): Response
     {
         $qb = $repository->createQueryBuilder('i');
 
@@ -63,22 +66,28 @@ final class ParticipantsController extends AbstractController implements MultiSe
 
         // $filter = $this->filterFactory->create($qb)->applyFilter($request->query->all());
 
-        $_suffix = ltrim((string) $_suffix, '.');
-        if ('' !== $_suffix) {
-            // TODO service-tagged exporter
-            if ('xlsx' === $_suffix) {
-                return $this->file($xlsxExport->generate($qb), 'teilnehmende.xlsx');
-            }
-        }
-
         return $this->render('@FerienpassAdmin/page/participants/index.html.twig', [
             'qb' => $qb,
             'filterType' => ParticipantFilter::class,
-            'exports' => ['xlsx'],
+            'exports' => array_keys($this->exporters->getProvidedServices()),
             'searchable' => ['firstname', 'lastname', 'email', 'mobile', 'phone'],
             'createUrl' => $this->generateUrl('admin_participants_create'),
             'breadcrumb' => $breadcrumb->generate('participants.title'),
         ]);
+    }
+
+    #[Route('/export.{format}', name: 'admin_participants_export', requirements: ['format' => '\w+'])]
+    public function export(ParticipantRepositoryInterface $repository, string $format)
+    {
+        $qb = $repository->createQueryBuilder('i');
+
+        if (!$this->exporters->has($format)) {
+            throw $this->createNotFoundException();
+        }
+
+        $exporter = $this->exporters->get($format);
+
+        return $this->file($exporter->generate($qb), "teilnehmende.$format");
     }
 
     #[Route('/neu', name: 'admin_participants_create')]

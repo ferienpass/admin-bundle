@@ -15,7 +15,6 @@ namespace Ferienpass\AdminBundle\Controller\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\AdminBundle\Breadcrumb\Breadcrumb;
-use Ferienpass\AdminBundle\Export\XlsxExport;
 use Ferienpass\AdminBundle\Form\EditAccountType;
 use Ferienpass\AdminBundle\Form\Filter\AccountsFilter;
 use Ferienpass\CoreBundle\Entity\User;
@@ -41,8 +40,8 @@ final class AccountsController extends AbstractController
         'admins' => 'ROLE_ADMIN',
     ];
 
-    #[Route('{_suffix?}', name: 'admin_accounts_index', requirements: ['role' => '\w+', '_suffix' => '\.\w+'])]
-    public function index(string $role, ?string $_suffix, UserRepository $repository, Breadcrumb $breadcrumb, FactoryInterface $menuFactory, XlsxExport $xlsxExport): Response
+    #[Route('', name: 'admin_accounts_index', requirements: ['role' => '\w+'])]
+    public function index(string $role, UserRepository $repository, Breadcrumb $breadcrumb, FactoryInterface $menuFactory): Response
     {
         if (!\in_array($role, array_keys(self::ROLES), true)) {
             throw $this->createNotFoundException('The role does not exist');
@@ -73,18 +72,9 @@ final class AccountsController extends AbstractController
             ]);
         }
 
-        $_suffix = ltrim((string) $_suffix, '.');
-        if ('' !== $_suffix) {
-            // TODO service-tagged exporter
-            if ('xlsx' === $_suffix) {
-                return $this->file($xlsxExport->generate($qb), $role.'.xlsx');
-            }
-        }
-
         return $this->render('@FerienpassAdmin/page/accounts/index.html.twig', [
             'qb' => $qb,
             'filterType' => AccountsFilter::class,
-            'exports' => ['xlsx'],
             'role' => $actualRole,
             'searchable' => ['firstname', 'lastname', 'email'],
             'createUrl' => $this->generateUrl('admin_accounts_create', ['role' => $role]),

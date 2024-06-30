@@ -115,6 +115,7 @@ final class PaymentsController extends AbstractController implements MultiSelect
 
         $user = $this->getUser();
 
+        /** @var PaymentItem[] $items */
         $items = $this->paymentItems->createQueryBuilder('i')
             ->leftJoin('i.attendance', 'a')
             ->where('i.id IN (:ids)')
@@ -130,8 +131,7 @@ final class PaymentsController extends AbstractController implements MultiSelect
             return $this->redirectToRoute('admin_payments_index');
         }
 
-        /** @var Payment $payment */
-        $payment = $items[0];
+        $payment = $items[0]->getPayment();
 
         $reversalPayment = new Payment($this->numberGenerator->generate(), $user);
         $reversalPayment->setBillingAddress($payment->getBillingAddress());

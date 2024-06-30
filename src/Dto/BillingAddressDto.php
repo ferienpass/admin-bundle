@@ -79,7 +79,7 @@ EOF;
         $payment->setStatus($this->paid ? Payment::STATUS_PAID : Payment::STATUS_UNPAID);
 
         foreach ($this->items as $item) {
-            $payment->addItem(new PaymentItem($item->getAttendance(), $item->getAmount()));
+            $payment->addItem(new PaymentItem($payment, $item->getAttendance(), $item->getAmount()));
         }
 
         return $payment;

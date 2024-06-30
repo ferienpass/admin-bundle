@@ -137,7 +137,7 @@ final class PaymentsController extends AbstractController implements MultiSelect
         $reversalPayment->setBillingAddress($payment->getBillingAddress());
         $reversalPayment->setBillingEmail($payment->getBillingEmail());
         foreach ($items as $item) {
-            $reversalPayment->addItem(new PaymentItem($item->getAttendance(), (-1) * $item->getAmount()));
+            $reversalPayment->addItem(new PaymentItem($reversalPayment, $item->getAttendance(), (-1) * $item->getAmount()));
         }
 
         $reversalPayment->getItems()->map(fn (PaymentItem $item) => $item->getAttendance()->setPaid(false));

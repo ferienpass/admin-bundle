@@ -61,6 +61,7 @@ final class ParticipantsController extends AbstractController implements MultiSe
             ->leftJoin('i.attendances', 'a')
             ->addSelect('a')
             ->leftJoin('i.activity', 'l')
+            ->leftJoin('a.offer', 'o')
             ->addSelect('l')
         ;
 

@@ -7,6 +7,7 @@ use Ferienpass\AdminBundle\Form\Filter\AttendancesFilter;
 use Ferienpass\AdminBundle\Form\Filter\ConsentsFilter;
 use Ferienpass\AdminBundle\Form\Filter\HostsFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\EditionFilter;
+use Ferienpass\AdminBundle\Form\Filter\Offer\HostFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\OnlineApplicationFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresAgreementLetterFilter;
 use Ferienpass\AdminBundle\Form\Filter\Offer\RequiresApplicationFilter;
@@ -79,7 +80,7 @@ return function(ContainerConfigurator $container): void {
         ->tag('ferienpass_admin.filter.offer', ['key' => 'edition', 'priority' => 90])
     ;
     $services
-        ->get(EditionFilter::class)
+        ->get(HostFilter::class)
         ->tag('ferienpass_admin.filter.offer', ['key' => 'host', 'priority' => 90])
     ;
     $services

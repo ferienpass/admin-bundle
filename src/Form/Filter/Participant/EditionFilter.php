@@ -64,7 +64,6 @@ class EditionFilter extends AbstractFilterType
         $v = $form->getData();
 
         $qb
-            ->leftJoin('a.offer', 'o')
             ->andWhere('o.edition = :q_'.$k)
             ->setParameter('q_'.$k, $v)
         ;

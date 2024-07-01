@@ -28,7 +28,7 @@ class OfferWorkflowButton extends AbstractController
 {
     use DefaultActionTrait;
 
-    #[LiveProp(updateFromParent: true)]
+    #[LiveProp]
     public OfferInterface $offer;
 
     public function __construct(private readonly WorkflowInterface $offerStateMachine)

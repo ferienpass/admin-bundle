@@ -34,7 +34,7 @@ class OfferAssign extends AbstractController
 {
     use DefaultActionTrait;
 
-    #[LiveProp]
+    #[LiveProp(updateFromParent: true)]
     public OfferInterface $offer;
 
     #[LiveProp(updateFromParent: true)]

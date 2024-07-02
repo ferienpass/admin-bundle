@@ -3,9 +3,10 @@
 
 {# tw !bg-blue-100 #}
 
-{% macro column(status, participant, attendances, autoAssign = false, max = null) %}
+{% macro column(status, offer, participant, attendances, autoAssign = false, max = null) %}
     <div {{ stimulus_target('ferienpass/admin-offer-assign', status~'Column') }}
-            class="bg-white dark:bg-gray-900 dark:border dark:border-gray-800 overflow-hidden shadow dark:shadow-none rounded-lg">
+            class="bg-white dark:bg-gray-900 dark:border dark:border-gray-800 overflow-hidden shadow dark:shadow-none rounded-lg"
+    >
         <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-5 sm:px-6">
             <div class="flex justify-between">
                 <h3 class="text-lg leading-6 font-medium">
@@ -159,20 +160,20 @@
 
             <div class="space-y-6 @lg:space-y-0 @lg:grid @lg:grid-cols-2 @xl:grid-cols-4 @lg:gap-6">
 
-                {{ _self.column('confirmed', participant, offer.attendances|filter(a => a.confirmed), autoAssign|default, offer.maxParticipants) }}
+                {{ _self.column('confirmed', offer, participant, offer.attendances|filter(a => a.confirmed), autoAssign|default, offer.maxParticipants) }}
 
-                {{ _self.column('waitlisted', participant, offer.attendances|filter(a => a.waitlisted), autoAssign|default) }}
+                {{ _self.column('waitlisted', offer, participant, offer.attendances|filter(a => a.waitlisted), autoAssign|default) }}
 
-                {{ _self.column('waiting', participant, offer.attendances|filter(a => a.waiting), autoAssign|default) }}
+                {{ _self.column('waiting', offer, participant, offer.attendances|filter(a => a.waiting), autoAssign|default) }}
 
                 {% if offer.attendances|filter(a => a.errored)|length %}
                 <div>{% endif %}
 
-                    {{ _self.column('withdrawn', participant, offer.attendances|filter(a => a.withdrawn), autoAssign|default) }}
+                    {{ _self.column('withdrawn', offer, participant, offer.attendances|filter(a => a.withdrawn), autoAssign|default) }}
 
                     {% if offer.attendances|filter(a => a.errored)|length %}
                         <div class="mt-6">
-                            {{ _self.column('error', participant, offer.attendances|filter(a => a.errored), autoAssign|default) }}
+                            {{ _self.column('error', offer, participant, offer.attendances|filter(a => a.errored), autoAssign|default) }}
                         </div>
                     {% endif %}
 

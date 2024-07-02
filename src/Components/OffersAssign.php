@@ -68,6 +68,7 @@ class OffersAssign extends AbstractController
     #[ExposeInTemplate]
     public function offers(): iterable
     {
+        /** @var QueryBuilder $qb */
         $qb = $this->offers->createQueryBuilder('o');
         $qb
             ->addSelect('sum(CASE WHEN a.status = :status_waiting THEN 1 ELSE 0 END) AS HIDDEN countAttendances')
@@ -77,10 +78,12 @@ class OffersAssign extends AbstractController
             ->andWhere('o.requiresApplication = 1')
             ->andWhere('o.onlineApplication = 1')
             ->addOrderBy('countAttendances', 'DESC')
+            ->addOrderBy('CASE WHEN o.state = :state_cancelled THEN 0 ELSE 1 END', 'DESC')
             ->addOrderBy('d.begin')
             ->addGroupBy('o.id')
             ->addGroupBy('d.begin')
             ->setParameter('status_waiting', Attendance::STATUS_WAITING)
+            ->setParameter('state_cancelled', OfferInterface::STATE_CANCELLED)
         ;
 
         $this->addQueryBuilderSearch($qb);
@@ -125,6 +128,7 @@ class OffersAssign extends AbstractController
             $qb
                 ->addOrderBy('a.userPriority', 'ASC')
                 ->addOrderBy('a.status')
+                ->addOrderBy('a.createdAt', 'ASC')
             ;
         }
 

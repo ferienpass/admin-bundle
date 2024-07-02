@@ -14,22 +14,29 @@
                     <div>
 
                         {% if offer is not null %}
-                            <h2 class="text-gray-700 font-semibold text-base leading-4">
-                                <a href="{{ path("admin_offers_show", { id: offer.id }) }}"
-                                   class="hover:underline"
-                                   data-turbo-frame="slideover">
-                                    {{ offer.name }}
-                                </a>
-                            </h2>
+                            <div class="flex items-center space-x-2">
 
-                            <p class="text-gray-500 text-sm">
-                                {% if offer.dates is not empty %}
-                                    {% set startDate = offer.dates|first.begin %}
-                                    <time datetime="{{ startDate|date('c') }}">{{ startDate|format_datetime(pattern="E, dd.MM.yyyy HH:mm") }}</time>
-                                {% else %}
-                                    <span>Dauerangebot</span>
-                                {% endif %}
-                            </p>
+                                {{ component("Admin:OfferWorkflowButton", { offer, key: offer.id }) }}
+
+                                <div>
+                                    <h2 class="text-gray-700 font-semibold text-base leading-4 {{ offer.cancelled ? 'line-through' : '' }}">
+                                        <a href="{{ path("admin_offers_show", { id: offer.id }) }}"
+                                           class="hover:underline"
+                                           data-turbo-frame="slideover">
+                                            {{ offer.name }}
+                                        </a>
+                                    </h2>
+
+                                    <p class="text-gray-500 text-sm">
+                                        {% if offer.dates is not empty %}
+                                            {% set startDate = offer.dates|first.begin %}
+                                            <time datetime="{{ startDate|date('c') }}">{{ startDate|format_datetime(pattern="E, dd.MM.yyyy HH:mm") }}</time>
+                                        {% else %}
+                                            <span>Dauerangebot</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -44,8 +51,7 @@
                     {#                    </div> #}
 
                     <div class="p-6">
-                        <twig:Admin:OfferAssign offer="{{ offer }}" participant="{{ participant }}"
-                                                key="{{ offer.id }}"/>
+                        <twig:Admin:OfferAssign offer="{{ offer }}" participant="{{ participant }}"/>
                     </div>
 
                 </div>
@@ -105,9 +111,8 @@
                                                data-live-event-param="open"
                                                data-live-offer-param="{{ item.id }}">
                                                 <span class="absolute inset-0" aria-hidden="true"></span>
-                                                <p class="truncate text-sm font-medium text-gray-900 flex items-center gap-1">
+                                                <p class="truncate text-sm font-medium text-gray-900 flex items-center gap-1 {{ item.cancelled ? 'line-through' : '' }}">
                                                     {{ item.name }}
-
                                                 </p>
 
                                             </a>
@@ -138,7 +143,7 @@
                                         <span>
                                             {{ item.attendancesWithStatuses(["confirmed", "waiting"])|length ~ ' / ' ~ (item.maxParticipants ?: '∞') ~ '' }}
                                         </span>
-                                        {% if item.attendancesWaiting|length %}
+                                        {% if item.attendancesWaiting|length and not item.cancelled %}
                                             <span title="nicht-zugeteilte Teilnehmende"
                                                   class="mt-0.5 text-orange-600 w-4 h-4">{{ source("@FerienpassAdmin/icons/exclamation-triangle.micro.svg") }}</span>
                                         {% endif %}
@@ -195,7 +200,7 @@
 
                 {% for item in participants %}
 
-                    <button class="group text-left w-full {{ participant is not null and participant.id == item.id ? 'bg-gray-200/60':'hover:bg-gray-100 dark:hover:bg-gray-900' }} rounded px-3 py-2"
+                    <button class="group text-left w-full {{ participant is not null and participant.id == item.id ? 'bg-gray-200/60': (participant is not null ? 'opacity-50 hover:opacity-95' :'hover:bg-gray-100 dark:hover:bg-gray-900') }} rounded px-3 py-2"
                             data-action="live#emit:self"
                             data-live-event-param="selectParticipant"
                             data-live-participant-param="{{ item.id }}"
@@ -280,6 +285,16 @@
                             {% endif %}
 
                             {% if participant is not null and participant.id == item.id %}
+                                {% set activity = attendance.activity|filter(a => 'create' == a.transition.name)|first %}
+                                {% if activity %}
+                                    <div class="mt-2">
+                                        <h5 class="inline text-xs text-gray-700 font-medium">Anmeldung:</h5>
+                                        <span class="text-xs text-gray-500">
+                                            {{ activity.createdAt|ago }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+
                                 <h5 class="mt-2 text-xs text-gray-700 font-medium">Andere Anmeldungen:</h5>
                                 <ul class="text-gray-700">
                                     {% for a in item.attendancesNotWithdrawn|filter((a) => a.offer.id != offer.id)|sort((a, b) => a.status <=> b.status) %}
@@ -289,25 +304,25 @@
                                                class="flex items-center space-x-1 hover:underline"
                                                data-action="live#emit:prevent"
                                                data-live-event-param="open"
-                                               data-live-offer-param="{{ item.id }}">
+                                               data-live-offer-param="{{ a.offer.id }}">
 
-                                            {% if a.status == 'confirmed' %}
-                                                <span class="w-4 h-4">
-                                                    {{ source('@FerienpassAdmin/icons/check.micro.svg') }}
-                                                </span>
-                                            {% elseif a.status == 'waitlist' %}
-                                                <span class="w-4 h-4">
-                                                    {{ source('@FerienpassAdmin/icons/x-mark.micro.svg') }}
-                                                </span>
-                                            {% elseif a.status == 'waiting' %}
-                                                <span class="w-4 h-4">
-                                                    {{ source('@FerienpassAdmin/icons/arrow-path.micro.svg') }}
-                                                </span>
-                                            {% endif %}
+                                                {% if a.status == 'confirmed' %}
+                                                    <span class="w-4 h-4">
+                                                        {{ source('@FerienpassAdmin/icons/check.micro.svg') }}
+                                                    </span>
+                                                {% elseif a.status == 'waitlist' %}
+                                                    <span class="w-4 h-4">
+                                                        {{ source('@FerienpassAdmin/icons/x-mark.micro.svg') }}
+                                                    </span>
+                                                {% elseif a.status == 'waiting' %}
+                                                    <span class="w-4 h-4">
+                                                        {{ source('@FerienpassAdmin/icons/arrow-path.micro.svg') }}
+                                                    </span>
+                                                {% endif %}
 
-                                            <span>
-                                                {{ a.offer.name }}
-                                            </span>
+                                                <span>
+                                                    {{ a.offer.name }}
+                                                </span>
 
                                                 {% if offer.variants|filter(v => v.id == a.offer.id)|length %}
                                                     <span title="Ist Alternativtermin, bite nur einen Termin zusagen und andere abmelden"

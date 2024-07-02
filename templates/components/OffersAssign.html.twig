@@ -259,58 +259,68 @@
                         </div>
 
                         {% if offer is not null %}
+                            {% set attendance = item.attendances|filter((a) => a.offer.id == offer.id)|first %}
+                            {% if attendance.task.maxApplications|default %}
+                                <h5 class="mt-2 text-xs text-gray-700 font-medium">Priorität:</h5>
 
-                            <div class="pointer-events-none">
-                                {% set attendance = item.attendances|filter((a) => a.offer.id == offer.id)|first %}
-                                {% if attendance.task.maxApplications|default %}
-                                    <h5 class="mt-2 text-xs text-gray-700 font-medium">Priorität:</h5>
+                                <div class="flex items-center space-x-1">
+                                    <p class="mt-0.5">
+                                        <span class="sr-only">Priorität {{ attendance.userPriority }}</span>
+                                        <span aria-hidden="true" class="flex items-center -ml-1">
+                                            {% for i in attendance.task.maxApplications..1 %}
+                                                {% if attendance.userPriority > i %}
+                                                    <span class="block h-4 w-4 text-gray-300">{{ source('@FerienpassCore/Icons/star-solid.svg') }}</span>
+                                                {% else %}
+                                                    <span class="block h-4 w-4 text-yellow-500">{{ source('@FerienpassCore/Icons/star-solid.svg') }}</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </p>
+                                </div>
+                            {% endif %}
 
-                                    <div class="flex items-center space-x-1">
-                                        <p class="mt-0.5">
-                                            <span class="sr-only">Priorität {{ attendance.userPriority }}</span>
-                                            <span aria-hidden="true" class="flex items-center -ml-1">
-                                                {% for i in attendance.task.maxApplications..1 %}
-                                                    {% if attendance.userPriority > i %}
-                                                        <span class="block h-4 w-4 text-gray-300">{{ source('@FerienpassCore/Icons/star-solid.svg') }}</span>
-                                                    {% else %}
-                                                        <span class="block h-4 w-4 text-yellow-500">{{ source('@FerienpassCore/Icons/star-solid.svg') }}</span>
-                                                    {% endif %}
-                                                {% endfor %}
+                            {% if participant is not null and participant.id == item.id %}
+                                <h5 class="mt-2 text-xs text-gray-700 font-medium">Andere Anmeldungen:</h5>
+                                <ul class="text-gray-700">
+                                    {% for a in item.attendancesNotWithdrawn|filter((a) => a.offer.id != offer.id)|sort((a, b) => a.status <=> b.status) %}
+                                        <li class="text-xs leading-4 {{ a.status == 'confirmed' ? 'text-green-700' : (a.status == 'waitlist' ? 'text-red-700' : 'text-gray-500') }}">
+
+                                            <a href="#"
+                                               class="flex items-center space-x-1 hover:underline"
+                                               data-action="live#emit:prevent"
+                                               data-live-event-param="open"
+                                               data-live-offer-param="{{ item.id }}">
+
+                                            {% if a.status == 'confirmed' %}
+                                                <span class="w-4 h-4">
+                                                    {{ source('@FerienpassAdmin/icons/check.micro.svg') }}
+                                                </span>
+                                            {% elseif a.status == 'waitlist' %}
+                                                <span class="w-4 h-4">
+                                                    {{ source('@FerienpassAdmin/icons/x-mark.micro.svg') }}
+                                                </span>
+                                            {% elseif a.status == 'waiting' %}
+                                                <span class="w-4 h-4">
+                                                    {{ source('@FerienpassAdmin/icons/arrow-path.micro.svg') }}
+                                                </span>
+                                            {% endif %}
+
+                                            <span>
+                                                {{ a.offer.name }}
                                             </span>
-                                        </p>
-                                    </div>
-                                {% endif %}
 
-                                {% if participant is not null and participant.id == item.id %}
-                                    <h5 class="mt-2 text-xs text-gray-700 font-medium">Andere Anmeldungen:</h5>
-                                    <ul class="text-gray-700">
-                                        {% for a in item.attendancesNotWithdrawn|filter((a) => a.offer.id != offer.id)|sort((a, b) => a.status <=> b.status) %}
-                                            <li class="flex items-center space-x-1 leading-4 text-xs {{ a.status == 'confirmed' ? 'text-green-700' : (a.status == 'waitlist' ? 'text-red-700' : 'text-gray-500') }}">
-
-                                                {% if a.status == 'confirmed' %}
-                                                    <span class="w-4 h-4">
-                                                        {{ source('@FerienpassAdmin/icons/check.micro.svg') }}
-                                                    </span>
-                                                {% elseif a.status == 'waitlist' %}
-                                                    <span class="w-4 h-4">
-                                                        {{ source('@FerienpassAdmin/icons/x-mark.micro.svg') }}
-                                                    </span>
-                                                {% elseif a.status == 'waiting' %}
-                                                    <span class="w-4 h-4">
-                                                        {{ source('@FerienpassAdmin/icons/arrow-path.micro.svg') }}
-                                                    </span>
+                                                {% if offer.variants|filter(v => v.id == a.offer.id)|length %}
+                                                    <span title="Ist Alternativtermin, bite nur einen Termin zusagen und andere abmelden"
+                                                          class="mt-0.5 text-orange-600 w-4 h-4">{{ source("@FerienpassAdmin/icons/exclamation-triangle.micro.svg") }}</span>
                                                 {% endif %}
 
-                                                <span>
-                                                    {{ a.offer.name }}
-                                                </span>
-                                            </li>
-                                        {% else %}
-                                            <li class="leading-4 text-xs ">./.</li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </div>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="leading-4 text-xs ">./.</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         {% endif %}
                     </button>
 

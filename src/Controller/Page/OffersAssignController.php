@@ -33,7 +33,7 @@ class OffersAssignController extends AbstractController
         /** @noinspection FormViewTemplate `createView()` messes ups error handling/redirect */
         return $this->render('@FerienpassAdmin/page/edition/assign.html.twig', [
             'edition' => $edition,
-            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], $edition?->getName() ?? '', 'Zulosen'),
+            'breadcrumb' => $breadcrumb->generate(['tools.title', ['route' => 'admin_tools']], $edition?->getName() ?? '', 'Plätze zuteilen'),
         ]);
     }
 }

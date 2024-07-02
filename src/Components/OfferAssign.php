@@ -16,8 +16,10 @@ namespace Ferienpass\AdminBundle\Components;
 use Doctrine\ORM\EntityManagerInterface;
 use Ferienpass\CoreBundle\Entity\Attendance;
 use Ferienpass\CoreBundle\Entity\Offer\OfferInterface;
+use Ferienpass\CoreBundle\Entity\Participant\ParticipantInterface;
 use Ferienpass\CoreBundle\Message\AttendanceStatusChanged;
 use Ferienpass\CoreBundle\Message\ParticipantListChanged;
+use Ferienpass\CoreBundle\Repository\ParticipantRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -35,12 +37,21 @@ class OfferAssign extends AbstractController
     #[LiveProp]
     public OfferInterface $offer;
 
+    #[LiveProp(updateFromParent: true)]
+    public ?ParticipantInterface $participant = null;
+
     #[LiveProp(writable: true)]
     public bool $autoAssign;
 
-    public function __construct()
+    public function __construct(private readonly ParticipantRepositoryInterface $participants)
     {
         $this->autoAssign = false;
+    }
+
+    #[LiveListener('selectParticipant')]
+    public function selectParticipant(#[LiveArg] int $participant): void
+    {
+        $this->participant = $this->participants->find($participant);
     }
 
     #[LiveAction]

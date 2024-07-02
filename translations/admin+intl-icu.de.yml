@@ -235,6 +235,7 @@ editions:
   action:
     edit: Bearbeiten
     stats: Statistiken
+    assign: Plätze zuordnen
     delete: Löschen
   legend:
     base:
@@ -276,7 +277,7 @@ editions:
     hide_status: Aktuellen Status verbergen
     archived: Saison archivieren
     hosts: Auf Veranstaltende limitieren
-    hostsCanAssign: Veranstaltende dürfen Plätze zulosen
+    hostsCanAssign: Veranstaltende dürfen Plätze zuteilen
     holiday: Ferien
     countOffers: Anzahl Angebote
     hasAgreementLetter: Einverständniserklärung erforderlich
@@ -292,7 +293,7 @@ editions:
     hide_status: Den Eltern den aktuellen Status nicht anzeigen. Dies sollte aktiviert werden für das Losverfahren, damit die Eltern den Status erst nach dem Losen einsehen können.
     archived: Die Saison wird nicht mehr angezeigt in Eingabemasken, bleibt aber erhalten.
     hosts: Wenn gewünscht, wird die Bearbeitung dieser Saison auf die ausgewählten Veranstalter limitiert.
-    hostsCanAssign: Die Veranstaltende dürfen Ihre Plätze selbst zulosen.
+    hostsCanAssign: Die Veranstaltende dürfen Ihre Plätze selbst zuteilen.
     hasAgreementLetter: Es ist eine allgemeine Einverständniserklärung zu unterzeichnen.
   edit_edition_tasks_entry_delete: Phase löschen
   edit_edition_tasks_add: Neue Phase definieren

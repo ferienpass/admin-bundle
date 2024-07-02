@@ -4,9 +4,12 @@
 <div class="grid">
 
     <div>
-        <h2 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-50">Was gibt es heute zu erledigen?</h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300 dark:text-gray-300">Vielleicht helfen Ihnen diese Links für den Einstieg.</p>
-        <ul role="list" class="mt-6 divide-y divide-gray-200 dark:divide-gray-800 border-b border-t border-gray-200 dark:border-gray-800">
+        <h2 class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-50">Was gibt es heute zu
+            erledigen?</h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300 dark:text-gray-300">Vielleicht helfen Ihnen diese Links
+            für den Einstieg.</p>
+        <ul role="list"
+            class="mt-6 divide-y divide-gray-200 dark:divide-gray-800 border-b border-t border-gray-200 dark:border-gray-800">
 
             {% if not is_granted('ROLE_ADMIN') %}
                 {% for offer in offers.findUpcoming|filter((offer) => offer.state == 'draft' and is_granted('view', offer)) %}
@@ -135,7 +138,8 @@
                                     Neue Veranstaltung in <span class="italic">{{ edition.name }}</span>
                                 </a>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-300">Erstellen Sie jetzt eine neue Veranstaltung für <span
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Erstellen Sie jetzt eine neue
+                                Veranstaltung für <span
                                         class="italic">{{ edition.name }}</span>!</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
@@ -150,6 +154,38 @@
                 </li>
             {% endfor %}
 
+            {% if is_granted('ROLE_ADMIN') %}
+                {% for edition in editions.findAll|filter(e => false == e.isCompleted and e.offers|filter(o => o.attendancesWaiting|length > 0)|length > 0) %}
+                    <li>
+                        <div class="group relative flex items-start space-x-3 py-4">
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-pink-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 text-white">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-50">
+                                    <a href="{{ path('admin_editions_assign', { alias: edition.alias }) }}">
+                                        <span class="absolute inset-0" aria-hidden="true"></span>
+                                        Plätze zuteilen
+                                    </a>
+                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Es gibt Teilnehmende, denen noch Plätze zugeteilt werden müssen.</p>
+                            </div>
+                            <div class="flex-shrink-0 self-center">
+                                <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
+                                     fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
             {% if is_granted('ROLE_ADMIN') and editions.findPrevious is not empty and editions.findUpcoming is empty %}
                 <li>
                     <div class="group relative flex items-start space-x-3 py-4">
@@ -169,7 +205,8 @@
                                     Neue Ferienpass-Saison erstellen
                                 </a>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-300">Es schaut so aus, als wäre es Zeit für einen neuen
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Es schaut so aus, als wäre es Zeit für
+                                einen neuen
                                 Ferienpass.</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
@@ -232,7 +269,8 @@
                                     Daten löschen
                                 </a>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-300">Es ist Zeit, die personenbezogenen Daten der Teilnehmenden zu löschen.</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-300">Es ist Zeit, die personenbezogenen Daten
+                                der Teilnehmenden zu löschen.</p>
                         </div>
                         <div class="flex-shrink-0 self-center">
                             <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20"
@@ -248,7 +286,7 @@
 
         </ul>
     </div>
-{#
+    {#
     <div>
         <h2 class="text-base font-semibold leading-6 text-gray-900">Sind Sie auf Kurs?</h2>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Hier können Sie sehen, was zuletzt alles passiert ist.</p>
@@ -312,5 +350,5 @@
             </li>
         </ul>
 
-    </div>#}
+    </div> #}
 </div>

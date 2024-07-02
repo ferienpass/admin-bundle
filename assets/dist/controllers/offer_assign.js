@@ -12,8 +12,6 @@ import { Controller } from '@hotwired/stimulus';
 import Sortable from "sortablejs";
 // @ts-ignore
 import { getComponent } from '@symfony/ux-live-component';
-// Multi-drag currently disabled because it complicates handling one or many entities in the event listener
-// Sortable.mount(new MultiDrag());
 export default class default_1 extends Controller {
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26,11 +24,13 @@ export default class default_1 extends Controller {
                 if (!(list instanceof HTMLElement)) {
                     return;
                 }
+                const component = this.component;
                 Sortable.create(list, {
                     group: 'assign',
                     ghostClass: 'bg-yellow-50',
-                    // selectedClass: '!bg-blue-100',
-                    // multiDrag: true,
+                    onChoose: function (event) {
+                        component.emit('selectParticipant', { participant: event.item.dataset.participantId });
+                    },
                     onAdd: (event) => this.component.emit('statusChanged', {
                         attendance: event.item.dataset.attendanceId,
                         newStatus: event.to.dataset.attendanceStatus,

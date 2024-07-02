@@ -272,7 +272,7 @@ class ActionsBuilder
             'route' => 'admin_editions_assign',
             'routeParameters' => ['alias' => $item->getAlias()],
             'display' => $this->isGranted('assign', $item),
-            'extras' => ['icon' => 'chart-pie.mini'],
+            'extras' => ['icon' => 'arrow-path-rounded-square.mini'],
         ]);
 
         $root->addChild('delete', [

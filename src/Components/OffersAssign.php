@@ -36,8 +36,10 @@ use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\LiveComponent\Metadata\UrlMapping;
 use Symfony\UX\LiveComponent\ValidatableComponentTrait;
 use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
+use Symfony\UX\TwigComponent\Attribute\PostMount;
 use Twig\Environment;
 
 #[AsLiveComponent(route: 'live_component_admin')]
@@ -50,7 +52,7 @@ class OffersAssign extends AbstractController
     #[LiveProp]
     public ?Edition $edition;
 
-    #[LiveProp(onUpdated: 'onOfferUpdated')]
+    #[LiveProp(onUpdated: 'onOfferUpdated', url: new UrlMapping(as: 'angebot'))]
     public ?OfferInterface $offer = null;
 
     #[LiveProp]
@@ -104,22 +106,7 @@ class OffersAssign extends AbstractController
         $qb = $this->participants->createQueryBuilder('p');
         $qb
             ->innerJoin('p.attendances', 'a')
-            ->addSelect('sum(CASE WHEN a.status = :status_waiting THEN 1 ELSE 0 END) AS HIDDEN countWaiting')
-            ->addSelect('sum(CASE WHEN a.status = :status_confirmed THEN 1 ELSE 0 END) AS HIDDEN countConfirmed')
             ->addGroupBy('p')
-            ->setParameter('status_waiting', Attendance::STATUS_WAITING)
-            ->setParameter('status_confirmed', Attendance::STATUS_CONFIRMED)
-        ;
-
-        if (null !== $this->offer) {
-            $qb
-                ->addOrderBy('a.userPriority', 'DESC')
-            ;
-        }
-
-        $qb
-            ->addOrderBy('countWaiting', 'DESC')
-            ->addOrderBy('countConfirmed', 'DESC')
         ;
 
         if (null !== $this->offer) {
@@ -131,6 +118,24 @@ class OffersAssign extends AbstractController
         } else {
             $qb
                 ->innerJoin('a.offer', 'o')
+            ;
+        }
+
+        if (null !== $this->offer) {
+            $qb
+                ->addOrderBy('a.userPriority', 'ASC')
+                ->addOrderBy('a.status')
+            ;
+        }
+
+        if (null === $this->offer) {
+            $qb
+                ->addSelect('sum(CASE WHEN a.status = :status_waiting THEN 1 ELSE 0 END) AS HIDDEN countWaiting')
+                ->addSelect('sum(CASE WHEN a.status = :status_confirmed THEN 1 ELSE 0 END) AS HIDDEN countConfirmed')
+                ->addOrderBy('countWaiting', 'DESC')
+                ->addOrderBy('countConfirmed', 'DESC')
+                ->setParameter('status_waiting', Attendance::STATUS_WAITING)
+                ->setParameter('status_confirmed', Attendance::STATUS_CONFIRMED)
             ;
         }
 
@@ -180,21 +185,32 @@ class OffersAssign extends AbstractController
     }
 
     #[LiveListener('open')]
-    public function openOffer(#[LiveArg] int $offer): void
+    public function openOffer(#[LiveArg('offer')] int $offerId): void
     {
-        $this->offer = $this->offers->find($offer);
-
-        $this->participant = null;
+        $this->offer = $this->offers->find($offerId);
     }
 
     #[LiveListener('selectParticipant')]
-    public function selectParticipant(#[LiveArg] int $participant): void
+    public function selectParticipant(#[LiveArg('participant')] int $participantId): void
     {
-        $this->participant = $this->participants->find($participant);
+        if (null === $this->participant || $participantId !== $this->participant->getId()) {
+            $this->participant = $this->participants->find($participantId);
+        } else {
+            $this->participant = null;
+        }
     }
 
     public function onOfferUpdated($previous): void
     {
+    }
+
+    #[PostMount]
+    public function postMount(): void
+    {
+        // Fix invalid entity when ?angebot=
+        if (null === $this->offer?->getId()) {
+            $this->offer = null;
+        }
     }
 
     private function addQueryBuilderSearch(QueryBuilder $qb): void

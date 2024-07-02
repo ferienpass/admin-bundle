@@ -214,10 +214,6 @@
                                     {{ partials.status_badge(item.attendances|filter(a => a.offer.id == offer.id)|first.status, "xs", "ml-1") }}
                                 {% endif %}
                             </h4>
-                            {% if offer is not null and item.user %}
-                                <p class="text-xs text-gray-700 dark:text-gray-400"><span
-                                            class="font-medium">Account:</span> {{ item.user.name }}</p>
-                            {% endif %}
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ item.dateOfBirth|date('d.m.Y') }} {{ "(#{item.age} Jahre)" }}</p>
                         </div>
 
@@ -287,11 +283,12 @@
                             {% if participant is not null and participant.id == item.id %}
                                 {% set activity = attendance.activity|filter(a => 'create' == a.transition.name)|first %}
                                 {% if activity %}
-                                    <div class="mt-2">
+                                    <div class="mt-2 leading-4">
                                         <h5 class="inline text-xs text-gray-700 font-medium">Anmeldung:</h5>
                                         <span class="text-xs text-gray-500">
                                             {{ activity.createdAt|ago }}
                                         </span>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ activity.user.name }}</p>
                                     </div>
                                 {% endif %}
 

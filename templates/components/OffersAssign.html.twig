@@ -136,7 +136,7 @@
                                             </svg>
                                         </span>
                                         <span>
-                                            {{ item.attendancesWithStatuses(["confirmed", "waitlisted", "waiting"])|length ~ ' / ' ~ (item.maxParticipants ?: '∞') ~ '' }}
+                                            {{ item.attendancesWithStatuses(["confirmed", "waiting"])|length ~ ' / ' ~ (item.maxParticipants ?: '∞') ~ '' }}
                                         </span>
                                         {% if item.attendancesWaiting|length %}
                                             <span title="nicht-zugeteilte Teilnehmende"

@@ -95,7 +95,7 @@
                                             </span>
 
                                             <span>
-                                                {{ offer.attendancesWithStatuses(["confirmed", "waitlisted", "waiting"])|length|length ~ ' / ' ~ (offer.maxParticipants ?: '∞') ~ '' }}
+                                                {{ offer.attendancesWithStatuses(["confirmed", "waiting"])|length|length ~ ' / ' ~ (offer.maxParticipants ?: '∞') ~ '' }}
                                             </span>
 
                                             {% if offer.attendancesWaiting|length %}
